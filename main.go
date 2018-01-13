@@ -1,12 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"net/http"
 	"path"
 	"runtime"
+
+	"github.com/kr/pretty"
 
 	"github.com/go-chi/chi"
 )
@@ -29,12 +31,22 @@ func homeRoute(w http.ResponseWriter, r *http.Request) {
 	}
 	defer response.Body.Close()
 
+	//
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		// Handle err
 	}
 
-	fmt.Printf("%s\n", string(contents))
+	// JSON decode
+	json2 := JSON{}
+	if err := json.Unmarshal(contents, &json2); err != nil {
+		panic(err)
+	}
+	pretty.Print(json2)
+
+	//
+
+	// fmt.Printf("%s\n", string(contents))
 
 	returnTemplate(w, "home", nil)
 }

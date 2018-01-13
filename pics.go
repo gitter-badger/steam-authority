@@ -2,58 +2,98 @@ package main
 
 // JSON ...
 type JSON struct {
-	success         int8
-	apps            map[int]JsApp
-	packages        map[int]JsPackage
-	UnknownApps     []int `json:"unknown_apps"`
-	UnknownPackages []int `json:"unknown_packages"`
+	Success         int8              `json:"success"`
+	Apps            map[int]JsApp     `json:"apps"`
+	Packages        map[int]JsPackage `json:"packages"`
+	UnknownApps     []int             `json:"unknown_apps"`
+	UnknownPackages []int             `json:"unknown_packages"`
 }
 
 // JsApp ...
 type JsApp struct {
-	appID        int
-	changeNumber int
+	AppID              string                     `json:"appid"`
+	Common             JsAppCommon                `json:"common"`
+	Extended           JsAppExtended              `json:"extended"`
+	Config             JsAppConfig                `json:"config"`
+	Depots             JsAppDepots                `json:"depots"`
+	UFS                JsAppUFS                   `json:"ufs"`
+	SystemRequirements JsAppUFSSystemRequirements `json:"sysreqs"`
+	ChangeNumber       int                        `json:"change_number"`
 }
 
 // JsAppCommon ...
 type JsAppCommon struct {
-	icon          string
-	logo          string
-	LogoSmall     string `json:"logo_small"`
-	metacriticURL string
-	name          string
-	ClientIcon    string `json:"clienticon"`
-	ClientTga     string `json:"clienttga"`
-	languages     map[string]int8
-	// todo
+	Icon                  string            `json:"icon"`
+	Logo                  string            `json:"logo"`
+	LogoSmall             string            `json:"logo_small"`
+	MetacriticURL         string            `json:"metacritic_url"`
+	Name                  string            `json:"name"`
+	ClientIcon            string            `json:"clienticon"`
+	ClientTga             string            `json:"clienttga"`
+	Languages             map[string]string `json:"languages"`
+	ClientICNS            string            `json:"clienticns"`
+	LinuxClientIcon       string            `json:"linuxclienticon"`
+	OSList                string            `json:"oslist"`
+	Type                  string            `json:"type"`
+	MetacriticName        string            `json:"metacritic_name"`
+	ControllerSupport     string            `json:"controller_support"`
+	SmallCapsule          map[string]string `json:"small_capsule"`
+	HeaderImage           map[string]string `json:"header_image"`
+	MetacriticScore       string            `json:"metacritic_score"`
+	MetacriticFullurl     string            `json:"metacritic_fullurl"`
+	CommunityVisibleStats string            `json:"community_visible_stats"`
+	WorkshopVisible       string            `json:"workshop_visible"`
+	CommunityHubVisible   string            `json:"community_hub_visible"`
+	GameID                string            `json:"gameid"`
+	Exfgls                string            `json:"exfgls"`
+	StoreTags             map[string]string `json:"store_tags"`
 }
 
 // JsAppExtended ...
 type JsAppExtended struct {
-	developer           string
+	Developer           string `json:"developer"`
 	DeveloperURL        string `json:"developer_url"`
 	GameDir             string `json:"gamedir"`
 	GameManualURL       string `json:"gamemanualurl"`
-	homepage            string
-	icon                string
-	icon2               string
-	IsFreeApp           int8 `json:"isfreeapp"`
-	languages           string
-	LoadAllBeforeLaunch int8   `json:"loadallbeforelaunch"`
+	Homepage            string `json:"homepage"`
+	Icon                string `json:"icon"`
+	Icon2               string `json:"icon2"`
+	IsFreeApp           string `json:"isfreeapp"`
+	Languages           string `json:"languages"`
+	LoadAllBeforeLaunch string `json:"loadallbeforelaunch"`
 	MinClientVersion    string `json:"minclientversion"`
-	NoServers           int8   `json:"noservers"`
-	PrimaryCache        int    `json:"primarycache"`
-	PrimaryCacheLinux   int    `json:"primarycache_linux"`
-	RequireSSSE         int8   `json:"requiressse"`
+	NoServers           string `json:"noservers"`
+	PrimaryCache        string `json:"primarycache"`
+	PrimaryCacheLinux   string `json:"primarycache_linux"`
+	RequireSSSE         string `json:"requiressse"`
 	ServerBrowserName   string `json:"serverbrowsername"`
-	sourceGame          int8
-	state               string
-	VacMacModuleCache   int    `json:"vacmacmodulecache"`
-	VacModuleCache      int    `json:"vacmodulecache"`
+	SourceGame          string `json:"sourcegame"`
+	State               string `json:"state"`
+	VacMacModuleCache   string `json:"vacmacmodulecache"`
+	VacModuleCache      string `json:"vacmodulecache"`
 	VacModuleFilename   string `json:"vacmodulefilename"`
 	ValidosList         string `json:"validoslist"`
-	publisher           string
+	Publisher           string `json:"publisher"`
 	ListofDLC           string `json:"listofdlc"`
+}
+
+// JsAppConfig ...
+type JsAppConfig struct {
+}
+
+// JsAppDepots ...
+type JsAppDepots struct {
+}
+
+// JsAppUFS ...
+type JsAppUFS struct {
+	Quota       string `json:"quota"`
+	MaxNumFiles string `json:"maxnumfiles"`
+	HideCloudUI string `json:"hidecloudui"`
+}
+
+// JsAppUFSSystemRequirements ...
+type JsAppUFSSystemRequirements struct {
 }
 
 // JsPackage ...
@@ -65,7 +105,7 @@ type JsPackage struct {
 	Extended    JsPackageExtended `json:"extended"`
 	AppIDs      []int             `json:"appids"`
 	DepotIDs    []int             `json:"depotids"`
-	//AppItems    []int             `json:"appitems"` // todo
+	//AppItems    []int             `json:"appitems"` // todo, no data to test with
 }
 
 // JsPackageExtended ...
