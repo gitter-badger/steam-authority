@@ -1,0 +1,23 @@
+{{define "change"}} {{ template "header" }}
+
+<h1>Change {{ .Change.ChangeID }}</h1>
+
+<h2>Apps</h2>
+
+{{ range $key, $value := .Change.Apps }}
+
+<div>
+  {{ $value }}
+</div>
+
+{{ end }}
+
+<h2>Packages</h2>
+
+{{ range $key, $value := .Change.Packages }}
+
+<div>
+  {{ $value }}
+</div>
+
+{{ end }} {{ template "footer" }} {{end}}

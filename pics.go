@@ -2,16 +2,21 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
+	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
+	"github.com/kr/pretty"
 )
 
 func checkForChanges() {
 
-	changeID := 3928500
+	// Get from DB
+	changeID := 3928893
 
 	// Grab the JSON from node
 	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(changeID))
@@ -32,25 +37,74 @@ func checkForChanges() {
 		logger.Error(err)
 	}
 
-	var apps []string
-	var packages []string
+	// Make a list of changes to add
+	dsChanges := make(map[int]*dsChange, 0)
+	dsKeys := make([]*datastore.Key, 0)
 
-	for k := range jsChange.Apps {
-		apps = append(apps, k)
+	for k, v := range jsChange.Apps {
+
+		_, ok := dsChanges[v]
+		if !ok {
+			dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(v), nil))
+			dsChanges[v] = &dsChange{ChangeID: v}
+
+			fmt.Println("Key: " + strconv.Itoa(v))
+			fmt.Println("ChangeID: " + strconv.Itoa(v))
+		}
+
+		dsChanges[v].Apps = append(dsChanges[v].Apps, k)
 	}
 
-	for k := range jsChange.Packages {
-		packages = append(packages, k)
+	for k, v := range jsChange.Packages {
+
+		_, ok := dsChanges[v]
+		if !ok {
+			dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(v), nil))
+			dsChanges[v] = &dsChange{ChangeID: v}
+		}
+
+		dsChanges[v].Packages = append(dsChanges[v].Packages, k)
 	}
 
-	// Save change to DB
-	dsChange := dsChange{}
-	dsChange.ChangeID = changeID
-	dsChange.LatestChangeID = jsChange.LatestChangeNumber
-	dsChange.Apps = apps
-	dsChange.Packages = packages
+	// Convert the map to a slice
+	dsChangesSlice := make([]*dsChange, 0)
 
-	saveChange(dsChange)
+	for _, value := range dsChanges {
+		dsChangesSlice = append(dsChangesSlice, value)
+	}
+
+	// Bulk add changes
+	client, context := getDSClient()
+
+	if _, err := client.PutMulti(context, dsKeys, dsChangesSlice); err != nil {
+		logger.Error(err)
+	}
+}
+
+func getInfo(apps []string, packages []string) {
+
+	// Grab the JSON from node
+	response, err := http.Get("http://localhost:8086/info?apps=" + strings.Join(apps, ",") + "&packages=" + strings.Join(packages, ",") + "&prettyprint=0")
+	if err != nil {
+		logger.Error(err)
+	}
+	defer response.Body.Close()
+
+	// Convert to bytes
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	// Unmarshal JSON
+	info := JsInfo{}
+	if err := json.Unmarshal(contents, &info); err != nil {
+		logger.Error(err)
+	}
+
+	//pretty.Print(info.Apps)
+	pretty.Print("xx")
+
 }
 
 // JsChange ...

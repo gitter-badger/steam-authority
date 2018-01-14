@@ -1,1 +1,1 @@
-# steam-authority
+# Steam Authority

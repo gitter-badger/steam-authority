@@ -33,6 +33,9 @@ func main() {
 	r.Get("/", homeRoute)
 	r.Get("/{url}/list", homeRoute)
 
+	r.Get("/changes", changesHandler)
+	r.Get("/changes/{id}", changeHandler)
+
 	http.ListenAndServe(":8085", r)
 }
 

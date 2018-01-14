@@ -1,0 +1,11 @@
+{{define "changes"}} {{ template "header" }}
+
+<h1>Changes</h1>
+
+{{ range $key, $value := .Changes }}
+
+<div>
+  <a href="/changes/{{ .ChangeID }}">{{ .ChangeID }}</a>
+</div>
+
+{{ end }} {{ template "footer" }} {{end}}

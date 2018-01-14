@@ -44,18 +44,24 @@ func savePackage(data dsPackage) {
 
 func saveKind(key *datastore.Key, data interface{}) (newKey *datastore.Key) {
 
+	client, context := getDSClient()
+	newKey, err := client.Put(context, key, data)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return newKey
+}
+
+func getDSClient() (*datastore.Client, context.Context) {
+
 	ctx := context.Background()
 	client, err := datastore.NewClient(ctx, os.Getenv("STEAM_GOOGLE_PROJECT"))
 	if err != nil {
 		logger.Error(err)
 	}
 
-	newKey, err = client.Put(ctx, key, data)
-	if err != nil {
-		logger.Error(err)
-	}
-
-	return newKey
+	return client, ctx
 }
 
 type dsChange struct {
