@@ -1,7 +1,68 @@
 package main
 
-// JSON ...
-type JSON struct {
+import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+
+	"github.com/Jleagle/go-helpers/logger"
+)
+
+func checkForChanges() {
+
+	changeID := 3928500
+
+	// Grab the JSON from node
+	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(changeID))
+	if err != nil {
+		logger.Error(err)
+	}
+	defer response.Body.Close()
+
+	// Convert to bytes
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	// Unmarshal JSON
+	jsChange := JsChange{}
+	if err := json.Unmarshal(contents, &jsChange); err != nil {
+		logger.Error(err)
+	}
+
+	var apps []string
+	var packages []string
+
+	for k := range jsChange.Apps {
+		apps = append(apps, k)
+	}
+
+	for k := range jsChange.Packages {
+		packages = append(packages, k)
+	}
+
+	// Save change to DB
+	dsChange := dsChange{}
+	dsChange.ChangeID = changeID
+	dsChange.LatestChangeID = jsChange.LatestChangeNumber
+	dsChange.Apps = apps
+	dsChange.Packages = packages
+
+	saveChange(dsChange)
+}
+
+// JsChange ...
+type JsChange struct {
+	Success            int8           `json:"success"`
+	LatestChangeNumber int            `json:"current_changenumber"`
+	Apps               map[string]int `json:"apps"`     // map[app]change
+	Packages           map[string]int `json:"packages"` // map[package]change
+}
+
+// JsInfo ...
+type JsInfo struct {
 	Success         int8              `json:"success"`
 	Apps            map[int]JsApp     `json:"apps"`
 	Packages        map[int]JsPackage `json:"packages"`

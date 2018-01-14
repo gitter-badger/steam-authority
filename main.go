@@ -1,19 +1,32 @@
 package main
 
 import (
-	"encoding/json"
-	"html/template"
-	"io/ioutil"
+	"fmt"
 	"net/http"
-	"path"
-	"runtime"
-
-	"github.com/kr/pretty"
+	"os"
 
 	"github.com/go-chi/chi"
 )
 
 func main() {
+
+	// todo, give it the path in code not env
+	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("STEAM_GOOGLE_APPLICATION_CREDENTIALS"))
+
+	arguments := os.Args[1:]
+
+	if len(arguments) > 0 {
+
+		switch arguments[0] {
+		case "check-for-changes":
+			fmt.Println("Checking for changes")
+			checkForChanges()
+		default:
+			fmt.Println("No such CLI command")
+		}
+
+		os.Exit(0)
+	}
 
 	r := chi.NewRouter()
 
@@ -24,51 +37,5 @@ func main() {
 }
 
 func homeRoute(w http.ResponseWriter, r *http.Request) {
-
-	response, err := http.Get("http://localhost:8086/info?apps=440,441,730&packages=75330&prettyprint=1")
-	if err != nil {
-		// handle err
-	}
-	defer response.Body.Close()
-
-	//
-	contents, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		// Handle err
-	}
-
-	// JSON decode
-	json2 := JSON{}
-	if err := json.Unmarshal(contents, &json2); err != nil {
-		panic(err)
-	}
-	pretty.Print(json2)
-
-	//
-
-	// fmt.Printf("%s\n", string(contents))
-
 	returnTemplate(w, "home", nil)
-}
-
-func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) {
-
-	// Get current app path
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		// Handle err
-	}
-	folder := path.Dir(file)
-
-	// Load templates needed
-	t, err := template.ParseFiles(folder+"/templates/header.html", folder+"/templates/footer.html", folder+"/templates/"+page+".html")
-	if err != nil {
-		// Handle err
-	}
-
-	// Write a respone
-	err = t.ExecuteTemplate(w, page, pageData)
-	if err != nil {
-		// Handle err
-	}
 }
