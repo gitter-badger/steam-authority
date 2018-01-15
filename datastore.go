@@ -13,7 +13,7 @@ func saveChange(data dsChange) {
 
 	key := datastore.NameKey(
 		"Change",
-		strconv.Itoa(data.ChangeID)+"-"+strconv.Itoa(data.LatestChangeID),
+		strconv.Itoa(data.ChangeID),
 		nil,
 	)
 
@@ -68,10 +68,9 @@ func getDSClient() (*datastore.Client, context.Context) {
 }
 
 type dsChange struct {
-	ChangeID       int      `datastore:"change_id"`
-	LatestChangeID int      `datastore:"latest_change_id"`
-	Apps           []string `datastore:"apps"`
-	Packages       []string `datastore:"packages"`
+	ChangeID int      `datastore:"change_id"`
+	Apps     []string `datastore:"apps"`
+	Packages []string `datastore:"packages"`
 }
 
 type dsApp struct {

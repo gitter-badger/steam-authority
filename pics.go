@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -69,8 +70,8 @@ func checkForChanges() {
 
 	// Datastore can only bulk insert 500, so grab the oldest 500
 	sort.Ints(ChangeIDs)
-	len := int(math.Min(float64(len(ChangeIDs)), 500))
-	ChangeIDs = ChangeIDs[:len]
+	count := int(math.Min(float64(len(ChangeIDs)), 500))
+	ChangeIDs = ChangeIDs[:count]
 
 	dsKeys := make([]*datastore.Key, 0)
 	dsChangesSlice := make([]*dsChange, 0)
@@ -81,6 +82,8 @@ func checkForChanges() {
 	}
 
 	// Bulk add changes
+	fmt.Println("Saving " + strconv.Itoa(count) + " changes")
+
 	client, context := getDSClient()
 
 	if _, err := client.PutMulti(context, dsKeys, dsChangesSlice); err != nil {
