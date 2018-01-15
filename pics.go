@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -47,9 +46,6 @@ func checkForChanges() {
 		if !ok {
 			dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(v), nil))
 			dsChanges[v] = &dsChange{ChangeID: v}
-
-			fmt.Println("Key: " + strconv.Itoa(v))
-			fmt.Println("ChangeID: " + strconv.Itoa(v))
 		}
 
 		dsChanges[v].Apps = append(dsChanges[v].Apps, k)
@@ -69,8 +65,8 @@ func checkForChanges() {
 	// Convert the map to a slice
 	dsChangesSlice := make([]*dsChange, 0)
 
-	for _, value := range dsChanges {
-		dsChangesSlice = append(dsChangesSlice, value)
+	for key, value := range dsKeys {
+		dsChangesSlice = append(dsChangesSlice, dsChanges[value.Name])
 	}
 
 	// Bulk add changes
