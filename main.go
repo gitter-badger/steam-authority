@@ -30,15 +30,15 @@ func main() {
 
 	r := chi.NewRouter()
 
-	r.Get("/", homeRoute)
-	r.Get("/{url}/list", homeRoute)
+	r.Get("/", homeHandler)
+
+	r.Get("/apps", appsHandler)
+	r.Get("/apps/mine", appsHandler)
+
+	r.Get("/packages", packagesHandler)
 
 	r.Get("/changes", changesHandler)
 	r.Get("/changes/{id}", changeHandler)
 
 	http.ListenAndServe(":8085", r)
-}
-
-func homeRoute(w http.ResponseWriter, r *http.Request) {
-	returnTemplate(w, "home", nil)
 }

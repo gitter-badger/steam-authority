@@ -3,22 +3,10 @@ package main
 import (
 	"context"
 	"os"
-	"strconv"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
 )
-
-func saveChange(data dsChange) {
-
-	key := datastore.NameKey(
-		"Change",
-		strconv.Itoa(data.ChangeID),
-		nil,
-	)
-
-	saveKind(key, &data)
-}
 
 func saveApp(data dsApp) {
 
@@ -74,8 +62,17 @@ type dsChange struct {
 }
 
 type dsApp struct {
-	AppID string `datastore:"app_id"`
-	Test  string `datastore:"test"`
+	AppID             string   `datastore:"app_id"`
+	Name              string   `datastore:"name"`
+	Type              string   `datastore:"type"`
+	ReleaseState      string   `datastore:"releasestate"`
+	OSList            []string `datastore:"oslist"`
+	MetacriticScore   string   `datastore:"metacritic_score"`
+	MetacriticFullURL string   `datastore:"metacritic_fullurl"`
+	StoreTags         []string `datastore:"store_tags"`
+	Developer         string   `datastore:"developer"`
+	Publisher         string   `datastore:"publisher"`
+	Homepage          string   `datastore:"homepage"`
 }
 
 type dsPackage struct {

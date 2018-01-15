@@ -13,7 +13,6 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := changesTemplate{}
 
-	// Get changes
 	client, context := getDSClient()
 	q := datastore.NewQuery("Change").Order("-change_id")
 	it := client.Run(context, q)

@@ -15,14 +15,25 @@ import (
 	"github.com/kr/pretty"
 )
 
-func getLatestSavedChange() (change int) {
-	return 3932488
+func getLatestSavedChange() (change dsChange) {
+
+	client, context := getDSClient()
+	q := datastore.NewQuery("Change").Order("-change_id").Limit(1)
+	it := client.Run(context, q)
+
+	_, err := it.Next(&change)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return change
 }
 
 func checkForChanges() {
 
 	// Grab the JSON from node
-	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(getLatestSavedChange()))
+	latestChangeID := strconv.Itoa(getLatestSavedChange().ChangeID)
+	response, err := http.Get("http://localhost:8086/changes/" + latestChangeID)
 	if err != nil {
 		logger.Error(err)
 	}
