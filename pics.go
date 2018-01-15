@@ -159,30 +159,40 @@ type JsApp struct {
 
 // JsAppCommon ...
 type JsAppCommon struct {
-	Icon                  string            `json:"icon"`
-	Logo                  string            `json:"logo"`
-	LogoSmall             string            `json:"logo_small"`
-	MetacriticURL         string            `json:"metacritic_url"`
-	Name                  string            `json:"name"`
-	ClientIcon            string            `json:"clienticon"`
-	ClientTga             string            `json:"clienttga"`
-	Languages             map[string]string `json:"languages"`
-	ClientICNS            string            `json:"clienticns"`
-	LinuxClientIcon       string            `json:"linuxclienticon"`
-	OSList                string            `json:"oslist"`
-	Type                  string            `json:"type"`
-	MetacriticName        string            `json:"metacritic_name"`
-	ControllerSupport     string            `json:"controller_support"`
-	SmallCapsule          map[string]string `json:"small_capsule"`
-	HeaderImage           map[string]string `json:"header_image"`
-	MetacriticScore       string            `json:"metacritic_score"`
-	MetacriticFullurl     string            `json:"metacritic_fullurl"`
-	CommunityVisibleStats string            `json:"community_visible_stats"`
-	WorkshopVisible       string            `json:"workshop_visible"`
-	CommunityHubVisible   string            `json:"community_hub_visible"`
-	GameID                string            `json:"gameid"`
-	Exfgls                string            `json:"exfgls"`
-	StoreTags             map[string]string `json:"store_tags"`
+	ClientICNS            string                     `json:"clienticns"`
+	ClientIcon            string                     `json:"clienticon"`
+	ClientTGA             string                     `json:"clienttga"`
+	CommunityHubVisible   string                     `json:"community_hub_visible"`
+	CommunityVisibleStats string                     `json:"community_visible_stats"`
+	ControllerSupport     string                     `json:"controller_support"`
+	EULAs                 map[string]JsAppCommonEULA `json:"eulas"`
+	Exfgls                string                     `json:"exfgls"`
+	GameID                string                     `json:"gameid"`
+	HeaderImage           map[string]string          `json:"header_image"`
+	Icon                  string                     `json:"icon"`
+	Languages             map[string]string          `json:"languages"`
+	LinuxClientIcon       string                     `json:"linuxclienticon"`
+	Logo                  string                     `json:"logo"`
+	LogoSmall             string                     `json:"logo_small"`
+	MetacriticFullurl     string                     `json:"metacritic_fullurl"`
+	MetacriticName        string                     `json:"metacritic_name"`
+	MetacriticScore       string                     `json:"metacritic_score"`
+	MetacriticURL         string                     `json:"metacritic_url"`
+	Name                  string                     `json:"name"`
+	OSList                string                     `json:"oslist"`
+	OSArch                string                     `json:"osarch"`
+	ReleaseState          string                     `json:"releasestate"`
+	SmallCapsule          map[string]string          `json:"small_capsule"`
+	StoreTags             map[string]string          `json:"store_tags"`
+	Type                  string                     `json:"type"`
+	WorkshopVisible       string                     `json:"workshop_visible"`
+}
+
+// JsAppCommonEULA ...
+type JsAppCommonEULA struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 // JsAppExtended ...

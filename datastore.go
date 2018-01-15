@@ -3,20 +3,41 @@ package main
 import (
 	"context"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
 )
 
-func saveApp(data dsApp) {
+func saveApp(jsApp JsApp) {
+
+	jsTags := jsApp.Common.StoreTags
+	tags := make([]string, 0, len(jsTags))
+	for _, value := range jsTags {
+		tags = append(tags, value)
+	}
+
+	dsApp := dsApp{}
+	dsApp.AppID = jsApp.AppID
+	dsApp.Name = jsApp.Common.Name
+	dsApp.Type = jsApp.Common.Type
+	dsApp.ReleaseState = jsApp.Common.ReleaseState
+	dsApp.OSList = strings.Split(jsApp.Common.OSList, ",")
+	dsApp.MetacriticScore = jsApp.Common.MetacriticScore
+	dsApp.MetacriticFullURL = jsApp.Common.MetacriticURL
+	dsApp.StoreTags = tags
+	dsApp.Developer = jsApp.Extended.Developer
+	dsApp.Publisher = jsApp.Extended.Publisher
+	dsApp.Homepage = jsApp.Extended.Homepage
+	dsApp.ChangeNumber = jsApp.ChangeNumber
 
 	key := datastore.NameKey(
 		"App",
-		data.AppID,
+		dsApp.AppID,
 		nil,
 	)
 
-	saveKind(key, &data)
+	saveKind(key, &dsApp)
 }
 
 func savePackage(data dsPackage) {
@@ -73,6 +94,7 @@ type dsApp struct {
 	Developer         string   `datastore:"developer"`
 	Publisher         string   `datastore:"publisher"`
 	Homepage          string   `datastore:"homepage"`
+	ChangeNumber      int      `datastore:"change_number"`
 }
 
 type dsPackage struct {
