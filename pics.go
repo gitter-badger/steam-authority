@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"math"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -12,13 +14,14 @@ import (
 	"github.com/kr/pretty"
 )
 
+func getLatestSavedChange() (change int) {
+	return 3932488
+}
+
 func checkForChanges() {
 
-	// Get from DB
-	changeID := 3928893
-
 	// Grab the JSON from node
-	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(changeID))
+	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(getLatestSavedChange()))
 	if err != nil {
 		logger.Error(err)
 	}
@@ -38,13 +41,11 @@ func checkForChanges() {
 
 	// Make a list of changes to add
 	dsChanges := make(map[int]*dsChange, 0)
-	dsKeys := make([]*datastore.Key, 0)
 
 	for k, v := range jsChange.Apps {
 
 		_, ok := dsChanges[v]
 		if !ok {
-			dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(v), nil))
 			dsChanges[v] = &dsChange{ChangeID: v}
 		}
 
@@ -55,18 +56,28 @@ func checkForChanges() {
 
 		_, ok := dsChanges[v]
 		if !ok {
-			dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(v), nil))
 			dsChanges[v] = &dsChange{ChangeID: v}
 		}
 
 		dsChanges[v].Packages = append(dsChanges[v].Packages, k)
 	}
 
-	// Convert the map to a slice
+	var ChangeIDs []int
+	for k := range dsChanges {
+		ChangeIDs = append(ChangeIDs, k)
+	}
+
+	// Datastore can only bulk insert 500, so grab the oldest 500
+	sort.Ints(ChangeIDs)
+	len := int(math.Min(float64(len(ChangeIDs)), 500))
+	ChangeIDs = ChangeIDs[:len]
+
+	dsKeys := make([]*datastore.Key, 0)
 	dsChangesSlice := make([]*dsChange, 0)
 
-	for key, value := range dsKeys {
-		dsChangesSlice = append(dsChangesSlice, dsChanges[value.Name])
+	for _, k := range ChangeIDs {
+		dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(k), nil))
+		dsChangesSlice = append(dsChangesSlice, dsChanges[k])
 	}
 
 	// Bulk add changes

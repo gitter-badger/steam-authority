@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"cloud.google.com/go/datastore"
@@ -16,7 +15,7 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get changes
 	client, context := getDSClient()
-	q := datastore.NewQuery("Change").Order("change_id")
+	q := datastore.NewQuery("Change").Order("-change_id")
 	it := client.Run(context, q)
 	for {
 		var change dsChange
@@ -29,9 +28,6 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		template.Changes = append(template.Changes, change)
-
-		fmt.Println(change)
-
 	}
 
 	returnTemplate(w, "changes", template)

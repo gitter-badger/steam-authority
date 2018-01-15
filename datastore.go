@@ -7,7 +7,6 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
-	"google.golang.org/api/option"
 )
 
 func saveChange(data dsChange) {
@@ -60,9 +59,7 @@ func getDSClient() (*datastore.Client, context.Context) {
 	client, err := datastore.NewClient(
 		context,
 		os.Getenv("STEAM_GOOGLE_PROJECT"),
-		option.WithServiceAccountFile("config/cloud.datastore.user.json"),
 	)
-	client.Set
 	if err != nil {
 		logger.Error(err)
 	}
