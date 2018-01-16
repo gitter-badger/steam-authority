@@ -56,6 +56,18 @@
   revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/kr/pretty"
+  packages = ["."]
+  revision = "cfb55aafdaf3ec08f0db22699ab822c50091b1c4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kr/text"
+  packages = ["."]
+  revision = "7cafcd837844e784b526369c9bce262804aebc60"
+
+[[projects]]
   name = "github.com/stvp/rollbar"
   packages = ["."]
   revision = "b20261800d8cda3be14dcef0d1a8320779bba61a"
@@ -106,6 +118,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3b87cc670e5f759cc3fa0d7118c4f5e896483b6ec29a9121dbd7038a3b16d843"
+  inputs-digest = "59beb388a8a559bf18930aa505da3bc13157733a6e8c684f24474c785fc4452b"
   solver-name = "gps-cdcl"
   solver-version = 1

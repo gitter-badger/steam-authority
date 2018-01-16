@@ -39,5 +39,7 @@ func main() {
 	r.Get("/changes", changesHandler)
 	r.Get("/changes/{id}", changeHandler)
 
+	r.Get("/websocket", websocketHandler)
+
 	http.ListenAndServe(":8085", r)
 }

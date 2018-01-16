@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"os"
+	"strconv"
 	"strings"
 
 	"cloud.google.com/go/datastore"
@@ -11,19 +12,25 @@ import (
 
 func createDsAppFromJsApp(js JsApp) *dsApp {
 
+	// Convert map of tags to slice
 	jsTags := js.Common.StoreTags
-	tags := make([]string, 0, len(jsTags))
+	tags := make([]int, 0, len(jsTags))
 	for _, value := range jsTags {
-		tags = append(tags, value)
+		valueInt, _ := strconv.Atoi(value)
+		tags = append(tags, valueInt)
 	}
 
+	// String to int
+	appIDInt, _ := strconv.Atoi(js.AppID)
+	metacriticScoreInt, _ := strconv.Atoi(js.Common.MetacriticScore)
+
 	dsApp := dsApp{}
-	dsApp.AppID = js.AppID
+	dsApp.AppID = appIDInt
 	dsApp.Name = js.Common.Name
 	dsApp.Type = js.Common.Type
 	dsApp.ReleaseState = js.Common.ReleaseState
 	dsApp.OSList = strings.Split(js.Common.OSList, ",")
-	dsApp.MetacriticScore = js.Common.MetacriticScore
+	dsApp.MetacriticScore = int8(metacriticScoreInt)
 	dsApp.MetacriticFullURL = js.Common.MetacriticURL
 	dsApp.StoreTags = tags
 	dsApp.Developer = js.Extended.Developer
@@ -44,11 +51,9 @@ func createDsPackageFromJsPackage(js JsPackage) *dsPackage {
 
 func savePackage(data dsPackage) {
 
-	key := datastore.NameKey(
-		"Package",
-		data.PackageID,
-		nil,
-	)
+	packageIDString := strconv.Itoa(data.PackageID)
+
+	key := datastore.NameKey("Package", packageIDString, nil)
 
 	saveKind(key, &data)
 }
@@ -85,14 +90,14 @@ type dsChange struct {
 }
 
 type dsApp struct {
-	AppID             string   `datastore:"app_id"`
+	AppID             int      `datastore:"app_id"`
 	Name              string   `datastore:"name"`
 	Type              string   `datastore:"type"`
 	ReleaseState      string   `datastore:"releasestate"`
 	OSList            []string `datastore:"oslist"`
-	MetacriticScore   string   `datastore:"metacritic_score"`
+	MetacriticScore   int8     `datastore:"metacritic_score"`
 	MetacriticFullURL string   `datastore:"metacritic_fullurl"`
-	StoreTags         []string `datastore:"store_tags"`
+	StoreTags         []int    `datastore:"store_tags"`
 	Developer         string   `datastore:"developer"`
 	Publisher         string   `datastore:"publisher"`
 	Homepage          string   `datastore:"homepage"`
@@ -100,9 +105,9 @@ type dsApp struct {
 }
 
 type dsPackage struct {
-	PackageID   string `datastore:"package_id"`
-	BillingType int8   `datastore:"billingtype"`
-	LicenseType int8   `datastore:"licensetype"`
-	Status      int8   `datastore:"status"`
-	Apps        []int  `datastore:"apps"`
+	PackageID   int   `datastore:"package_id"`
+	BillingType int8  `datastore:"billingtype"`
+	LicenseType int8  `datastore:"licensetype"`
+	Status      int8  `datastore:"status"`
+	Apps        []int `datastore:"apps"`
 }

@@ -12,9 +12,19 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
+	"github.com/kr/pretty"
+)
+
+const (
+	changesLimit = 500
 )
 
 func checkForChanges() {
+
+	test := dsChange{}
+	test.ChangeID = 123
+	sendWebsocket(test)
+	return
 
 	// Get the latest change to start from
 	client, context := getDSClient()
@@ -74,14 +84,15 @@ func checkForChanges() {
 		return
 	}
 
+	// Make a slice from map
 	var ChangeIDs []int
 	for k := range dsChanges {
 		ChangeIDs = append(ChangeIDs, k)
 	}
 
-	// Datastore can only bulk insert 500, so grab the oldest 500
+	// Datastore can only bulk insert 500, grab the oldest
 	sort.Ints(ChangeIDs)
-	count := int(math.Min(float64(len(ChangeIDs)), 500))
+	count := int(math.Min(float64(len(ChangeIDs)), changesLimit))
 	ChangeIDs = ChangeIDs[:count]
 
 	dsKeys := make([]*datastore.Key, 0)
@@ -90,73 +101,82 @@ func checkForChanges() {
 	for _, v := range ChangeIDs {
 		dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(v), nil))
 		dsChangesSlice = append(dsChangesSlice, dsChanges[v])
+		// sendWebsocket(dsChanges[v])
 	}
 
 	// Bulk add changes
-	fmt.Println("Saving " + strconv.Itoa(count) + " change(s)")
-
+	fmt.Println("Saving " + strconv.Itoa(count) + " changes")
 	if _, err := client.PutMulti(context, dsKeys, dsChangesSlice); err != nil {
 		logger.Error(err)
 	}
 
 	// Get apps/packages IDs
-	apps := []string{}
-	packages := []string{}
+	for _, v := range dsChangesSlice {
 
-	for _, v := range dsChanges {
+		apps := []string{}
+		packages := []string{}
+
 		for _, vv := range v.Apps {
 			apps = append(apps, vv)
 		}
 		for _, vv := range v.Packages {
 			packages = append(packages, vv)
 		}
-	}
 
-	// Grab the JSON from node
-	response, err = http.Get("http://localhost:8086/info?apps=" + strings.Join(apps, ",") + "&packages=" + strings.Join(packages, ",") + "&prettyprint=0")
-	if err != nil {
-		logger.Error(err)
-	}
-	defer response.Body.Close()
+		// Grab the JSON from node
+		response, err = http.Get("http://localhost:8086/info?apps=" + strings.Join(apps, ",") + "&packages=" + strings.Join(packages, ",") + "&prettyprint=0")
+		if err != nil {
+			logger.Error(err)
+			continue
+		}
+		defer response.Body.Close()
 
-	// Convert to bytes
-	contents, err = ioutil.ReadAll(response.Body)
-	if err != nil {
-		logger.Error(err)
-	}
+		// Convert to bytes
+		contents, err = ioutil.ReadAll(response.Body)
+		if err != nil {
+			logger.Error(err)
+		}
 
-	// Unmarshal JSON
-	info := JsInfo{}
-	if err := json.Unmarshal(contents, &info); err != nil {
-		logger.Error(err)
-	}
+		// Unmarshal JSON
+		info := JsInfo{}
+		if err := json.Unmarshal(contents, &info); err != nil {
+			if strings.Contains(err.Error(), "cannot unmarshal") {
+				pretty.Print(string(contents))
+			}
+			logger.Error(err)
+		}
 
-	// Build up rows to bulk add apps
-	dsApps := make([]*dsApp, 0)
-	dsAppKeys := make([]*datastore.Key, 0)
+		// Build up rows to bulk add apps
+		dsApps := make([]*dsApp, 0)
+		dsAppKeys := make([]*datastore.Key, 0)
 
-	for _, v := range info.Apps {
-		dsApps = append(dsApps, createDsAppFromJsApp(v))
-		dsAppKeys = append(dsAppKeys, datastore.NameKey("App", v.AppID, nil))
-	}
+		for _, v := range info.Apps {
+			dsApps = append(dsApps, createDsAppFromJsApp(v))
+			dsAppKeys = append(dsAppKeys, datastore.NameKey("App", v.AppID, nil))
+		}
 
-	fmt.Println("Saving " + strconv.Itoa(len(dsApps)) + " app(s)")
-	if _, err := client.PutMulti(context, dsAppKeys, dsApps); err != nil {
-		logger.Error(err)
-	}
+		if len(dsApps) > 0 {
+			fmt.Println("Saving " + strconv.Itoa(len(dsApps)) + " apps")
+			if _, err := client.PutMulti(context, dsAppKeys, dsApps); err != nil {
+				logger.Error(err)
+			}
+		}
 
-	// Build up rows to bulk add packages
-	dsPackages := make([]*dsPackage, 0)
-	dsPackageKeys := make([]*datastore.Key, 0)
+		// Build up rows to bulk add packages
+		dsPackages := make([]*dsPackage, 0)
+		dsPackageKeys := make([]*datastore.Key, 0)
 
-	for _, v := range info.Packages {
-		dsPackages = append(dsPackages, createDsPackageFromJsPackage(v))
-		dsPackageKeys = append(dsPackageKeys, datastore.NameKey("Package", strconv.Itoa(v.PackageID), nil))
-	}
+		for _, v := range info.Packages {
+			dsPackages = append(dsPackages, createDsPackageFromJsPackage(v))
+			dsPackageKeys = append(dsPackageKeys, datastore.NameKey("Package", strconv.Itoa(v.PackageID), nil))
+		}
 
-	fmt.Println("Saving " + strconv.Itoa(len(dsPackages)) + " package(s)")
-	if _, err := client.PutMulti(context, dsPackageKeys, dsPackages); err != nil {
-		logger.Error(err)
+		if len(dsPackages) > 0 {
+			fmt.Println("Saving " + strconv.Itoa(len(dsPackages)) + " packages")
+			if _, err := client.PutMulti(context, dsPackageKeys, dsPackages); err != nil {
+				logger.Error(err)
+			}
+		}
 	}
 }
 
@@ -277,19 +297,19 @@ type JsAppSystemRequirements struct {
 
 // JsPackage ...
 type JsPackage struct {
-	PackageID   int               `json:"packageid"`
-	BillingType int8              `json:"billingtype"`
-	LicenseType int8              `json:"licensetype"`
-	Status      int8              `json:"status"`
-	Extended    JsPackageExtended `json:"extended"`
-	AppIDs      []int             `json:"appids"`
-	DepotIDs    []int             `json:"depotids"`
-	AppItems    []int             `json:"appitems"` // todo, no data to test with
+	PackageID   int  `json:"packageid"`
+	BillingType int8 `json:"billingtype"`
+	LicenseType int8 `json:"licensetype"`
+	Status      int8 `json:"status"`
+	// Extended    JsPackageExtended `json:"extended"` // Sometimes shows as empty array, breaking unmarshal
+	AppIDs   []int `json:"appids"`
+	DepotIDs []int `json:"depotids"`
+	AppItems []int `json:"appitems"` // todo, no data to test with
 }
 
 // JsPackageExtended ...
 type JsPackageExtended struct {
-	AlwaysCountAsOwned                int8   `json:"alwayscountasowned"`
+	AlwaysCountsAsOwned               int8   `json:"alwayscountsasowned"`
 	DevComp                           int8   `json:"devcomp"`
 	ReleaseStateOverride              string `json:"releasestateoverride"`
 	AllowCrossRegionTradingAndGifting string `json:"allowcrossregiontradingandgifting"`
