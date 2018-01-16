@@ -30,3 +30,18 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) {
 		logger.Error(err)
 	}
 }
+
+func returnErrorTemplate(w http.ResponseWriter, code int, message string) {
+
+	template := errorTemplate{
+		Code:    code,
+		Message: message,
+	}
+
+	returnTemplate(w, "error", template)
+}
+
+type errorTemplate struct {
+	Code    int
+	Message string
+}

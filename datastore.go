@@ -9,35 +9,37 @@ import (
 	"github.com/Jleagle/go-helpers/logger"
 )
 
-func saveApp(jsApp JsApp) {
+func createDsAppFromJsApp(js JsApp) *dsApp {
 
-	jsTags := jsApp.Common.StoreTags
+	jsTags := js.Common.StoreTags
 	tags := make([]string, 0, len(jsTags))
 	for _, value := range jsTags {
 		tags = append(tags, value)
 	}
 
 	dsApp := dsApp{}
-	dsApp.AppID = jsApp.AppID
-	dsApp.Name = jsApp.Common.Name
-	dsApp.Type = jsApp.Common.Type
-	dsApp.ReleaseState = jsApp.Common.ReleaseState
-	dsApp.OSList = strings.Split(jsApp.Common.OSList, ",")
-	dsApp.MetacriticScore = jsApp.Common.MetacriticScore
-	dsApp.MetacriticFullURL = jsApp.Common.MetacriticURL
+	dsApp.AppID = js.AppID
+	dsApp.Name = js.Common.Name
+	dsApp.Type = js.Common.Type
+	dsApp.ReleaseState = js.Common.ReleaseState
+	dsApp.OSList = strings.Split(js.Common.OSList, ",")
+	dsApp.MetacriticScore = js.Common.MetacriticScore
+	dsApp.MetacriticFullURL = js.Common.MetacriticURL
 	dsApp.StoreTags = tags
-	dsApp.Developer = jsApp.Extended.Developer
-	dsApp.Publisher = jsApp.Extended.Publisher
-	dsApp.Homepage = jsApp.Extended.Homepage
-	dsApp.ChangeNumber = jsApp.ChangeNumber
+	dsApp.Developer = js.Extended.Developer
+	dsApp.Publisher = js.Extended.Publisher
+	dsApp.Homepage = js.Extended.Homepage
+	dsApp.ChangeNumber = js.ChangeNumber
 
-	key := datastore.NameKey(
-		"App",
-		dsApp.AppID,
-		nil,
-	)
+	return &dsApp
+}
 
-	saveKind(key, &dsApp)
+func createDsPackageFromJsPackage(js JsPackage) *dsPackage {
+
+	dsPackage := dsPackage{}
+
+	return &dsPackage
+
 }
 
 func savePackage(data dsPackage) {
@@ -98,6 +100,9 @@ type dsApp struct {
 }
 
 type dsPackage struct {
-	PackageID string  `datastore:"package_id"`
-	Apps      []dsApp `datastore:"apps"`
+	PackageID   string `datastore:"package_id"`
+	BillingType int8   `datastore:"billingtype"`
+	LicenseType int8   `datastore:"licensetype"`
+	Status      int8   `datastore:"status"`
+	Apps        []int  `datastore:"apps"`
 }

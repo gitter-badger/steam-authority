@@ -16,6 +16,7 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 	client, context := getDSClient()
 	q := datastore.NewQuery("Change").Order("-change_id")
 	it := client.Run(context, q)
+
 	for {
 		var change dsChange
 		_, err := it.Next(&change)
@@ -40,6 +41,10 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 
 	change := &dsChange{}
 	if err := client.Get(context, key, change); err != nil {
+		if err != nil && err.Error() == "datastore: no such entity" {
+			returnErrorTemplate(w, 404, "We can't find this change in our database, there may not have been one with this ID.")
+			return
+		}
 		logger.Error(err)
 	}
 

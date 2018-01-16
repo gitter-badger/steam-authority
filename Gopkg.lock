@@ -44,22 +44,16 @@
   version = "v2.0.0"
 
 [[projects]]
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  revision = "ea4d1f681babbce9545c9c5f3d5194a789c89f5b"
+  version = "v1.2.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/kardianos/osext"
   packages = ["."]
   revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/kr/pretty"
-  packages = ["."]
-  revision = "cfb55aafdaf3ec08f0db22699ab822c50091b1c4"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/kr/text"
-  packages = ["."]
-  revision = "7cafcd837844e784b526369c9bce262804aebc60"
 
 [[projects]]
   name = "github.com/stvp/rollbar"
@@ -112,6 +106,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4951c2e5eb91d9f41d026cefb969324d1cc43cef5462466cc5041c2d4880ebfb"
+  inputs-digest = "3b87cc670e5f759cc3fa0d7118c4f5e896483b6ec29a9121dbd7038a3b16d843"
   solver-name = "gps-cdcl"
   solver-version = 1

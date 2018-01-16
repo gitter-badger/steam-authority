@@ -12,28 +12,23 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
-	"github.com/kr/pretty"
 )
 
-func getLatestSavedChange() (change dsChange) {
+func checkForChanges() {
 
+	// Get the latest change to start from
 	client, context := getDSClient()
 	q := datastore.NewQuery("Change").Order("-change_id").Limit(1)
 	it := client.Run(context, q)
 
-	_, err := it.Next(&change)
+	var latestChange dsChange
+	_, err := it.Next(&latestChange)
 	if err != nil {
 		logger.Error(err)
 	}
 
-	return change
-}
-
-func checkForChanges() {
-
 	// Grab the JSON from node
-	latestChangeID := strconv.Itoa(getLatestSavedChange().ChangeID)
-	response, err := http.Get("http://localhost:8086/changes/" + latestChangeID)
+	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(latestChange.ChangeID))
 	if err != nil {
 		logger.Error(err)
 	}
@@ -74,6 +69,11 @@ func checkForChanges() {
 		dsChanges[v].Packages = append(dsChanges[v].Packages, k)
 	}
 
+	// Stop if there are no apps/packages
+	if len(dsChanges) < 1 {
+		return
+	}
+
 	var ChangeIDs []int
 	for k := range dsChanges {
 		ChangeIDs = append(ChangeIDs, k)
@@ -87,32 +87,40 @@ func checkForChanges() {
 	dsKeys := make([]*datastore.Key, 0)
 	dsChangesSlice := make([]*dsChange, 0)
 
-	for _, k := range ChangeIDs {
-		dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(k), nil))
-		dsChangesSlice = append(dsChangesSlice, dsChanges[k])
+	for _, v := range ChangeIDs {
+		dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(v), nil))
+		dsChangesSlice = append(dsChangesSlice, dsChanges[v])
 	}
 
 	// Bulk add changes
-	fmt.Println("Saving " + strconv.Itoa(count) + " changes")
-
-	client, context := getDSClient()
+	fmt.Println("Saving " + strconv.Itoa(count) + " change(s)")
 
 	if _, err := client.PutMulti(context, dsKeys, dsChangesSlice); err != nil {
 		logger.Error(err)
 	}
-}
 
-func getInfo(apps []string, packages []string) {
+	// Get apps/packages IDs
+	apps := []string{}
+	packages := []string{}
+
+	for _, v := range dsChanges {
+		for _, vv := range v.Apps {
+			apps = append(apps, vv)
+		}
+		for _, vv := range v.Packages {
+			packages = append(packages, vv)
+		}
+	}
 
 	// Grab the JSON from node
-	response, err := http.Get("http://localhost:8086/info?apps=" + strings.Join(apps, ",") + "&packages=" + strings.Join(packages, ",") + "&prettyprint=0")
+	response, err = http.Get("http://localhost:8086/info?apps=" + strings.Join(apps, ",") + "&packages=" + strings.Join(packages, ",") + "&prettyprint=0")
 	if err != nil {
 		logger.Error(err)
 	}
 	defer response.Body.Close()
 
 	// Convert to bytes
-	contents, err := ioutil.ReadAll(response.Body)
+	contents, err = ioutil.ReadAll(response.Body)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -123,17 +131,41 @@ func getInfo(apps []string, packages []string) {
 		logger.Error(err)
 	}
 
-	//pretty.Print(info.Apps)
-	pretty.Print("xx")
+	// Build up rows to bulk add apps
+	dsApps := make([]*dsApp, 0)
+	dsAppKeys := make([]*datastore.Key, 0)
 
+	for _, v := range info.Apps {
+		dsApps = append(dsApps, createDsAppFromJsApp(v))
+		dsAppKeys = append(dsAppKeys, datastore.NameKey("App", v.AppID, nil))
+	}
+
+	fmt.Println("Saving " + strconv.Itoa(len(dsApps)) + " app(s)")
+	if _, err := client.PutMulti(context, dsAppKeys, dsApps); err != nil {
+		logger.Error(err)
+	}
+
+	// Build up rows to bulk add packages
+	dsPackages := make([]*dsPackage, 0)
+	dsPackageKeys := make([]*datastore.Key, 0)
+
+	for _, v := range info.Packages {
+		dsPackages = append(dsPackages, createDsPackageFromJsPackage(v))
+		dsPackageKeys = append(dsPackageKeys, datastore.NameKey("Package", strconv.Itoa(v.PackageID), nil))
+	}
+
+	fmt.Println("Saving " + strconv.Itoa(len(dsPackages)) + " package(s)")
+	if _, err := client.PutMulti(context, dsPackageKeys, dsPackages); err != nil {
+		logger.Error(err)
+	}
 }
 
 // JsChange ...
 type JsChange struct {
 	Success            int8           `json:"success"`
 	LatestChangeNumber int            `json:"current_changenumber"`
-	Apps               map[string]int `json:"apps"`     // map[app]change
-	Packages           map[string]int `json:"packages"` // map[package]change
+	Apps               map[string]int `json:"apps"`
+	Packages           map[string]int `json:"packages"`
 }
 
 // JsInfo ...
@@ -147,14 +179,15 @@ type JsInfo struct {
 
 // JsApp ...
 type JsApp struct {
-	AppID              string                     `json:"appid"`
-	Common             JsAppCommon                `json:"common"`
-	Extended           JsAppExtended              `json:"extended"`
-	Config             JsAppConfig                `json:"config"`
-	Depots             JsAppDepots                `json:"depots"`
-	UFS                JsAppUFS                   `json:"ufs"`
-	SystemRequirements JsAppUFSSystemRequirements `json:"sysreqs"`
-	ChangeNumber       int                        `json:"change_number"`
+	AppID              string                  `json:"appid"`
+	PublicOnly         string                  `json:"public_only"`
+	Common             JsAppCommon             `json:"common"`
+	Extended           JsAppExtended           `json:"extended"`
+	Config             JsAppConfig             `json:"config"`
+	Depots             JsAppDepots             `json:"depots"`
+	UFS                JsAppUFS                `json:"ufs"`
+	SystemRequirements JsAppSystemRequirements `json:"sysreqs"`
+	ChangeNumber       int                     `json:"change_number"`
 }
 
 // JsAppCommon ...
@@ -238,8 +271,8 @@ type JsAppUFS struct {
 	HideCloudUI string `json:"hidecloudui"`
 }
 
-// JsAppUFSSystemRequirements ...
-type JsAppUFSSystemRequirements struct {
+// JsAppSystemRequirements ...
+type JsAppSystemRequirements struct {
 }
 
 // JsPackage ...
@@ -251,12 +284,13 @@ type JsPackage struct {
 	Extended    JsPackageExtended `json:"extended"`
 	AppIDs      []int             `json:"appids"`
 	DepotIDs    []int             `json:"depotids"`
-	//AppItems    []int             `json:"appitems"` // todo, no data to test with
+	AppItems    []int             `json:"appitems"` // todo, no data to test with
 }
 
 // JsPackageExtended ...
 type JsPackageExtended struct {
-	Alwayscountasowned   int8   `json:"alwayscountasowned"`
-	Devcomp              int8   `json:"devcomp"`
-	Releasestateoverride string `json:"releasestateoverride"`
+	AlwaysCountAsOwned                int8   `json:"alwayscountasowned"`
+	DevComp                           int8   `json:"devcomp"`
+	ReleaseStateOverride              string `json:"releasestateoverride"`
+	AllowCrossRegionTradingAndGifting string `json:"allowcrossregiontradingandgifting"`
 }

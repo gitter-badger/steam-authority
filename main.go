@@ -10,7 +10,6 @@ import (
 
 func main() {
 
-	// todo, give it the path in code not env
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("STEAM_GOOGLE_APPLICATION_CREDENTIALS"))
 
 	arguments := os.Args[1:]
