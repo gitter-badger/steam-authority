@@ -2,18 +2,20 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/steam-authority/steam-authority/websockets"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 
-	template := homeTemplate{}
-	template.test = "xx"
+	template := HomeTemplate{}
+	template.Test = "xx"
 
-	sendWebsocket(template)
+	websockets.Send(template)
 
 	returnTemplate(w, "home", template)
 }
 
-type homeTemplate struct {
-	test string `json:"test"`
+type HomeTemplate struct {
+	Test string `json:"test"`
 }

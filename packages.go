@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/steam-authority/steam-authority/datastore"
 )
 
 func packagesHandler(w http.ResponseWriter, r *http.Request) {
@@ -12,5 +14,5 @@ func packagesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type packagesTemplate struct {
-	Packages []*dsPackage
+	Packages []*datastore.DsPackage
 }

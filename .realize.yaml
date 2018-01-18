@@ -1,0 +1,41 @@
+settings:
+  files:
+    outputs:
+      status: false
+      path: ""
+      name: .r.outputs.log
+    logs:
+      status: false
+      path: ""
+      name: .r.logs.log
+    errors:
+      status: false
+      path: ""
+      name: .r.errors.log
+  legacy:
+    force: false
+    interval: 0s
+server:
+  status: false
+  open: false
+  port: 0
+  host: ""
+schema:
+- name: STEAM
+  path: /Users/james/Go/src/github.com/steam-authority/steam-authority
+  commands:
+    install:
+      status: false
+    build:
+      status: true
+    run:
+      status: true
+  watcher:
+    paths:
+    - /
+    extensions:
+    - go
+    ignored_paths:
+    - .git
+    - .realize
+    - vendor

@@ -1,4 +1,4 @@
-package main
+package websockets
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	changes = "changes"
+	CHANGES = "changes"
 )
 
 var wsConnections []*websocket.Conn
@@ -20,9 +20,10 @@ var wsUpgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func sendWebsocket(data interface{}) {
+func Send(data interface{}) {
 
-	fmt.Println(strconv.Itoa(len(wsConnections)) + " conns")
+	fmt.Println("Sending websocket to " + strconv.Itoa(len(wsConnections)) + " connections")
+
 	for k, v := range wsConnections {
 
 		err := v.WriteJSON(data)
@@ -32,13 +33,14 @@ func sendWebsocket(data interface{}) {
 			if strings.Contains(err.Error(), "broken pipe") {
 				v.Close()
 				wsConnections = append(wsConnections[:k], wsConnections[k+1:]...) // Remove from slice
+			} else {
+				logger.Error(err)
 			}
-			logger.Error(err)
 		}
 	}
 }
 
-func websocketHandler(w http.ResponseWriter, r *http.Request) {
+func Handler(w http.ResponseWriter, r *http.Request) {
 
 	// Upgrade the connection
 	connection, err := wsUpgrader.Upgrade(w, r, nil)

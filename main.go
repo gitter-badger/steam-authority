@@ -8,6 +8,8 @@ import (
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
+	"github.com/steam-authority/steam-authority/pics"
+	"github.com/steam-authority/steam-authority/websockets"
 )
 
 func main() {
@@ -23,13 +25,13 @@ func main() {
 	r.Get("/packages/{id}", packagesHandler)
 	r.Get("/changes", changesHandler)
 	r.Get("/changes/{id}", changeHandler)
-	r.Get("/websocket", websocketHandler)
+	r.Get("/websocket", websockets.Handler)
 
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "assets")
 	fileServer(r, "/assets", http.Dir(filesDir))
 
-	go checkForChanges()
+	go pics.Run()
 
 	http.ListenAndServe(":8085", r)
 }

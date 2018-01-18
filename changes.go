@@ -3,49 +3,34 @@ package main
 import (
 	"net/http"
 
-	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
-	"google.golang.org/api/iterator"
+	"github.com/steam-authority/steam-authority/datastore"
 )
 
 func changesHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := changesTemplate{}
 
-	client, context := getDSClient()
-	q := datastore.NewQuery("Change").Order("-change_id").Limit(10)
-	it := client.Run(context, q)
-
-	for {
-		var change dsChange
-		_, err := it.Next(&change)
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			logger.Error(err)
-		}
-
-		template.Changes = append(template.Changes, change)
+	changes, err := datastore.GetLatestChanges(10)
+	if err != nil {
+		logger.Error(err)
 	}
+
+	template.Changes = changes
 
 	returnTemplate(w, "changes", template)
 }
 
 func changeHandler(w http.ResponseWriter, r *http.Request) {
 
-	client, context := getDSClient()
-
-	key := datastore.NameKey("Change", chi.URLParam(r, "id"), nil)
-
-	change := &dsChange{}
-	if err := client.Get(context, key, change); err != nil {
-		if err != nil && err.Error() == "datastore: no such entity" {
+	change, err := datastore.GetChange(chi.URLParam(r, "id"))
+	if err != nil {
+		logger.Error(err)
+		if err.Error() == "datastore: no such entity" {
 			returnErrorTemplate(w, 404, "We can't find this change in our database, there may not have been one with this ID.")
 			return
 		}
-		logger.Error(err)
 	}
 
 	template := changeTemplate{}
@@ -55,9 +40,9 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type changesTemplate struct {
-	Changes []dsChange
+	Changes []datastore.DsChange
 }
 
 type changeTemplate struct {
-	Change *dsChange
+	Change *datastore.DsChange
 }

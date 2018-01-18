@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/steam-authority/steam-authority/datastore"
 )
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
@@ -12,5 +14,5 @@ func appsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type appsTemplate struct {
-	Apps []*dsApp
+	Apps []*datastore.DsApp
 }
