@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
@@ -20,11 +21,18 @@ const (
 )
 
 func checkForChanges() {
+	fmt.Println("Checking for changes")
+	for {
+		fmt.Println("Checking for changes")
+		err := checkForChangesx()
+		if err != nil {
+			logger.Error(err)
+		}
+		time.Sleep(10 * time.Second)
+	}
+}
 
-	test := dsChange{}
-	test.ChangeID = 123
-	sendWebsocket(test)
-	return
+func checkForChangesx() (err error) {
 
 	// Get the latest change to start from
 	client, context := getDSClient()
@@ -32,7 +40,7 @@ func checkForChanges() {
 	it := client.Run(context, q)
 
 	var latestChange dsChange
-	_, err := it.Next(&latestChange)
+	_, err = it.Next(&latestChange)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -40,42 +48,38 @@ func checkForChanges() {
 	// Grab the JSON from node
 	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(latestChange.ChangeID))
 	if err != nil {
-		logger.Error(err)
+		return err
 	}
 	defer response.Body.Close()
 
 	// Convert to bytes
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		logger.Error(err)
+		return err
 	}
 
 	// Unmarshal JSON
 	jsChange := JsChange{}
 	if err := json.Unmarshal(contents, &jsChange); err != nil {
-		logger.Error(err)
+		return err
 	}
 
 	// Make a list of changes to add
 	dsChanges := make(map[int]*dsChange, 0)
 
 	for k, v := range jsChange.Apps {
-
 		_, ok := dsChanges[v]
 		if !ok {
 			dsChanges[v] = &dsChange{ChangeID: v}
 		}
-
 		dsChanges[v].Apps = append(dsChanges[v].Apps, k)
 	}
 
 	for k, v := range jsChange.Packages {
-
 		_, ok := dsChanges[v]
 		if !ok {
 			dsChanges[v] = &dsChange{ChangeID: v}
 		}
-
 		dsChanges[v].Packages = append(dsChanges[v].Packages, k)
 	}
 
@@ -101,13 +105,13 @@ func checkForChanges() {
 	for _, v := range ChangeIDs {
 		dsKeys = append(dsKeys, datastore.NameKey("Change", strconv.Itoa(v), nil))
 		dsChangesSlice = append(dsChangesSlice, dsChanges[v])
-		// sendWebsocket(dsChanges[v])
+		sendWebsocket(dsChanges[v])
 	}
 
 	// Bulk add changes
 	fmt.Println("Saving " + strconv.Itoa(count) + " changes")
 	if _, err := client.PutMulti(context, dsKeys, dsChangesSlice); err != nil {
-		logger.Error(err)
+		return err
 	}
 
 	// Get apps/packages IDs
@@ -178,6 +182,8 @@ func checkForChanges() {
 			}
 		}
 	}
+
+	return err
 }
 
 // JsChange ...

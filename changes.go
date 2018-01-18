@@ -14,7 +14,7 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 	template := changesTemplate{}
 
 	client, context := getDSClient()
-	q := datastore.NewQuery("Change").Order("-change_id")
+	q := datastore.NewQuery("Change").Order("-change_id").Limit(10)
 	it := client.Run(context, q)
 
 	for {

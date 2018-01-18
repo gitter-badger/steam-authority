@@ -95,7 +95,7 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = ["googleapi","googleapi/internal/uritemplates","internal","iterator","option","transport/grpc"]
-  revision = "8124d1ac69f14d76f852b3c28a59418989a4bdbe"
+  revision = "373a4c220f5c90e5b7ff7101779c5be385d171be"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -115,9 +115,15 @@
   revision = "7cea4cc846bcf00cbb27595b07da5de875ef7de9"
   version = "v1.9.1"
 
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/urfave/cli.v2"
+  packages = ["."]
+  revision = "b2bf3c5abeb90da407891aecd1df2c5a1f6170c1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "59beb388a8a559bf18930aa505da3bc13157733a6e8c684f24474c785fc4452b"
+  inputs-digest = "c77c206ce1aebe047c1d76a45698fb92e53a60190b7cd7c529ae42a310e3360c"
   solver-name = "gps-cdcl"
   solver-version = 1

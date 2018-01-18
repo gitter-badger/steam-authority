@@ -24,6 +24,7 @@ func createDsAppFromJsApp(js JsApp) *dsApp {
 	appIDInt, _ := strconv.Atoi(js.AppID)
 	metacriticScoreInt, _ := strconv.Atoi(js.Common.MetacriticScore)
 
+	//
 	dsApp := dsApp{}
 	dsApp.AppID = appIDInt
 	dsApp.Name = js.Common.Name
@@ -44,9 +45,13 @@ func createDsAppFromJsApp(js JsApp) *dsApp {
 func createDsPackageFromJsPackage(js JsPackage) *dsPackage {
 
 	dsPackage := dsPackage{}
+	dsPackage.PackageID = js.PackageID
+	dsPackage.Apps = js.AppIDs
+	dsPackage.BillingType = js.BillingType
+	dsPackage.LicenseType = js.LicenseType
+	dsPackage.Status = js.Status
 
 	return &dsPackage
-
 }
 
 func savePackage(data dsPackage) {
