@@ -20,13 +20,19 @@ var wsUpgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func Send(data interface{}) {
+func Send(page string, data interface{}) {
 
-	fmt.Println("Sending websocket to " + strconv.Itoa(len(wsConnections)) + " connections")
+	count := len(wsConnections)
+	if count > 0 {
+		fmt.Println("Sending websocket to " + strconv.Itoa(count) + " connections")
+	}
+
+	ws := websocketPayload{}
+	ws.Page = page
+	ws.Data = data
 
 	for k, v := range wsConnections {
-
-		err := v.WriteJSON(data)
+		err := v.WriteJSON(ws)
 		if err != nil {
 
 			// todo, tidy with https://github.com/gorilla/websocket/issues/104
@@ -51,4 +57,10 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wsConnections = append(wsConnections, connection)
+}
+
+// Properties must be exported so websocket can read them.
+type websocketPayload struct {
+	Data interface{}
+	Page string
 }

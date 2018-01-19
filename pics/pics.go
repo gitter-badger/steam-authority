@@ -74,10 +74,10 @@ func getInfoJson(change *datastore.DsChange) (jsInfo JsInfo, err error) {
 	packages := []string{}
 
 	for _, vv := range change.Apps {
-		apps = append(apps, vv)
+		apps = append(apps, strconv.Itoa(vv))
 	}
 	for _, vv := range change.Packages {
-		packages = append(packages, vv)
+		packages = append(packages, strconv.Itoa(vv))
 	}
 
 	// Grab the JSON from node
@@ -116,7 +116,9 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 		if !ok {
 			dsChanges[v] = &datastore.DsChange{ChangeID: v}
 		}
-		dsChanges[v].Apps = append(dsChanges[v].Apps, k)
+
+		int, _ := strconv.Atoi(k)
+		dsChanges[v].Apps = append(dsChanges[v].Apps, int)
 	}
 
 	for k, v := range jsChange.Packages {
@@ -124,7 +126,9 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 		if !ok {
 			dsChanges[v] = &datastore.DsChange{ChangeID: v}
 		}
-		dsChanges[v].Packages = append(dsChanges[v].Packages, k)
+
+		int, _ := strconv.Atoi(k)
+		dsChanges[v].Packages = append(dsChanges[v].Packages, int)
 	}
 
 	// Stop if there are no apps/packages
@@ -147,7 +151,7 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 
 	for _, v := range ChangeIDs {
 		dsChangesSlice = append(dsChangesSlice, dsChanges[v])
-		websockets.Send(dsChanges[v])
+		websockets.Send(websockets.CHANGES, dsChanges[v])
 	}
 
 	// Bulk add changes

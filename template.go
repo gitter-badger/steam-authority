@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"path"
 	"runtime"
+	"strings"
 
 	"github.com/Jleagle/go-helpers/logger"
 )
@@ -21,6 +22,10 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) {
 	// Load templates needed
 	t, err := template.ParseFiles(folder+"/templates/header.html", folder+"/templates/footer.html", folder+"/templates/"+page+".html")
 	if err != nil {
+		if strings.Contains(err.Error(), "no such file or directory") {
+			returnErrorTemplate(w, 404, "The file for this page seems to be missing!")
+			return
+		}
 		logger.Error(err)
 	}
 

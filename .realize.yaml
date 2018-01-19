@@ -22,12 +22,12 @@ server:
   host: ""
 schema:
 - name: STEAM
-  path: /Users/james/Go/src/github.com/steam-authority/steam-authority
+  path: .
   commands:
     install:
-      status: false
-    build:
       status: true
+    build:
+      status: false
     run:
       status: true
   watcher:
@@ -37,5 +37,4 @@ schema:
     - go
     ignored_paths:
     - .git
-    - .realize
     - vendor

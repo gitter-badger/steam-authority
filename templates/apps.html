@@ -17,4 +17,10 @@
   </li>
 </ul>
 
-{{ template "footer" }} {{end}}
+{{ range $key, $value := .Apps }}
+
+<div>
+  <a href="/apps/{{ .AppID }}">{{ .Name }}</a>
+</div>
+
+{{ end }} {{ template "footer" }} {{end}}

@@ -1,9 +1,9 @@
 package datastore
 
 type DsChange struct {
-	ChangeID int      `datastore:"change_id"`
-	Apps     []string `datastore:"apps"`
-	Packages []string `datastore:"packages"`
+	ChangeID int   `datastore:"change_id"`
+	Apps     []int `datastore:"apps"`
+	Packages []int `datastore:"packages"`
 }
 
 type DsApp struct {

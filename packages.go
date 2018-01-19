@@ -10,7 +10,7 @@ func packagesHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := packagesTemplate{}
 
-	returnTemplate(w, "apps", template)
+	returnTemplate(w, "packages", template)
 }
 
 type packagesTemplate struct {

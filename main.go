@@ -16,11 +16,13 @@ func main() {
 
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("STEAM_GOOGLE_APPLICATION_CREDENTIALS"))
 
+	logger.SetRollbarKey(os.Getenv("STEAM_ROLLBAR_PRIVATE"))
+
 	r := chi.NewRouter()
 	r.Get("/", homeHandler)
 	r.Get("/apps", appsHandler)
-	r.Get("/apps/{id}", appsHandler)
-	r.Get("/apps/mine", appsHandler)
+	r.Get("/apps/{id}", appHandler)
+	// r.Get("/apps/mine", appsHandler)
 	r.Get("/packages", packagesHandler)
 	r.Get("/packages/{id}", packagesHandler)
 	r.Get("/changes", changesHandler)

@@ -45,6 +45,29 @@ func GetLatestChanges(limit int) (changes []DsChange, err error) {
 	return changes, err
 }
 
+func GetLatestUpdatedApps(limit int) (apps []DsApp, err error) {
+
+	client, context := getDSClient()
+
+	q := datastore.NewQuery(APP).Order("-change_number").Limit(limit)
+	it := client.Run(context, q)
+
+	for {
+		var app DsApp
+		_, err := it.Next(&app)
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			logger.Error(err)
+		}
+
+		apps = append(apps, app)
+	}
+
+	return apps, err
+}
+
 func GetChange(id string) (change *DsChange, err error) {
 
 	client, context := getDSClient()
@@ -57,6 +80,20 @@ func GetChange(id string) (change *DsChange, err error) {
 	}
 
 	return change, err
+}
+
+func GetApp(id string) (app DsApp, err error) {
+
+	client, context := getDSClient()
+
+	key := datastore.NameKey(APP, id, nil)
+
+	err = client.Get(context, key, app)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return app, err
 }
 
 func BulkAddChanges(changes []*DsChange) (err error) {
