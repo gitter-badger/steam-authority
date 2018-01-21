@@ -8,7 +8,6 @@ import (
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
-	"github.com/steam-authority/steam-authority/pics"
 	"github.com/steam-authority/steam-authority/websockets"
 )
 
@@ -20,20 +19,26 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Get("/", homeHandler)
+
 	r.Get("/apps", appsHandler)
 	r.Get("/apps/{id}", appHandler)
-	// r.Get("/apps/mine", appsHandler)
+
 	r.Get("/packages", packagesHandler)
-	r.Get("/packages/{id}", packagesHandler)
+	r.Get("/packages/{id}", packageHandler)
+
+	r.Get("/players", playersHandler)
+	r.Get("/players/{id}", playerHandler)
+
 	r.Get("/changes", changesHandler)
 	r.Get("/changes/{id}", changeHandler)
+
 	r.Get("/websocket", websockets.Handler)
 
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "assets")
 	fileServer(r, "/assets", http.Dir(filesDir))
 
-	go pics.Run()
+	// go pics.Run()
 
 	http.ListenAndServe(":8085", r)
 }

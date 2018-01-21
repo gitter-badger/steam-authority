@@ -12,12 +12,40 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := changesTemplate{}
 
+	// Get changes
 	changes, err := datastore.GetLatestChanges(10)
 	if err != nil {
 		logger.Error(err)
 	}
-
 	template.Changes = changes
+
+	// // Get apps/packages
+	// apps := make([]int, 0, 500)
+	// packages := make([]int, 0, 500)
+	// for _, v := range changes {
+	// 	apps = append(apps, v.Apps...)
+	// 	packages = append(apps, v.Packages...)
+	// }
+
+	// dsApps, err := datastore.GetMultiAppsByKey(apps)
+	// if err != nil {
+	// 	logger.Error(err)
+	// }
+	// template.Apps = make(map[int]datastore.DsApp)
+	// for _, v := range dsApps {
+	// 	template.Apps[v.AppID] = v
+	// }
+
+	// dsPackages, err := datastore.GetMultiPackagesByKey(packages)
+	// if err != nil {
+	// 	logger.Error(err)
+	// }
+	// template.Packages = make(map[int]datastore.DsPackage)
+	// for _, v := range dsPackages {
+	// 	template.Packages[v.PackageID] = v
+	// }
+
+	// pretty.Print(template)
 
 	returnTemplate(w, "changes", template)
 }
@@ -28,7 +56,7 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Error(err)
 		if err.Error() == "datastore: no such entity" {
-			returnErrorTemplate(w, 404, "We can't find this change in our database, there may not have been one with this ID.")
+			returnErrorTemplate(w, 404, "We can't find this change in our database, there may not be one with this ID.")
 			return
 		}
 	}
@@ -40,9 +68,13 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type changesTemplate struct {
-	Changes []datastore.DsChange
+	GlobalTemplate
+	Changes  []datastore.DsChange
+	Apps     map[int]datastore.DsApp
+	Packages map[int]datastore.DsPackage
 }
 
 type changeTemplate struct {
+	GlobalTemplate
 	Change *datastore.DsChange
 }

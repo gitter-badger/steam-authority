@@ -1,9 +1,8 @@
 package websockets
 
 import (
-	"fmt"
+	"math/rand"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/Jleagle/go-helpers/logger"
@@ -14,7 +13,7 @@ const (
 	CHANGES = "changes"
 )
 
-var wsConnections []*websocket.Conn
+var wsConnections map[int]websocketStruct
 var wsUpgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -22,23 +21,28 @@ var wsUpgrader = websocket.Upgrader{
 
 func Send(page string, data interface{}) {
 
-	count := len(wsConnections)
-	if count > 0 {
-		fmt.Println("Sending websocket to " + strconv.Itoa(count) + " connections")
-	}
+	// count := len(wsConnections)
+	// if count > 0 {
+	// 	fmt.Println("Sending websocket to " + strconv.Itoa(count) + " connections")
+	// }
 
 	ws := websocketPayload{}
 	ws.Page = page
 	ws.Data = data
 
 	for k, v := range wsConnections {
-		err := v.WriteJSON(ws)
+		err := v.connection.WriteJSON(ws)
 		if err != nil {
 
+			// Clean up old connections
 			// todo, tidy with https://github.com/gorilla/websocket/issues/104
 			if strings.Contains(err.Error(), "broken pipe") {
-				v.Close()
-				wsConnections = append(wsConnections[:k], wsConnections[k+1:]...) // Remove from slice
+				v.connection.Close()
+				_, ok := wsConnections[k]
+				if ok {
+					delete(wsConnections, k)
+				}
+
 			} else {
 				logger.Error(err)
 			}
@@ -56,7 +60,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wsConnections = append(wsConnections, connection)
+	structx := websocketStruct{}
+	structx.connection = connection
+
+	if wsConnections == nil {
+		wsConnections = make(map[int]websocketStruct)
+	}
+
+	wsConnections[rand.Int()] = structx
 }
 
 // Properties must be exported so websocket can read them.
@@ -64,3 +75,10 @@ type websocketPayload struct {
 	Data interface{}
 	Page string
 }
+
+type websocketStruct struct {
+	id         int
+	connection *websocket.Conn
+}
+
+// todo, store websockets as a map of structs with random IDs in the struct, this makes them easier to delete by ID

@@ -23,25 +23,37 @@ func appsHandler(w http.ResponseWriter, r *http.Request) {
 
 func appHandler(w http.ResponseWriter, r *http.Request) {
 
+	// Get app
 	app, err := datastore.GetApp(chi.URLParam(r, "id"))
 	if err != nil {
 		logger.Error(err)
 		if err.Error() == "datastore: no such entity" {
-			returnErrorTemplate(w, 404, "We can't find this change in our database, there may not have been one with this ID.")
+			returnErrorTemplate(w, 404, "We can't find this app in our database, there may not be one with this ID.")
 			return
 		}
 	}
 
+	// Get packages
+	packages, err := datastore.GetPackagesAppIsIn(app.AppID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	// Template
 	template := appTemplate{}
 	template.App = app
+	template.Packages = packages
 
-	returnTemplate(w, "change", template)
+	returnTemplate(w, "app", template)
 }
 
 type appsTemplate struct {
+	GlobalTemplate
 	Apps []datastore.DsApp
 }
 
 type appTemplate struct {
-	App datastore.DsApp
+	GlobalTemplate
+	App      datastore.DsApp
+	Packages []datastore.DsPackage
 }

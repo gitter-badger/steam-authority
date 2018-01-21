@@ -1,11 +1,13 @@
 package datastore
 
+// DsChange kind
 type DsChange struct {
 	ChangeID int   `datastore:"change_id"`
 	Apps     []int `datastore:"apps"`
 	Packages []int `datastore:"packages"`
 }
 
+// DsApp kind
 type DsApp struct {
 	AppID             int      `datastore:"app_id"`
 	Name              string   `datastore:"name"`
@@ -19,12 +21,16 @@ type DsApp struct {
 	Publisher         string   `datastore:"publisher"`
 	Homepage          string   `datastore:"homepage"`
 	ChangeNumber      int      `datastore:"change_number"`
+	Logo              string   `datastore:"logo"`
+	Icon              string   `datastore:"icon"`
 }
 
+// DsPackage kind
 type DsPackage struct {
 	PackageID   int   `datastore:"package_id"`
 	BillingType int8  `datastore:"billingtype"`
 	LicenseType int8  `datastore:"licensetype"`
 	Status      int8  `datastore:"status"`
 	Apps        []int `datastore:"apps"`
+	ChangeID    int   `datastore:"change_id"`
 }

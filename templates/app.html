@@ -1,0 +1,48 @@
+{{define "app"}} {{ template "header" }} {{if eq .App.ReleaseState "prerelease"}}
+<div class="alert alert-primary" role="alert">This game is not released yet!</div>
+{{end}}
+
+<h3>{{.App.Name}}</h3>
+
+<p>App Type: {{ .App.Type }}</p>
+<p>Release State: {{ .App.ReleaseState }}</p>
+<p>OS': {{ .App.OSList }}</p>
+
+{{ if gt .App.MetacriticScore 0 }}
+<p>Metacritic Score:
+  <a href="{{ .App.MetacriticFullURL }}">{{ .App.MetacriticScore }}</a>
+</p>
+{{end}}
+
+<p>Store Tags: {{ .App.StoreTags }}</p>
+<p>Developer: {{ .App.Developer }}</p>
+<p>Publisher: {{ .App.Publisher }}</p>
+<p>Homepage: {{ .App.Homepage }}</p>
+<p>Change Number:
+  <a href="/changes/{{ .App.ChangeNumber }}">{{ .App.ChangeNumber }}</a>
+</p>
+
+<h5>Included in these packages</h5>
+<table class="table table-hover table-sm">
+  <thead>
+    <th scope="col">Package ID</th>
+    <th scope="col">Billing</th>
+    <th scope="col">License</th>
+    <th scope="col">Status</th>
+    <th scope="col">Apps</th>
+  </thead>
+  {{ range $key, $value := .Packages }}
+  <tr>
+    <td>
+      <a href="/packages/{{.PackageID}}">{{.PackageID}}</a>
+    </td>
+    <td>{{ .BillingType }}</td>
+    <td>{{ .LicenseType }}</td>
+    <td>{{ .Status }}</td>
+    <td>{{ len .Apps }}</td>
+    <!-- <td>{{.ChangeID}}</td> -->
+  </tr>
+  {{ end }}
+</table>
+
+{{ template "footer" }} {{end}}

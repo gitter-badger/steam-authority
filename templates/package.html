@@ -1,0 +1,25 @@
+{{define "package"}} {{ template "header" }}
+
+<h3>Package {{ .Package.PackageID }}</h3>
+
+<p>Billing: {{ .Package.BillingType }}</p>
+<p>License: {{ .Package.LicenseType }}</p>
+<p>Status: {{ .Package.Status }}</p>
+
+<h5>Included in this packages</h5>
+<table class="table table-hover table-sm">
+  <thead>
+    <th scope="col">Name</th>
+    <th scope="col">Type</th>
+  </thead>
+  {{ range $key, $value := .Apps }}
+  <tr>
+    <td>
+      <a href="/apps/{{.AppID}}">{{.Name}}</a>
+    </td>
+    <td>{{ .Type }}</td>
+  </tr>
+  {{ end }}
+</table>
+
+{{ template "footer" }} {{end}}

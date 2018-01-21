@@ -1,0 +1,7 @@
+{{define "packages"}} {{ template "header" }} {{ range $key, $value := .Packages }}
+
+<div>
+  <a href="/packages/{{ .PackageID }}">Package {{ .PackageID }}</a>
+</div>
+
+{{ end }} {{ template "footer" }} {{end}}

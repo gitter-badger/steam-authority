@@ -21,6 +21,7 @@ const (
 	changesLimit = 500
 )
 
+// Run triggers the PICS updater to run forever
 func Run() {
 
 	for {
@@ -31,12 +32,12 @@ func Run() {
 			logger.Error(err)
 		}
 
-		jsChange, err := getChangesJson(changes[0])
+		jsChange, err := getChangesJSON(changes[0])
 		if err != nil {
 			logger.Error(err)
 		}
 
-		_, err = saveChangesFromJson(jsChange)
+		_, err = saveChangesFromJSON(jsChange)
 		if err != nil {
 			logger.Error(err)
 		}
@@ -45,7 +46,9 @@ func Run() {
 	}
 }
 
-func getChangesJson(latestChange datastore.DsChange) (jsChange JsChange, err error) {
+func getChangesJSON(latestChange datastore.DsChange) (jsChange JsChange, err error) {
+
+	latestChange.ChangeID = 3955150
 
 	// Grab the JSON from node
 	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(latestChange.ChangeID))
@@ -68,7 +71,7 @@ func getChangesJson(latestChange datastore.DsChange) (jsChange JsChange, err err
 	return jsChange, err
 }
 
-func getInfoJson(change *datastore.DsChange) (jsInfo JsInfo, err error) {
+func getInfoJSON(change *datastore.DsChange) (jsInfo JsInfo, err error) {
 
 	apps := []string{}
 	packages := []string{}
@@ -106,7 +109,7 @@ func getInfoJson(change *datastore.DsChange) (jsInfo JsInfo, err error) {
 	return info, nil
 }
 
-func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err error) {
+func saveChangesFromJSON(jsChange JsChange) (changes []*datastore.DsChange, err error) {
 
 	// Make a list of changes to add
 	dsChanges := make(map[int]*datastore.DsChange, 0)
@@ -117,8 +120,8 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 			dsChanges[v] = &datastore.DsChange{ChangeID: v}
 		}
 
-		int, _ := strconv.Atoi(k)
-		dsChanges[v].Apps = append(dsChanges[v].Apps, int)
+		intx, _ := strconv.Atoi(k)
+		dsChanges[v].Apps = append(dsChanges[v].Apps, intx)
 	}
 
 	for k, v := range jsChange.Packages {
@@ -127,8 +130,8 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 			dsChanges[v] = &datastore.DsChange{ChangeID: v}
 		}
 
-		int, _ := strconv.Atoi(k)
-		dsChanges[v].Packages = append(dsChanges[v].Packages, int)
+		intx, _ := strconv.Atoi(k)
+		dsChanges[v].Packages = append(dsChanges[v].Packages, intx)
 	}
 
 	// Stop if there are no apps/packages
@@ -151,7 +154,6 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 
 	for _, v := range ChangeIDs {
 		dsChangesSlice = append(dsChangesSlice, dsChanges[v])
-		websockets.Send(websockets.CHANGES, dsChanges[v])
 	}
 
 	// Bulk add changes
@@ -163,7 +165,7 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 	// Get apps/packages IDs
 	for _, v := range dsChangesSlice {
 
-		info, err := getInfoJson(v)
+		info, err := getInfoJSON(v)
 		if err != nil {
 			continue
 		}
@@ -175,6 +177,8 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 			dsApps = append(dsApps, createDsAppFromJsApp(v))
 		}
 
+		websockets.Send(websockets.CHANGES, dsApps)
+
 		err = datastore.BulkAddApps(dsApps)
 		if err != nil {
 			logger.Error(err)
@@ -183,9 +187,14 @@ func saveChangesFromJson(jsChange JsChange) (changes []*datastore.DsChange, err 
 		// Build up rows to bulk add packages
 		dsPackages := make([]*datastore.DsPackage, 0)
 
-		for _, v := range info.Packages {
-			dsPackages = append(dsPackages, createDsPackageFromJsPackage(v))
+		for _, vv := range info.Packages {
+			dsPackage := createDsPackageFromJsPackage(vv)
+			dsPackage.ChangeID = v.ChangeID
+
+			dsPackages = append(dsPackages, dsPackage)
 		}
+
+		websockets.Send(websockets.CHANGES, dsPackages)
 
 		err = datastore.BulkAddPackages(dsPackages)
 		if err != nil {
@@ -224,6 +233,8 @@ func createDsAppFromJsApp(js JsApp) *datastore.DsApp {
 	dsApp.Publisher = js.Extended.Publisher
 	dsApp.Homepage = js.Extended.Homepage
 	dsApp.ChangeNumber = js.ChangeNumber
+	dsApp.Logo = js.Common.Logo
+	dsApp.Icon = js.Common.Icon
 
 	return &dsApp
 }

@@ -6,10 +6,10 @@ import (
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 
-	template := HomeTemplate{}
+	template := homeTemplate{}
 
 	returnTemplate(w, "home", template)
 }
 
-type HomeTemplate struct {
+type homeTemplate struct {
 }

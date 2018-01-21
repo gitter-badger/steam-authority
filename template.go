@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"path"
 	"runtime"
-	"strings"
 
 	"github.com/Jleagle/go-helpers/logger"
 )
 
-func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) {
+func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (err error) {
 
 	// Get current app path
 	_, file, _, ok := runtime.Caller(0)
@@ -22,18 +21,22 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) {
 	// Load templates needed
 	t, err := template.ParseFiles(folder+"/templates/header.html", folder+"/templates/footer.html", folder+"/templates/"+page+".html")
 	if err != nil {
-		if strings.Contains(err.Error(), "no such file or directory") {
-			returnErrorTemplate(w, 404, "The file for this page seems to be missing!")
-			return
-		}
+		logger.Info("x")
 		logger.Error(err)
+		returnErrorTemplate(w, 404, err.Error())
+		return err
 	}
 
 	// Write a respone
 	err = t.ExecuteTemplate(w, page, pageData)
 	if err != nil {
+		logger.Info("y")
 		logger.Error(err)
+		returnErrorTemplate(w, 404, err.Error())
+		return err
 	}
+
+	return nil
 }
 
 func returnErrorTemplate(w http.ResponseWriter, code int, message string) {
@@ -47,6 +50,12 @@ func returnErrorTemplate(w http.ResponseWriter, code int, message string) {
 }
 
 type errorTemplate struct {
+	GlobalTemplate
 	Code    int
 	Message string
+}
+
+// GlobalTemplate is added to every other template
+type GlobalTemplate struct {
+	Env string
 }
