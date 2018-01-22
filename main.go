@@ -38,6 +38,7 @@ func main() {
 	r.Get("/donate", donateHandler)
 	r.Get("/faqs", faqsHandler)
 	r.Get("/credits", creditsHandler)
+	r.Get("/experience", experienceHandler)
 
 	r.Get("/changelog", changelogHandler)
 

@@ -9,3 +9,7 @@ nav.navbar {
 .jumbotron {
     padding: 2rem;
 }
+
+.jumbotron .lead{
+    margin: 0;
+}
