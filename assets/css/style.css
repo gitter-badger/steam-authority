@@ -5,3 +5,7 @@ body {
 nav.navbar {
     margin-bottom: 20px;
 }
+
+.jumbotron {
+    padding: 2rem;
+}

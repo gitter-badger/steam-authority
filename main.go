@@ -34,6 +34,13 @@ func main() {
 
 	r.Get("/websocket", websockets.Handler)
 
+	r.Get("/contact", contactHandler)
+	r.Get("/donate", donateHandler)
+	r.Get("/faqs", faqsHandler)
+	r.Get("/credits", creditsHandler)
+
+	r.Get("/changelog", changelogHandler)
+
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "assets")
 	fileServer(r, "/assets", http.Dir(filesDir))
