@@ -7,7 +7,6 @@ import (
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/google/go-github/github"
-	"github.com/kr/pretty"
 	"golang.org/x/oauth2"
 )
 
@@ -35,8 +34,6 @@ func changelogHandler(w http.ResponseWriter, r *http.Request) {
 		returnErrorTemplate(w, 500, err.Error())
 		return
 	}
-
-	pretty.Print(commits[0])
 
 	template := changelogTemplate{}
 	template.Commits = commits
