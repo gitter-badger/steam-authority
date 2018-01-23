@@ -2,32 +2,38 @@
 
 <div class="jumbotron">
   <h1 class="display-4">Experience</h1>
+  <p class="lead">Check how much XP you need to go up a level.</p>
 </div>
 
 <div class="table-responsive">
 
-  <table class="table table-bordered table-striped table-hover table-condensed">
-    <tr>
-      <th width="25%">Level</th>
-      <th width="25%">Start XP</th>
-      <th width="25%">End XP</th>
-      <th width="25%">Difference</th>
-    </tr>
+  <table class="table table-striped table-bordered table-hover table-sm">
+    <thead>
+      <tr>
+        <th scope="col" width="25%">Level</th>
+        <th scope="col" width="25%">Start XP</th>
+        <th scope="col" width="25%">End XP</th>
+        <th scope="col" width="25%">For Next Level</th>
+      </tr>
+    </thead>
   </table>
 
-  {{ range $key, $value := .Rows }}
-
-  <table class="table table-bordered table-striped table-hover table-condensed">
-    <tr class="">
-      <td width="25%">{{ .Level }}</td>
-      <td width="25%">{{ .Start }}</td>
-      <td width="25%">{{ .End }}</td>
-      <td width="25%">{{ .Count }}</td>
+  {{ range $key, $value := .Chunks }}
+  <table class="table table-striped table-bordered table-hover table-sm">
+    {{ range $keyx, $valuex := $value }}
+    <tr class="{{ if eq $.Level .Level }}table-primary{{ end }}" id="level_{{ .Level }}">
+      <td width="25%">{{ comma .Level }}</td>
+      <td width="25%">{{ comma .Start }}</td>
+      <td width="25%">{{ comma .End }}</td>
+      <td width="25%">{{ comma .Diff }}</td>
     </tr>
+    {{ end }}
   </table>
-
   {{ end }}
 
 </div>
 
-{{ template "footer" }} {{end}}
+{{ if gt .Level 0}}
+<script>
+  var scrollTo = '#level_{{ .Level }}'
+</script> {{end}} {{ template "footer" }} {{end}}

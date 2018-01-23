@@ -32,13 +32,15 @@ func main() {
 	r.Get("/changes", changesHandler)
 	r.Get("/changes/{id}", changeHandler)
 
+	r.Get("/experience", experienceHandler)
+	r.Get("/experience/{id}", experienceHandler)
+
 	r.Get("/websocket", websockets.Handler)
 
 	r.Get("/contact", contactHandler)
 	r.Get("/donate", donateHandler)
 	r.Get("/faqs", faqsHandler)
 	r.Get("/credits", creditsHandler)
-	r.Get("/experience", experienceHandler)
 
 	r.Get("/changelog", changelogHandler)
 

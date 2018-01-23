@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"path"
 	"runtime"
+	"strings"
 
 	"github.com/Jleagle/go-helpers/logger"
+	"github.com/dustin/go-humanize"
 )
 
 func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (err error) {
@@ -19,7 +21,7 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 	folder := path.Dir(file)
 
 	// Load templates needed
-	t, err := template.ParseFiles(folder+"/templates/header.html", folder+"/templates/footer.html", folder+"/templates/"+page+".html")
+	t, err := template.New("t").Funcs(getTemplateFuncMap()).ParseFiles(folder+"/templates/header.html", folder+"/templates/footer.html", folder+"/templates/"+page+".html")
 	if err != nil {
 		logger.Info("x")
 		logger.Error(err)
@@ -47,6 +49,14 @@ func returnErrorTemplate(w http.ResponseWriter, code int, message string) {
 	}
 
 	returnTemplate(w, "error", template)
+}
+
+func getTemplateFuncMap() map[string]interface{} {
+	return template.FuncMap{
+		"join":  func(a []string) string { return strings.Join(a, ", ") },
+		"title": func(a string) string { return strings.Title(a) },
+		"comma": func(a int) string { return humanize.Comma(int64(a)) },
+	}
 }
 
 type errorTemplate struct {

@@ -3,30 +3,30 @@ package main
 import (
 	"math"
 	"net/http"
+	"strconv"
+
+	"github.com/Jleagle/go-helpers/logger"
+	"github.com/go-chi/chi"
 )
 
 const (
-	ROWS = 2000
+	// ROWS is the number of rows to show.
+	ROWS = 3000
+
+	// CHUNK into tables of this size
+	CHUNK = 10
 )
 
-// https://github.com/Jleagle/steamranks.com/blob/master/src/Application/Views/ExperienceView.php
 func experienceHandler(w http.ResponseWriter, r *http.Request) {
 
-	template := experienceTemplate{}
+	rows := []experienceRow{}
+	xp := 0
 
-	template.Rows = append(template.Rows, experienceRow{
-		Level: 0,
-		Start: 0,
-	})
+	for i := 0; i <= ROWS+1; i++ {
 
-	var xp float64
-	xp = 10
+		diff := int((math.Ceil((float64(i) + 1) / 10)) * 100)
 
-	for i := 1; i <= ROWS+1; i++ {
-
-		diff := (math.Ceil((float64(i) + 1) / 10)) * 100
-
-		template.Rows = append(template.Rows, experienceRow{
+		rows = append(rows, experienceRow{
 			Level: i,
 			Start: int(xp),
 		})
@@ -34,22 +34,59 @@ func experienceHandler(w http.ResponseWriter, r *http.Request) {
 		xp = xp + diff
 	}
 
-	for i := 1; i <= ROWS; i++ {
-
-		nextRow := template.Rows[i+1]
-		thisRow := template.Rows[i]
-
-		template.Rows[i].Diff = nextRow.Start - thisRow.Start
-		template.Rows[i].End = nextRow.Start - 1
+	rows[0] = experienceRow{
+		Level: 0,
+		End:   99,
+		Diff:  100,
 	}
 
-	template.Rows = template.Rows[0:ROWS]
+	for i := 1; i <= ROWS; i++ {
+
+		// prevRow := rows[i-1]
+		thisRow := rows[i]
+		nextRow := rows[i+1]
+
+		rows[i].Diff = nextRow.Start - thisRow.Start
+		rows[i].End = nextRow.Start - 1
+	}
+
+	rows = rows[0 : ROWS+1]
+
+	template := experienceTemplate{}
+	template.Chunks = chunk(rows, CHUNK)
+
+	template.Level = -1
+	id := chi.URLParam(r, "id")
+	if id != "" {
+		i, err := strconv.Atoi(id)
+		if err != nil {
+			logger.Error(err)
+		}
+		template.Level = i
+	}
 
 	returnTemplate(w, "experience", template)
 }
 
+func chunk(rows []experienceRow, chunkSize int) (chunked [][]experienceRow) {
+
+	for i := 0; i < len(rows); i += chunkSize {
+		end := i + chunkSize
+
+		if end > len(rows) {
+			end = len(rows)
+		}
+
+		chunked = append(chunked, rows[i:end])
+	}
+
+	return chunked
+}
+
 type experienceTemplate struct {
-	Rows []experienceRow
+	GlobalTemplate
+	Chunks [][]experienceRow
+	Level  int
 }
 
 type experienceRow struct {
