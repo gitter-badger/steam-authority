@@ -9,15 +9,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/Acidic9/steam"
+  packages = ["."]
+  revision = "82d042d07b46ceb58dcbf7e1c03ba5a3963ab99a"
+
+[[projects]]
+  branch = "master"
   name = "github.com/Jleagle/go-helpers"
   packages = ["logger"]
   revision = "09f37256ce848a12afb351459d2ea99755571e88"
-
-[[projects]]
-  name = "github.com/Philipp15b/go-steam"
-  packages = [".","cryptoutil","netutil","protocol","protocol/gamecoordinator","protocol/protobuf","protocol/steamlang","rwu","socialcache","steamid"]
-  revision = "2f1da88ecc3d51b7cf31cd2045f9fadbf00636bb"
-  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/bugsnag/bugsnag-go"
@@ -142,6 +142,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e032d87de54934f6aaed7f96f2eee39cba5c57e00fc533180acadeb7d2e3de7e"
+  inputs-digest = "adaa875c435bb778cbf99e6fb63a378aaae4921cd6ec9445254dd3e42528f06b"
   solver-name = "gps-cdcl"
   solver-version = 1

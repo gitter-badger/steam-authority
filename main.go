@@ -27,6 +27,7 @@ func main() {
 	r.Get("/packages/{id}", packageHandler)
 
 	r.Get("/players", playersHandler)
+	r.Post("/players", playerIDHandler)
 	r.Get("/players/{id}", playerHandler)
 
 	r.Get("/changes", changesHandler)
