@@ -17,8 +17,12 @@ const (
 
 	// PACKAGE atastore kind
 	PACKAGE = "Package"
+
+	// PLAYER atastore kind
+	PLAYER = "Player"
 )
 
+// todo, return error
 func saveKind(key *datastore.Key, data interface{}) (newKey *datastore.Key) {
 
 	client, context := getDSClient()

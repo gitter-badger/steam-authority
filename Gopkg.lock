@@ -9,12 +9,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/Acidic9/steam"
-  packages = ["."]
-  revision = "82d042d07b46ceb58dcbf7e1c03ba5a3963ab99a"
-
-[[projects]]
-  branch = "master"
   name = "github.com/Jleagle/go-helpers"
   packages = ["logger"]
   revision = "09f37256ce848a12afb351459d2ea99755571e88"
@@ -142,6 +136,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "adaa875c435bb778cbf99e6fb63a378aaae4921cd6ec9445254dd3e42528f06b"
+  inputs-digest = "cb2e21e09277f0e48253552c295515e5b7c599613eee8ef1f90b1fee98c2fd6f"
   solver-name = "gps-cdcl"
   solver-version = 1

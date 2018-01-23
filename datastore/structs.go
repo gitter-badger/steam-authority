@@ -1,5 +1,26 @@
 package datastore
 
+// DsPlayer kind
+type DsPlayer struct {
+	ID64            int
+	ValintyURL      string `datastore:"vality_url"`
+	Avatar          string `datastore:"avatar"`
+	RealName        string `datastore:"real_name"`
+	CountryCode     string `datastore:"country_code"`
+	StateCode       string `datastore:"status_code"`
+	LastUpdated     int64  `datastore:"last_updated"`
+	Level           int    `datastore:"level"`
+	LevelRank       int    `datastore:"level_rank"`
+	Games           int    `datastore:"games"`
+	GamesRank       int    `datastore:"games_rank"`
+	Badges          int    `datastore:"badges"`
+	BadgesRank      int    `datastore:"badges_rank"`
+	PlayTime        int    `datastore:"play_time"`
+	PlayTimeRank    int    `datastore:"play_time_rank"`
+	TimeCreated     int    `datastore:"time_created"`
+	TimeCreatedRank int    `datastore:"time_created_rank"`
+}
+
 // DsChange kind
 type DsChange struct {
 	ChangeID int   `datastore:"change_id"`
