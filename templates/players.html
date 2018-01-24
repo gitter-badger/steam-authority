@@ -14,27 +14,30 @@
     </div>
 </form>
 
-<table class="table table-hover table-sm">
+<table class="table table-hover table-sm table-ranks">
     <thead>
         <th scope="col">Rank</th>
         <th scope="col">Player</th>
         <th scope="col">Country</th>
         <th scope="col">Level</th>
-        <th scope="col">Games Owned</th>
+        <th scope="col">Games</th>
         <th scope="col">Badges</th>
-        <th scope="col">Playtime</th>
+        <th scope="col">Play Time</th>
         <th scope="col">Time on Steam</th>
     </thead>
     {{ range $key, $value := .Players }}
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+    <tr data-link="/players/{{ .ID64 }}">
+        <td>{{ .Rank }}</td>
+        <td>
+            <img src="{{ .Avatar }}" alt="{{ .PersonaName }}" class="avatar">{{ .PersonaName }}</td>
+        <td>
+            <img src="/assets/images/flags/{{ .CountryCode }}.png" alt="">
+        </td>
+        <td>{{ .Level }}</td>
+        <td>{{ .Games }}</td>
+        <td>{{ .Badges }}</td>
+        <td>{{ .PlayTime }}</td>
+        <td>{{ .TimeCreated }}</td>
     </tr>
     {{ end }}
 </table>

@@ -6,6 +6,7 @@ type DsPlayer struct {
 	ValintyURL      string `datastore:"vality_url"`
 	Avatar          string `datastore:"avatar"`
 	RealName        string `datastore:"real_name"`
+	PersonaName     string `datastore:"persona_name"`
 	CountryCode     string `datastore:"country_code"`
 	StateCode       string `datastore:"status_code"`
 	LastUpdated     int64  `datastore:"last_updated"`
@@ -19,6 +20,8 @@ type DsPlayer struct {
 	PlayTimeRank    int    `datastore:"play_time_rank"`
 	TimeCreated     int    `datastore:"time_created"`
 	TimeCreatedRank int    `datastore:"time_created_rank"`
+
+	Rank int `datastore:"-"`
 }
 
 // DsChange kind

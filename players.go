@@ -15,7 +15,37 @@ import (
 
 func playersHandler(w http.ResponseWriter, r *http.Request) {
 
+	// Normalise the order
+	var sort string
+	switch chi.URLParam(r, "id") {
+	case "level":
+		sort = "level_rank"
+	case "games":
+		sort = "games_rank"
+	case "badges":
+		sort = "badges_rank"
+	case "playtime":
+		sort = "play_time_rank"
+	case "steamtime":
+		sort = "-time_created_rank"
+	default:
+		sort = "level_rank"
+	}
+
+	players, err := datastore.GetPlayers(sort, 10)
+	if err != nil {
+		logger.Error(err)
+		returnErrorTemplate(w, 404, err.Error())
+		return
+	}
+
+	// Set rank field
+	for k := range players {
+		players[k].Rank = players[k].LevelRank // todo, set depending on the sort
+	}
+
 	template := playersTemplate{}
+	template.Players = players
 
 	returnTemplate(w, "players", template)
 }
@@ -46,6 +76,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 			dsPlayer.LastUpdated = time.Now().Unix()
 			dsPlayer.CountryCode = summary.Response.Players[0].LOCCountryCode
 			dsPlayer.StateCode = summary.Response.Players[0].LOCStateCode
+			dsPlayer.PersonaName = summary.Response.Players[0].PersonaName
 
 			// todo, get friends, player bans, groups
 

@@ -32,7 +32,6 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 	// Write a respone
 	err = t.ExecuteTemplate(w, page, pageData)
 	if err != nil {
-		logger.Info("y")
 		logger.Error(err)
 		returnErrorTemplate(w, 404, err.Error())
 		return err

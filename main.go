@@ -20,29 +20,38 @@ func main() {
 	r := chi.NewRouter()
 	r.Get("/", homeHandler)
 
+	// Apps
 	r.Get("/apps", appsHandler)
 	r.Get("/apps/{id}", appHandler)
+	r.Get("/apps/{id}/{slug}", appHandler)
 
+	// Packages
 	r.Get("/packages", packagesHandler)
 	r.Get("/packages/{id}", packageHandler)
 
+	// Players
 	r.Get("/players", playersHandler)
 	r.Post("/players", playerIDHandler)
-	r.Get("/players/{id}", playerHandler)
+	r.Get("/players/{id:[a-z]+}", playersHandler)
+	r.Get("/players/{id:[0-9]+}", playerHandler)
+	r.Get("/players/{id:[0-9]+}/{slug}", playerHandler)
 
+	// Changes
 	r.Get("/changes", changesHandler)
 	r.Get("/changes/{id}", changeHandler)
 
+	// Experience
 	r.Get("/experience", experienceHandler)
 	r.Get("/experience/{id}", experienceHandler)
 
-	r.Get("/websocket", websockets.Handler)
-
+	// Static pages
 	r.Get("/contact", contactHandler)
 	r.Get("/donate", donateHandler)
 	r.Get("/faqs", faqsHandler)
 	r.Get("/credits", creditsHandler)
 
+	//
+	r.Get("/websocket", websockets.Handler)
 	r.Get("/changelog", changelogHandler)
 
 	workDir, _ := os.Getwd()

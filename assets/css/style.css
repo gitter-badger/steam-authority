@@ -13,3 +13,15 @@ nav.navbar {
 .jumbotron .lead{
     margin: 0;
 }
+
+.table-ranks tr[data-link]{
+    cursor: pointer;
+}
+
+.table-ranks img.avatar{
+    margin-right: 5px;
+}
+
+.table-ranks img{
+    height: 28px;
+}
