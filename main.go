@@ -50,7 +50,7 @@ func main() {
 	r.Get("/faqs", faqsHandler)
 	r.Get("/credits", creditsHandler)
 
-	//
+	// Other
 	r.Get("/websocket", websockets.Handler)
 	r.Get("/changelog", changelogHandler)
 

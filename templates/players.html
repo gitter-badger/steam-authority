@@ -5,14 +5,31 @@
     <p class="lead">Ranks are updated every midnight (GMT).</p>
 </div>
 
-<form action="/players" method="post">
-    <div class="input-group input-group-lg mb-4">
-        <input class="form-control" type="text" placeholder="Search Player" name="id">
-        <div class="input-group-append">
-            <input type="submit" value="Search" class="input-group-text">
+<div class="row">
+    <div class="col-md-auto">
+
+        <div class="btn-group btn-group-md mb-4" role="group">
+            <a class="btn btn-primary" href="/players/level">Level</a>
+            <a class="btn btn-primary" href="/players/games">Games</a>
+            <a class="btn btn-primary" href="/players/badges">Badges</a>
         </div>
+
     </div>
-</form>
+    <div class="col">
+
+        <form action="/players" method="post">
+            <div class="input-group input-group-md mb-4">
+                <input class="form-control" type="text" placeholder="Search Player" name="id">
+                <div class="input-group-append">
+                    <input type="submit" value="Search" class="input-group-text">
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
 
 <table class="table table-hover table-sm table-ranks">
     <thead>
