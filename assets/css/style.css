@@ -18,10 +18,19 @@ nav.navbar {
     cursor: pointer;
 }
 
-.table-ranks img.avatar{
-    margin-right: 5px;
+.table-ranks td.img{
+    padding: 0;
+}
+.table-ranks td.img span{
+    display: inline-block;
+    margin: .3rem;
 }
 
 .table-ranks img{
-    height: 28px;
+    height: 36px;
+    /* margin: -4px 0px -4px 0; */
+}
+
+.table-ranks img.avatar{
+    margin-right: 5px;
 }

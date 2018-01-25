@@ -19,7 +19,7 @@ const (
 
 func experienceHandler(w http.ResponseWriter, r *http.Request) {
 
-	rows := []experienceRow{}
+	var rows []experienceRow
 	xp := 0
 
 	for i := 0; i <= ROWS+1; i++ {

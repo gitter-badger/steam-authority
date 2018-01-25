@@ -68,13 +68,13 @@ func getChangesJSON(latestChange datastore.DsChange) (jsChange JsChange, err err
 		return jsChange, err
 	}
 
-	return jsChange, err
+	return jsChange, nil
 }
 
 func getInfoJSON(change *datastore.DsChange) (jsInfo JsInfo, err error) {
 
-	apps := []string{}
-	packages := []string{}
+	var apps []string
+	var packages []string
 
 	for _, vv := range change.Apps {
 		apps = append(apps, strconv.Itoa(vv))

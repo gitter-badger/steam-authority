@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"errors"
-	"strconv"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -12,7 +11,10 @@ import (
 
 func GetPlayer(id64 string) (player DsPlayer, err error) {
 
-	client, context := getDSClient()
+	client, context, err := getDSClient()
+	if err != nil {
+		return player, err
+	}
 
 	key := datastore.NameKey(PLAYER, id64, nil)
 
@@ -21,19 +23,23 @@ func GetPlayer(id64 string) (player DsPlayer, err error) {
 		logger.Error(err)
 	}
 
-	if player.LastUpdated < (time.Now().Unix() - int64(10)) { //todo, make a day?
+	// Error if data is older than a day
+	if player.TimeUpdated < (time.Now().Unix() - int64(86400)) {
 		return player, errors.New("expired")
 	}
 
-	return player, err
+	return player, nil
 }
 
 func GetPlayers(order string, limit int) (players []DsPlayer, err error) {
 
-	client, context := getDSClient()
+	client, ctx, err := getDSClient()
+	if err != nil {
+		return players, err
+	}
 
 	q := datastore.NewQuery(PLAYER).Order(order).Limit(limit)
-	it := client.Run(context, q)
+	it := client.Run(ctx, q)
 
 	for {
 		var dsPlayer DsPlayer
@@ -51,13 +57,18 @@ func GetPlayers(order string, limit int) (players []DsPlayer, err error) {
 	return players, err
 }
 
-func SavePlayer(data DsPlayer) {
+func CountPlayers() (count int, err error) {
 
-	key := datastore.NameKey(
-		PLAYER,
-		strconv.Itoa(data.ID64),
-		nil,
-	)
+	client, ctx, err := getDSClient()
+	if err != nil {
+		return count, err
+	}
 
-	saveKind(key, &data)
+	q := datastore.NewQuery(PLAYER)
+	count, err = client.Count(ctx, q)
+	if err != nil {
+		return count, err
+	}
+
+	return count, nil
 }

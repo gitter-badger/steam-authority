@@ -7,9 +7,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Jleagle/go-helpers/logger"
 	"github.com/kr/pretty"
 )
+
+/**
+https://partner.steamgames.com/doc/webapi/ISteamUser#ResolveVanityURL
+https://partner.steamgames.com/doc/webapi/ISteamUser#GetUserGroupList
+https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerBans
+https://partner.steamgames.com/doc/webapi/ISteamUser#GetFriendList
+https://partner.steamgames.com/doc/webapi/ISteamUser#GetAppPriceInfo
+*/
 
 func GetPlayerSummaries(ids []int) (resp getPlayerSummariesBody, err error) {
 
@@ -17,7 +24,7 @@ func GetPlayerSummaries(ids []int) (resp getPlayerSummariesBody, err error) {
 		return resp, errors.New("100 ids max")
 	}
 
-	idsString := []string{}
+	var idsString []string
 	for _, v := range ids {
 		idsString = append(idsString, strconv.Itoa(v))
 	}
@@ -27,7 +34,7 @@ func GetPlayerSummaries(ids []int) (resp getPlayerSummariesBody, err error) {
 
 	bytes, err := get("ISteamUser/GetPlayerSummaries/v2/", options)
 	if err != nil {
-		logger.Error(err)
+		return resp, err
 	}
 
 	// Unmarshal JSON
@@ -36,7 +43,7 @@ func GetPlayerSummaries(ids []int) (resp getPlayerSummariesBody, err error) {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			pretty.Print(string(bytes))
 		}
-		logger.Error(err)
+		return resp, err
 	}
 
 	return resp, nil

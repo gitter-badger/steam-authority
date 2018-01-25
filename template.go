@@ -23,7 +23,6 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 	// Load templates needed
 	t, err := template.New("t").Funcs(getTemplateFuncMap()).ParseFiles(folder+"/templates/header.html", folder+"/templates/footer.html", folder+"/templates/"+page+".html")
 	if err != nil {
-		logger.Info("x")
 		logger.Error(err)
 		returnErrorTemplate(w, 404, err.Error())
 		return err
@@ -42,12 +41,12 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 
 func returnErrorTemplate(w http.ResponseWriter, code int, message string) {
 
-	template := errorTemplate{
+	tmpl := errorTemplate{
 		Code:    code,
 		Message: message,
 	}
 
-	returnTemplate(w, "error", template)
+	returnTemplate(w, "error", tmpl)
 }
 
 func getTemplateFuncMap() map[string]interface{} {

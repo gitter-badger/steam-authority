@@ -42,22 +42,42 @@
         <th scope="col">Play Time</th>
         <th scope="col">Time on Steam</th>
     </thead>
-    {{ range $key, $value := .Players }}
+    {{ range $key, $value := .Ranks }}
     <tr data-link="/players/{{ .ID64 }}">
         <td>{{ .Rank }}</td>
-        <td>
-            <img src="{{ .Avatar }}" alt="{{ .PersonaName }}" class="avatar">{{ .PersonaName }}</td>
-        <td>
-            <img src="/assets/images/flags/{{ .CountryCode }}.png" alt="">
+        <td class="img">
+            <img src="{{ .Avatar }}" alt="{{ .PersonaName }}" class="avatar">
+            <span>{{ .PersonaName }}</span>
+        </td>
+        <td class="img">
+            <img src="/assets/images/flags/{{ .CountryCode }}.png" alt="{{ .CountryCode }}">
         </td>
         <td>{{ .Level }}</td>
         <td>{{ .Games }}</td>
         <td>{{ .Badges }}</td>
         <td>{{ .PlayTime }}</td>
         <td>{{ .TimeCreated }}</td>
+        <td>{{ .Friends }}</td>
     </tr>
     {{ end }}
 </table>
+
+<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="btn-group mr-2" role="group" aria-label="First group">
+        <button type="button" class="btn btn-secondary">1</button>
+        <button type="button" class="btn btn-secondary">2</button>
+        <button type="button" class="btn btn-secondary">3</button>
+        <button type="button" class="btn btn-secondary">4</button>
+    </div>
+    <div class="btn-group mr-2" role="group" aria-label="Second group">
+        <button type="button" class="btn btn-secondary">5</button>
+        <button type="button" class="btn btn-secondary">6</button>
+        <button type="button" class="btn btn-secondary">7</button>
+    </div>
+    <div class="btn-group" role="group" aria-label="Third group">
+        <button type="button" class="btn btn-secondary">8</button>
+    </div>
+</div>
 
 
 {{ template "footer" }} {{end}}

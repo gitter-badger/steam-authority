@@ -80,5 +80,3 @@ type websocketStruct struct {
 	id         int
 	connection *websocket.Conn
 }
-
-// todo, store websockets as a map of structs with random IDs in the struct, this makes them easier to delete by ID

@@ -11,7 +11,10 @@ import (
 
 func GetPackagesAppIsIn(appID int) (packages []DsPackage, err error) {
 
-	client, context := getDSClient()
+	client, context, err := getDSClient()
+	if err != nil {
+		return packages, err
+	}
 
 	q := datastore.NewQuery(PACKAGE).Filter("apps =", appID)
 	it := client.Run(context, q)
@@ -35,9 +38,12 @@ func GetPackagesAppIsIn(appID int) (packages []DsPackage, err error) {
 
 func GetMultiPackagesByKey(keys []int) (packages []DsPackage, err error) {
 
-	client, context := getDSClient()
+	client, context, err := getDSClient()
+	if err != nil {
+		return nil, err
+	}
 
-	keysReal := []*datastore.Key{}
+	var keysReal []*datastore.Key
 	for _, v := range keys {
 		keysReal = append(keysReal, datastore.NameKey(PACKAGE, strconv.Itoa(v), nil))
 	}
@@ -46,15 +52,19 @@ func GetMultiPackagesByKey(keys []int) (packages []DsPackage, err error) {
 
 	err = client.GetMulti(context, keysReal, packages)
 	if err != nil {
-		logger.Error(err)
+		return packages, err
 	}
 
-	return packages, err
+	return packages, nil
 }
 
 func GetLatestUpdatedPackages(limit int) (packages []DsPackage, err error) {
 
-	client, context := getDSClient()
+	client, context, err := getDSClient()
+	if err != nil {
+		logger.Error(err)
+		return packages, err
+	}
 
 	q := datastore.NewQuery(PACKAGE).Order("-change_id").Limit(limit)
 	it := client.Run(context, q)
@@ -75,44 +85,42 @@ func GetLatestUpdatedPackages(limit int) (packages []DsPackage, err error) {
 	return packages, err
 }
 
-func GetPackage(id string) (app DsPackage, err error) {
+func GetPackage(id string) (packagex DsPackage, err error) {
 
-	client, context := getDSClient()
+	client, context, err := getDSClient()
+	if err != nil {
+		return packagex, err
+	}
 
 	key := datastore.NameKey(PACKAGE, id, nil)
 
-	err = client.Get(context, key, &app)
+	err = client.Get(context, key, &packagex)
 	if err != nil {
-		logger.Error(err)
+		return packagex, err
 	}
 
-	return app, err
-}
-
-func savePackage(data DsPackage) {
-
-	packageIDString := strconv.Itoa(data.PackageID)
-
-	key := datastore.NameKey(PACKAGE, packageIDString, nil)
-
-	saveKind(key, &data)
+	return packagex, nil
 }
 
 func BulkAddPackages(changes []*DsPackage) (err error) {
 
-	len := len(changes)
-	if len == 0 {
+	packagesLen := len(changes)
+	if packagesLen == 0 {
 		return nil
 	}
 
-	client, context := getDSClient()
-	keys := make([]*datastore.Key, 0, len)
-
-	for _, v := range changes {
-		keys = append(keys, datastore.NameKey(PACKAGE, strconv.Itoa(v.PackageID), nil))
+	client, context, err := getDSClient()
+	if err != nil {
+		return err
 	}
 
-	fmt.Println("Saving " + strconv.Itoa(len) + " packages")
+	keys := make([]*datastore.Key, 0, packagesLen)
+
+	for _, v := range changes {
+		keys = append(keys, v.GetKey())
+	}
+
+	fmt.Println("Saving " + strconv.Itoa(packagesLen) + " packages")
 
 	_, err = client.PutMulti(context, keys, changes)
 	if err != nil {

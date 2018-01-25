@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/99designs/basicauth-go"
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/websockets"
@@ -30,8 +31,8 @@ func main() {
 	r.Get("/packages/{id}", packageHandler)
 
 	// Players
-	r.Get("/players", playersHandler)
 	r.Post("/players", playerIDHandler)
+	r.Get("/players", playersHandler)
 	r.Get("/players/{id:[a-z]+}", playersHandler)
 	r.Get("/players/{id:[0-9]+}", playerHandler)
 	r.Get("/players/{id:[0-9]+}/{slug}", playerHandler)
@@ -54,6 +55,9 @@ func main() {
 	r.Get("/websocket", websockets.Handler)
 	r.Get("/changelog", changelogHandler)
 
+	// Admin
+	r.Mount("/admin", adminRouter())
+
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "assets")
 	fileServer(r, "/assets", http.Dir(filesDir))
@@ -61,6 +65,13 @@ func main() {
 	// go pics.Run()
 
 	http.ListenAndServe(":8085", r)
+}
+
+func adminRouter() http.Handler {
+	r := chi.NewRouter()
+	r.Use(basicauth.NewFromEnv("Steam", "STEAM_ADMIN_"))
+	r.Get("/rerank-levels", reRankHandler)
+	return r
 }
 
 // FileServer conveniently sets up a http.FileServer handler to serve

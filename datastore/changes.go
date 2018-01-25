@@ -11,7 +11,10 @@ import (
 
 func GetLatestChanges(limit int) (changes []DsChange, err error) {
 
-	client, context := getDSClient()
+	client, context, err := getDSClient()
+	if err != nil {
+		return changes, err
+	}
 
 	q := datastore.NewQuery(CHANGE).Order("-change_id").Limit(limit)
 	it := client.Run(context, q)
@@ -34,7 +37,10 @@ func GetLatestChanges(limit int) (changes []DsChange, err error) {
 
 func GetChange(id string) (change *DsChange, err error) {
 
-	client, context := getDSClient()
+	client, context, err := getDSClient()
+	if err != nil {
+		return change, err
+	}
 
 	key := datastore.NameKey(CHANGE, id, nil)
 
@@ -44,24 +50,28 @@ func GetChange(id string) (change *DsChange, err error) {
 		logger.Error(err)
 	}
 
-	return change, err
+	return change, nil
 }
 
 func BulkAddChanges(changes []*DsChange) (err error) {
 
-	len := len(changes)
-	if len == 0 {
+	changesLen := len(changes)
+	if changesLen == 0 {
 		return nil
 	}
 
-	client, context := getDSClient()
-	keys := make([]*datastore.Key, 0, len)
-
-	for _, v := range changes {
-		keys = append(keys, datastore.NameKey(CHANGE, strconv.Itoa(v.ChangeID), nil))
+	client, context, err := getDSClient()
+	if err != nil {
+		return err
 	}
 
-	fmt.Println("Saving " + strconv.Itoa(len) + " changes")
+	keys := make([]*datastore.Key, 0, changesLen)
+
+	for _, v := range changes {
+		keys = append(keys, v.GetKey(), nil)
+	}
+
+	fmt.Println("Saving " + strconv.Itoa(changesLen) + " changes")
 
 	_, err = client.PutMulti(context, keys, changes)
 	if err != nil {
