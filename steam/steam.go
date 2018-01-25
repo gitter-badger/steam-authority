@@ -1,7 +1,6 @@
 package steam
 
 import (
-	"errors"
 	"io/ioutil"
 	"math/big"
 	"net/http"
@@ -51,10 +50,13 @@ func GetID(in string) (out string, err error) {
 	} else if regexp.MustCompile(`^\d{1,16}$`).MatchString(in) { // 8360464
 		return convert32to64(in), nil
 	} else {
-		// Do API call
-		//todo, check vanity url api endpoint first
 
-		return out, errors.New("cant find")
+		resp, err := ResolveVanityURL(in)
+		if err != nil {
+			return out, err
+		}
+
+		return resp.Response.SteamID, nil
 	}
 }
 

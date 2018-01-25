@@ -1,6 +1,8 @@
 {{define "error"}} {{ template "header" }}
 
-<h1>Error {{ .Code }}</h1>
-<p>{{ .Message }}</p>
+<div class="jumbotron">
+  <h1 class="display-4">Error {{ .Code }}</h1>
+  <p class="lead">{{ .Message }}</p>
+</div>
 
 {{ template "footer" }} {{end}}

@@ -72,3 +72,13 @@ func CountPlayers() (count int, err error) {
 
 	return count, nil
 }
+
+func SavePlayer(dsPlayer DsPlayer) (err error) {
+
+	_, err = SaveKind(dsPlayer.GetKey(), &dsPlayer)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

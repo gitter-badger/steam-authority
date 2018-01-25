@@ -94,7 +94,10 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 			// todo, get friends, player bans, groups
 
 			// todo, clear latest players cache
-			datastore.SaveKind(dsPlayer.GetKey(), dsPlayer)
+			err := datastore.SavePlayer(dsPlayer)
+			if err != nil {
+				logger.Error(err)
+			}
 		} else {
 			logger.Error(err)
 			returnErrorTemplate(w, 404, err.Error())
@@ -110,10 +113,13 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 
 func playerIDHandler(w http.ResponseWriter, r *http.Request) {
 
-	id, err := steam.GetID(r.PostFormValue("id"))
+	post := r.PostFormValue("id")
+
+	id, err := steam.GetID(post)
 	if err != nil {
-		logger.Error(err)
-		// todo error page
+		logger.Info(err.Error() + ": " + post)
+		returnErrorTemplate(w, 404, "Can't find user: "+post)
+		return
 	}
 
 	http.Redirect(w, r, "/players/"+id, 302) // Temp redirect

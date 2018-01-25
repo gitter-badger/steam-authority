@@ -1,35 +1,29 @@
 {{define "players"}} {{ template "header" }}
 
 <div class="jumbotron">
-    <h1 class="display-4">Players</h1>
-    <p class="lead">Ranks are updated every midnight (GMT).</p>
-</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
 
-<div class="row">
-    <div class="col-md-auto">
+                <h1 class="display-4">Players</h1>
+                <p class="lead">Ranks are updated every midnight (GMT).</p>
 
-        <div class="btn-group btn-group-md mb-4" role="group">
-            <a class="btn btn-primary" href="/players/level">Level</a>
-            <a class="btn btn-primary" href="/players/games">Games</a>
-            <a class="btn btn-primary" href="/players/badges">Badges</a>
-        </div>
-
-    </div>
-    <div class="col">
-
-        <form action="/players" method="post">
-            <div class="input-group input-group-md mb-4">
-                <input class="form-control" type="text" placeholder="Search Player" name="id">
-                <div class="input-group-append">
-                    <input type="submit" value="Search" class="input-group-text">
-                </div>
             </div>
-        </form>
+            <div class="col-sm-6">
 
+                <form action="/players" method="post" class="">
+                    <div class="input-group input-group-lg mb-4">
+                        <input class="form-control" type="text" placeholder="Search For Player" name="id">
+                        <div class="input-group-append">
+                            <input type="submit" value="Search" class="input-group-text">
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
     </div>
 </div>
-
-
 
 <table class="table table-hover table-sm table-ranks">
     <thead>
@@ -41,6 +35,7 @@
         <th scope="col">Badges</th>
         <th scope="col">Play Time</th>
         <th scope="col">Time on Steam</th>
+        <th scope="col">Friends</th>
     </thead>
     {{ range $key, $value := .Ranks }}
     <tr data-link="/players/{{ .ID64 }}">
@@ -62,20 +57,22 @@
     {{ end }}
 </table>
 
-<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-    <div class="btn-group mr-2" role="group" aria-label="First group">
-        <button type="button" class="btn btn-secondary">1</button>
-        <button type="button" class="btn btn-secondary">2</button>
-        <button type="button" class="btn btn-secondary">3</button>
-        <button type="button" class="btn btn-secondary">4</button>
-    </div>
-    <div class="btn-group mr-2" role="group" aria-label="Second group">
-        <button type="button" class="btn btn-secondary">5</button>
-        <button type="button" class="btn btn-secondary">6</button>
-        <button type="button" class="btn btn-secondary">7</button>
-    </div>
-    <div class="btn-group" role="group" aria-label="Third group">
-        <button type="button" class="btn btn-secondary">8</button>
+<div style="text-align:center;">
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups" style="display: inline-block;">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <button type="button" class="btn btn-secondary">1</button>
+            <button type="button" class="btn btn-secondary">2</button>
+            <button type="button" class="btn btn-secondary">3</button>
+            <button type="button" class="btn btn-secondary">4</button>
+        </div>
+        <div class="btn-group mr-2" role="group" aria-label="Second group">
+            <button type="button" class="btn btn-secondary">5</button>
+            <button type="button" class="btn btn-secondary">6</button>
+            <button type="button" class="btn btn-secondary">7</button>
+        </div>
+        <div class="btn-group" role="group" aria-label="Third group">
+            <button type="button" class="btn btn-secondary">8</button>
+        </div>
     </div>
 </div>
 
