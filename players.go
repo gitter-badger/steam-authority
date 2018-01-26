@@ -104,6 +104,8 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 	template := playerTemplate{}
 	template.Player = dsPlayer
 
+	dsPlayer.Reflect()
+
 	returnTemplate(w, "player", template)
 }
 

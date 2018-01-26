@@ -10,15 +10,30 @@ import (
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
 
-	apps, err := datastore.GetLatestUpdatedApps(10)
+	// Get apps
+	apps, err := datastore.GetLatestUpdatedApps(96)
 	if err != nil {
 		logger.Error(err)
 	}
 
+	// Get apps count
+	count, err := datastore.CountApps()
+	if err != nil {
+		logger.Error(err)
+	}
+
+	// Template
 	template := appsTemplate{}
 	template.Apps = apps
+	template.Count = count
 
 	returnTemplate(w, "apps", template)
+}
+
+type appsTemplate struct {
+	GlobalTemplate
+	Apps  []datastore.DsApp
+	Count int
 }
 
 func appHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,11 +60,6 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	template.Packages = packages
 
 	returnTemplate(w, "app", template)
-}
-
-type appsTemplate struct {
-	GlobalTemplate
-	Apps []datastore.DsApp
 }
 
 type appTemplate struct {

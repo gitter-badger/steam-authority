@@ -1,26 +1,152 @@
 {{define "apps"}} {{ template "header" }}
 
-<input class="form-control form-control-lg" type="text" placeholder=".form-control-lg">
+<form action="/apps" method="get" class="mb-3" data-persist="garlic" data-destroy="false">
 
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link active" href="#">My Library</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Latest Updated</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Link</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link disabled" href="#">Disabled</a>
-  </li>
-</ul>
+    <div class="jumbotron">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
 
+                    <h1 class="display-4">Games</h1>
+                    <p class="lead">A live database of {{ .Count }} Steam games</p>
+
+                </div>
+                <div class="col-sm-6">
+
+                    <div class="input-group input-group-lg mt-4">
+                        <input class="form-control" type="text" placeholder="Search for a Game" name="name">
+                        <div class="input-group-append">
+                            <input type="submit" value="Search" class="input-group-text">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Operating System</label>
+                <select multiple data-placeholder="Choose an OS" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="os">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Tag</label>
+                <select multiple data-placeholder="Choose Tags" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="tag">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Genre</label>
+                <select multiple data-placeholder="Choose Genres" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="genre">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Type</label>
+                <select multiple data-placeholder="Choose Types" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="type">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Release State</label>
+                <select multiple data-placeholder="Choose States" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="state">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Virtual Reality</label>
+                <select multiple data-placeholder="Choose VR Options" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="vr">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Developer</label>
+                <select multiple data-placeholder="Choose Developers" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="developer">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Publisher</label>
+                <select multiple data-placeholder="Choose Publishers" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="publisher">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Language</label>
+                <select multiple data-placeholder="Choose Languages" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="language">
+                    <option value=""></option>
+                    <option value="windows">Windows</option>
+                    <option value="macos">MacOS</option>
+                    <option value="linux">Linux</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-primary btn-block">Search</button>
+        </div>
+    </div>
+
+</form>
+
+<div class="row app-results">
 {{ range $key, $value := .Apps }}
 
-<div>
-  <a href="/apps/{{ .AppID }}">{{ .Name }}</a>
+    <div class="col-sm-3 mb-3">
+        <a href="{{ .GetPath }}">
+            <span>{{ .Name }}</span>
+            <img src="http://cdn.akamai.steamstatic.com/steam/apps/{{ .AppID }}/header.jpg" alt="{{ .Name }}"
+                 onError="this.onerror=null;this.src='/assets/images/no-app-image.jpg';">
+        </a>
+    </div>
+
+{{ end }}
 </div>
 
-{{ end }} {{ template "footer" }} {{end}}
+{{ template "footer" }} {{end}}

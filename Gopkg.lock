@@ -9,6 +9,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/99designs/basicauth-go"
+  packages = ["."]
+  revision = "2a93ba0f464da2a77748a1dc2e9e5bea8bbdd4b9"
+
+[[projects]]
+  branch = "master"
   name = "github.com/Jleagle/go-helpers"
   packages = ["logger"]
   revision = "09f37256ce848a12afb351459d2ea99755571e88"
@@ -136,6 +142,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cb2e21e09277f0e48253552c295515e5b7c599613eee8ef1f90b1fee98c2fd6f"
+  inputs-digest = "c6332c89bccdbe71b421d4efe710aa1cb9342e1f8d19585de89f6a3787ce71a2"
   solver-name = "gps-cdcl"
   solver-version = 1

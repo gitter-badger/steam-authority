@@ -9,6 +9,7 @@ import (
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/dustin/go-humanize"
+	"github.com/gosimple/slug"
 )
 
 func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (err error) {
@@ -54,6 +55,7 @@ func getTemplateFuncMap() map[string]interface{} {
 		"join":  func(a []string) string { return strings.Join(a, ", ") },
 		"title": func(a string) string { return strings.Title(a) },
 		"comma": func(a int) string { return humanize.Comma(int64(a)) },
+		"slug": func(a string) string { return slug.Make(a) },
 	}
 }
 

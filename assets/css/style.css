@@ -34,3 +34,20 @@ nav.navbar {
 .table-ranks img.avatar{
     margin-right: 5px;
 }
+
+.app-results a{
+    color: #212529;
+    text-decoration: none;
+}
+
+.app-results span{
+    display: block;
+    height: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.app-results img{
+    width: 100%;
+    border-radius: .3rem;
+}

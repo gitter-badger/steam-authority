@@ -4,8 +4,10 @@ import (
 	"context"
 	"os"
 	"strconv"
+	"strings"
 
 	"cloud.google.com/go/datastore"
+	"github.com/gosimple/slug"
 )
 
 const (
@@ -53,7 +55,8 @@ func SaveKind(key *datastore.Key, data interface{}) (newKey *datastore.Key, err 
 
 // DsPlayer has everything visible on a player page
 type DsPlayer struct {
-	ID64        int
+	Model
+	ID64        int    `datastore:"id64" model:"key"`
 	ValintyURL  string `datastore:"vality_url"`
 	Avatar      string `datastore:"avatar"`
 	RealName    string `datastore:"real_name"`
@@ -75,9 +78,14 @@ func (p *DsPlayer) GetKey() (key *datastore.Key) {
 	return datastore.NameKey(PLAYER, strconv.Itoa(p.ID64), nil)
 }
 
+func (p *DsPlayer) GetPath() string {
+	return "/players/" + strconv.Itoa(p.ID64) + "/" + slug.Make(p.PersonaName)
+}
+
 // DsRank has only the things that need to be visible on the frontend ranks page
 type DsRank struct {
-	ID64            int
+	Model
+	ID64            int    `datastore:"id64" model:"key"`
 	ValintyURL      string `datastore:"vality_url"`
 	Avatar          string `datastore:"avatar"`
 	PersonaName     string `datastore:"persona_name"`
@@ -121,7 +129,8 @@ func (rank *DsRank) UpdateFromPlayer(player DsPlayer) *DsRank {
 
 // DsChange kind
 type DsChange struct {
-	ChangeID int   `datastore:"change_id"`
+	Model
+	ChangeID int   `datastore:"change_id" model:"key"`
 	Apps     []int `datastore:"apps"`
 	Packages []int `datastore:"packages"`
 }
@@ -132,7 +141,8 @@ func (change *DsChange) GetKey() (key *datastore.Key) {
 
 // DsApp kind
 type DsApp struct {
-	AppID             int      `datastore:"app_id"`
+	Model
+	AppID             int      `datastore:"app_id" model:"key"`
 	Name              string   `datastore:"name"`
 	Type              string   `datastore:"type"`
 	ReleaseState      string   `datastore:"releasestate"`
@@ -152,9 +162,26 @@ func (app *DsApp) GetKey() (key *datastore.Key) {
 	return datastore.NameKey(APP, strconv.Itoa(app.AppID), nil)
 }
 
+func (app *DsApp) GetPath() string {
+	return "/players/" + strconv.Itoa(app.AppID) + "/" + slug.Make(app.Name)
+}
+
+func (app *DsApp) Tidy() *DsApp {
+
+	app.Type = strings.ToLower(app.Type)
+	app.ReleaseState = strings.ToLower(app.ReleaseState)
+
+	if app.Name == "" {
+		app.Name = "App " + strconv.Itoa(app.AppID)
+	}
+
+	return app
+}
+
 // DsPackage kind
 type DsPackage struct {
-	PackageID   int   `datastore:"package_id"`
+	Model
+	PackageID   int   `datastore:"package_id" model:"key"`
 	BillingType int8  `datastore:"billingtype"`
 	LicenseType int8  `datastore:"licensetype"`
 	Status      int8  `datastore:"status"`

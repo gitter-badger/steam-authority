@@ -99,3 +99,19 @@ func BulkAddApps(changes []*DsApp) (err error) {
 
 	return nil
 }
+
+func CountApps() (count int, err error) {
+
+	client, ctx, err := getDSClient()
+	if err != nil {
+		return count, err
+	}
+
+	q := datastore.NewQuery(APP)
+	count, err = client.Count(ctx, q)
+	if err != nil {
+		return count, err
+	}
+
+	return count, nil
+}
