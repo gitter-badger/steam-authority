@@ -70,7 +70,7 @@ func main() {
 func adminRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(basicauth.NewFromEnv("Steam", "STEAM_ADMIN_"))
-	r.Get("/rerank-levels", reRankHandler)
+	r.Get("/rerank", reRankHandler)
 	return r
 }
 

@@ -25,6 +25,17 @@ const (
 	RANK = "Rank"
 )
 
+func getDSClient() (client *datastore.Client, ctx context.Context, err error) {
+
+	ctx = context.Background()
+	client, err = datastore.NewClient(ctx, os.Getenv("STEAM_GOOGLE_PROJECT"))
+	if err != nil {
+		return client, ctx, err
+	}
+
+	return client, ctx, nil
+}
+
 func SaveKind(key *datastore.Key, data interface{}) (newKey *datastore.Key, err error) {
 
 	client, ctx, err := getDSClient()
@@ -38,17 +49,6 @@ func SaveKind(key *datastore.Key, data interface{}) (newKey *datastore.Key, err 
 	}
 
 	return newKey, nil
-}
-
-func getDSClient() (client *datastore.Client, ctx context.Context, err error) {
-
-	ctx = context.Background()
-	client, err = datastore.NewClient(ctx, os.Getenv("STEAM_GOOGLE_PROJECT"))
-	if err != nil {
-		return client, ctx, err
-	}
-
-	return client, ctx, nil
 }
 
 // DsPlayer has everything visible on a player page
@@ -100,6 +100,23 @@ type DsRank struct {
 
 func (rank *DsRank) GetKey() (key *datastore.Key) {
 	return datastore.NameKey(RANK, strconv.Itoa(rank.ID64), nil)
+}
+
+func (rank *DsRank) UpdateFromPlayer(player DsPlayer) *DsRank {
+
+	rank.ID64 = player.ID64
+	rank.ValintyURL = player.ValintyURL
+	rank.Avatar = player.Avatar
+	rank.PersonaName = player.PersonaName
+	rank.CountryCode = player.CountryCode
+	rank.Level = player.Level
+	rank.Games = player.Games
+	rank.Badges = player.Badges
+	rank.PlayTime = player.PlayTime
+	rank.TimeCreated = player.TimeCreated
+	rank.Friends = len(player.Friends)
+
+	return rank
 }
 
 // DsChange kind

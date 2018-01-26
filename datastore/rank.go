@@ -55,7 +55,6 @@ func BulkSaveRanks(ranks []*DsRank) (err error) {
 	}
 
 	fmt.Println("Saving " + strconv.Itoa(RanksLen) + " ranks")
-
 	_, err = client.PutMulti(context, keys, ranks)
 	if err != nil {
 		logger.Error(err)
@@ -64,20 +63,26 @@ func BulkSaveRanks(ranks []*DsRank) (err error) {
 	return nil
 }
 
-func GetRankKeys() (keys []*datastore.Key, err error) {
+func GetRankKeys() (keysMap map[string]*datastore.Key, err error) {
+
+	keysMap = make(map[string]*datastore.Key)
 
 	client, ctx, err := getDSClient()
 	if err != nil {
-		return keys, err
+		return keysMap, err
 	}
 
 	q := datastore.NewQuery(RANK).KeysOnly().Limit(1000)
-	keys, err = client.GetAll(ctx, q, nil)
+	keys, err := client.GetAll(ctx, q, nil)
 	if err != nil {
-		return keys, err
+		return keysMap, err
 	}
 
-	return keys, nil
+	for _, v := range keys {
+		keysMap[v.Name] = v
+	}
+
+	return keysMap, nil
 }
 
 func CountRankedPlayers() (count int, err error) {
@@ -94,4 +99,25 @@ func CountRankedPlayers() (count int, err error) {
 	}
 
 	return count, nil
+}
+
+func BulkDeleteRanks(keys map[string]*datastore.Key) (err error) {
+
+	// Make map a slice
+	var keysToDelete []*datastore.Key
+	for _, v := range keys {
+		keysToDelete = append(keysToDelete, v)
+	}
+
+	client, ctx, err := getDSClient()
+	if err != nil {
+		return err
+	}
+
+	err = client.DeleteMulti(ctx, keysToDelete)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

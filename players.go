@@ -13,10 +13,6 @@ import (
 	"github.com/steam-authority/steam-authority/steam"
 )
 
-const (
-	playersToRank = 500
-)
-
 func playersHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Normalise the order
@@ -132,42 +128,53 @@ type playerTemplate struct {
 
 func reRankHandler(w http.ResponseWriter, r *http.Request) {
 
-	reRank("level")
-	//reRank("games")
-	//reRank("badhes")
+	var playersToRank = 500
+
+	// Get keys, will delete any that are not removed from this map
+	oldKeys, err := datastore.GetRankKeys()
+
+	newRanks := make(map[int]*datastore.DsRank)
+
+	// Get players by level
+	players, err := datastore.GetPlayers("-level", playersToRank)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	for k, v := range players {
+
+		_, ok := newRanks[v.ID64]
+		if !ok {
+
+			rank := &datastore.DsRank{}
+			rank.UpdateFromPlayer(v)
+
+			newRanks[v.ID64] = rank
+		}
+		newRanks[v.ID64].LevelRank = k + 1
+
+		_, ok = oldKeys[strconv.Itoa(v.ID64)]
+		if ok {
+			delete(oldKeys, strconv.Itoa(v.ID64))
+		}
+	}
+
+	// Convert new ranks to slice
+	var ranks []*datastore.DsRank
+	for _, v := range newRanks {
+		ranks = append(ranks, v)
+	}
+
+	// Bulk save ranks
+	err = datastore.BulkSaveRanks(ranks)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	// Delete leftover keys
+	datastore.BulkDeleteRanks(oldKeys)
 
 	w.Write([]byte("OK"))
-}
-
-func reRank(order string) {
-
-	// todo!!
-	// - key new ranks table by ID64 - done
-	// - get keys only for current ranked players
-	// - read players table and get top 500
-	// - insert into ranks table
-	// - delete any keys that have not just been updated
-	// todo!!
-
-	//keys, err := datastore.GetRankKeys()
-
-	//players, err := datastore.GetPlayers("-level", playersToRank)
-	//if err != nil {
-	//	logger.Error(err)
-	//	return
-	//}
-	//
-	//var bulk []*datastore.DsPlayer
-	//
-	//for index := 0; index < len(players); index++ {
-	//	player := players[index]
-	//	//player.LevelRank = index + 1
-	//	bulk = append(bulk, &player)
-	//}
-
-	//err = datastore.BulkSavePlayers(bulk)
-	//if err != nil {
-	//	logger.Error(err)
-	//	return
-	//}
 }
