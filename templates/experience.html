@@ -23,7 +23,7 @@
     {{ range $key, $value := .Chunks }}
     <table class="table table-striped table-bordered table-hover table-sm">
       {{ range $keyx, $valuex := $value }}
-      <tr class="{{ if eq $.Level .Level }}table-primary{{ end }}" id="level_{{ .Level }}">
+      <tr class="{{ if eq $.Level .Level }}table-success{{ end }}" id="level_{{ .Level }}">
         <td width="25%">{{ comma .Level }}</td>
         <td width="25%">{{ comma .Start }}</td>
         <td width="25%">{{ comma .End }}</td>

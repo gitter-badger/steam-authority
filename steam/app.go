@@ -12,7 +12,6 @@ import (
 /**
 https://partner.steamgames.com/doc/webapi/ISteamApps#GetCheatingReports
 https://partner.steamgames.com/doc/webapi/ISteamApps#GetPlayersBanned
-http://store.steampowered.com/api/appdetails/?appids=440
 */
 
 func GetAppDetails(id string) (app AppDetailsBody, err error) {

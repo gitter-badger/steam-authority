@@ -13,9 +13,47 @@ import (
 /**
 https://partner.steamgames.com/doc/webapi/ISteamUser#GetUserGroupList
 https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerBans
-https://partner.steamgames.com/doc/webapi/ISteamUser#GetFriendList
 https://partner.steamgames.com/doc/webapi/ISteamUser#GetAppPriceInfo
 */
+
+func GetFriendList(id string) (friends []GetFriendListFriend, err error) {
+
+	options := url.Values{}
+	options.Set("steamid", id)
+	options.Set("relationship", "friend")
+
+	bytes, err := get("ISteamUser/GetFriendList/v1/", options)
+	if err != nil {
+		return friends, err
+	}
+
+	if strings.Contains(string(bytes), "Internal Server Error") {
+		return friends, errors.New("no such user")
+	}
+
+	// Unmarshal JSON
+	var resp *GetFriendListBody
+	if err := json.Unmarshal(bytes, &resp); err != nil {
+		if strings.Contains(err.Error(), "cannot unmarshal") {
+			pretty.Print(string(bytes))
+		}
+		return friends, err
+	}
+
+	return resp.Friendslist.Friends, nil
+}
+
+type GetFriendListBody struct {
+	Friendslist struct {
+		Friends []GetFriendListFriend `json:"friends"`
+	} `json:"friendslist"`
+}
+
+type GetFriendListFriend struct {
+	Steamid      string `json:"steamid"`
+	Relationship string `json:"relationship"`
+	FriendSince  int    `json:"friend_since"`
+}
 
 func ResolveVanityURL(id string) (resp ResolveVanityURLBody, err error) {
 
@@ -37,7 +75,7 @@ func ResolveVanityURL(id string) (resp ResolveVanityURLBody, err error) {
 	}
 
 	if resp.Response.Success != 1 {
-		return resp, errors.New("No user found")
+		return resp, errors.New("no user found")
 	}
 
 	return resp, nil
@@ -53,6 +91,7 @@ type ResolveVanityURLResponse struct {
 	Message string `json:"message"`
 }
 
+// todo, only return the needed response
 func GetPlayerSummaries(ids []int) (resp PlayerSummariesBody, err error) {
 
 	if len(ids) > 100 {

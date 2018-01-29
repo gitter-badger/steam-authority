@@ -81,3 +81,8 @@ li.media:last-child p{
 .card-body .list-unstyled{
     margin-bottom: 0;
 }
+
+#player-page .jumbotron img{
+    height: 3.5rem;
+    vertical-align: text-bottom;
+}

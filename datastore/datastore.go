@@ -69,7 +69,7 @@ type DsPlayer struct {
 	PersonaName string    `datastore:"persona_name"`
 	CountryCode string    `datastore:"country_code"`
 	StateCode   string    `datastore:"status_code"`
-	TimeUpdated int64     `datastore:"time_updated"`
+	TimeUpdated int64     `datastore:"time_updated"` // todo, Remove?
 	Level       int       `datastore:"level"`
 	Games       int       `datastore:"games"`
 	Badges      int       `datastore:"badges"`
@@ -109,6 +109,18 @@ func (player *DsPlayer) FillFromSummary(summary steam.PlayerSummariesBody) *DsPl
 		player.PersonaName = summary.Response.Players[0].PersonaName
 	}
 
+	return player
+}
+
+func (player *DsPlayer) FillFromFriends(summary []steam.GetFriendListFriend) *DsPlayer {
+
+	var friends []int
+	for _, v := range summary {
+		i, _ := strconv.Atoi(v.Steamid)
+		friends = append(friends, i)
+	}
+
+	player.Friends = friends
 	return player
 }
 

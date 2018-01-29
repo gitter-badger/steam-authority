@@ -3,8 +3,6 @@ package main
 import (
 	"net/http"
 	"strconv"
-	"time"
-
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/datastore"
@@ -74,6 +72,8 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err.Error() == "datastore: no such entity" || err.Error() == "expired" {
 
+			dsPlayer.ID64 = idx
+			
 			//Get summary
 			summary, err := steam.GetPlayerSummaries([]int{idx})
 			if err != nil {
@@ -81,14 +81,18 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 				returnErrorTemplate(w, 404, err.Error())
 				return
 			}
-
 			dsPlayer.FillFromSummary(summary)
 
-			dsPlayer.ID64 = idx
-			dsPlayer.TimeUpdated = time.Now().Unix()
+			//Get friends
+			friends, err := steam.GetFriendList(id)
+			if err != nil {
+				logger.Error(err)
+				returnErrorTemplate(w, 404, err.Error())
+				return
+			}
+			dsPlayer.FillFromFriends(friends)
 
-			// todo, get friends, player bans, groups
-
+			// todo, get player bans, groups
 			// todo, clear latest players cache
 			dsPlayer.Tidy()
 			_, err = datastore.SaveKind(dsPlayer.GetKey(), &dsPlayer)
