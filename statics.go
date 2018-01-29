@@ -11,6 +11,7 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func donateHandler(w http.ResponseWriter, r *http.Request) {
+	// todo, setup Patreon for donations
 	returnTemplate(w, "donate", nil)
 }
 

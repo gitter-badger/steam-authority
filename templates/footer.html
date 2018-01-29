@@ -6,28 +6,6 @@
 <script src="/assets/js/chosen.min.js"></script>
 <script src="/assets/js/js.js"></script>
 
-<script>
-    $(document).ready(function () {
-        if (typeof scrollTo === 'string') {
-            window.scroll({
-                top: $(scrollTo).offset().top - 100,
-                left: 0,
-                behavior: 'smooth'
-            });
-        }
-
-        $("[data-link]").click(function () {
-            window.location.href = $(this).attr('data-link');
-        });
-
-        $('select.form-control-chosen').chosen({
-            disable_search_threshold: 10,
-            allow_single_deselect: true,
-            rtl: false
-        });
-    });
-</script>
-
 </body>
 
 </html>

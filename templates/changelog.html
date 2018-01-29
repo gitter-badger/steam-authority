@@ -12,16 +12,18 @@
 
     {{ range $key, $value := .Commits }}
 
-    <li class="media">
-      <img class="mr-3" src="{{ .Author.AvatarURL }}" alt="{{ .Author.Login }}" style="width: 36px; margin-bottom: 1rem;">
-      <div class="media-body">
-        <h5 class="mt-0 mb-1">{{ .Commit.Message }}</h5>
-        {{ .Commit.Author.Date.Unix }}
-        <a href="{{ .HTMLURL }}">
-          <i class="fa fa-paperclip" aria-hidden="true"></i>
-        </a>
-      </div>
-    </li>
+        <li class="media">
+            <img class="mr-3" src="{{ .Author.AvatarURL }}" alt="{{ .Author.Login }}">
+            <div class="media-body">
+                <h5 class="mt-0 mb-1">{{ .Commit.Message }}</h5>
+                <p class="text-muted">
+                    {{ .Commit.Author.Date.Unix }}
+                    <a href="{{ .HTMLURL }}">
+                        <i class="fa fa-paperclip" aria-hidden="true"></i>
+                    </a>
+                </p>
+            </div>
+        </li>
 
     {{ end }}
 

@@ -2,10 +2,7 @@ body {
     overflow-y: scroll;
 }
 
-nav.navbar {
-    /* margin-bottom: 20px; */
-}
-
+/* Jumbotron */
 .jumbotron {
     padding: 2rem;
     margin-top: 2rem;
@@ -15,6 +12,7 @@ nav.navbar {
     margin: 0;
 }
 
+/* Tables */
 .table-ranks tr[data-link]{
     cursor: pointer;
 }
@@ -36,6 +34,7 @@ nav.navbar {
     margin-right: 5px;
 }
 
+/* App Results */
 .app-results a{
     color: #212529;
     text-decoration: none;
@@ -53,6 +52,7 @@ nav.navbar {
     border-radius: .3rem;
 }
 
+/* App */
 .app-header{
     background-position: center;
     background-repeat: no-repeat;
@@ -65,6 +65,20 @@ nav.navbar {
     margin-top: 0;
 }
 
-.transparent {
-    opacity: 0.8;
+/* Media lists */
+li.media img{
+    width: 52px;
+    height: 52px;
+}
+
+li.media p{
+    margin-bottom: 1rem;
+}
+
+li.media:last-child p{
+    margin-bottom: 0;
+}
+
+.card-body .list-unstyled{
+    margin-bottom: 0;
 }

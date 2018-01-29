@@ -51,6 +51,10 @@ func main() {
 	r.Get("/faqs", faqsHandler)
 	r.Get("/credits", creditsHandler)
 
+	// Chat
+	r.Get("/chat", chatHandler)
+	r.Get("/chat/{id}", chatHandler)
+
 	// Other
 	r.Get("/websocket", websockets.Handler)
 	r.Get("/changelog", changelogHandler)

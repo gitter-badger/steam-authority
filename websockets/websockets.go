@@ -11,6 +11,7 @@ import (
 
 const (
 	CHANGES = "changes"
+	CHAT = "chat"
 )
 
 var wsConnections map[int]websocketStruct

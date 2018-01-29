@@ -32,6 +32,12 @@
   version = "v1.2.0"
 
 [[projects]]
+  name = "github.com/bwmarrin/discordgo"
+  packages = ["."]
+  revision = "4a33b9bc7c56cfdb9bb244e33e83cb3941fe2bdc"
+  version = "v0.18.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/dustin/go-humanize"
   packages = ["."]
@@ -111,6 +117,12 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["nacl/secretbox","poly1305","salsa20/salsa"]
+  revision = "1875d0a70c90e57f11972aefd42276df65e895b9"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
   revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
@@ -154,6 +166,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6985c13767ef57c91a81f11443433584963db93ec6db13b824e7932d35ecfab5"
+  inputs-digest = "8beb6aa6b5e85ce98aa2bc34a42018d576a69b3e7dbb7a5b6fc7f69c4285637a"
   solver-name = "gps-cdcl"
   solver-version = 1
