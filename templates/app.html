@@ -1,48 +1,107 @@
-{{define "app"}} {{ template "header" }} {{if eq .App.ReleaseState "prerelease"}}
-<div class="alert alert-primary" role="alert">This game is not released yet!</div>
-{{end}}
+{{define "app"}} {{ template "header" }} {{if ne .App.Background "" }}
 
-<h3>{{.App.Name}}</h3>
+<div class="container">
 
-<p>App Type: {{ .App.Type }}</p>
-<p>Release State: {{ .App.ReleaseState }}</p>
-<p>OS': {{ .App.OSList }}</p>
+  <div class="jumbotron">
+    <h1 class="display-4">{{.App.Name}}</h1>
+    <p class="lead">x</p>
+  </div>
 
-{{ if gt .App.MetacriticScore 0 }}
-<p>Metacritic Score:
-  <a href="{{ .App.MetacriticFullURL }}">{{ .App.MetacriticScore }}</a>
-</p>
-{{end}}
+  {{ end }} {{if eq .App.ReleaseState "prerelease"}}
+  <div class="alert alert-primary" role="alert">This game is not released yet!</div>
+  {{end}}
 
-<p>Store Tags: {{ .App.StoreTags }}</p>
-<p>Developer: {{ .App.Developer }}</p>
-<p>Publisher: {{ .App.Publisher }}</p>
-<p>Homepage: {{ .App.Homepage }}</p>
-<p>Change Number:
-  <a href="/changes/{{ .App.ChangeNumber }}">{{ .App.ChangeNumber }}</a>
-</p>
+  <div class="card">
+    <div class="card-header bg-light text-white">
 
-<h5>Included in these packages</h5>
-<table class="table table-hover table-sm">
-  <thead>
-    <th scope="col">Package ID</th>
-    <th scope="col">Billing</th>
-    <th scope="col">License</th>
-    <th scope="col">Status</th>
-    <th scope="col">Apps</th>
-  </thead>
-  {{ range $key, $value := .Packages }}
-  <tr>
-    <td>
-      <a href="/packages/{{.PackageID}}">{{.PackageID}}</a>
-    </td>
-    <td>{{ .BillingType }}</td>
-    <td>{{ .LicenseType }}</td>
-    <td>{{ .Status }}</td>
-    <td>{{ len .Apps }}</td>
-    <!-- <td>{{.ChangeID}}</td> -->
-  </tr>
-  {{ end }}
-</table>
+      <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="home-tab" data-toggle="tab" href="#details" role="tab">Details</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="profile-tab" data-toggle="tab" href="#media" role="tab">Media ({{ len .App.ScreenshotStruct }})</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="contact-tab" data-toggle="tab" href="#achievements" role="tab">Achievements ({{ .App.AchievementsStruct.Total }})</a>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane show active" id="details" role="tabpanel">
+
+          <p>App Type: {{ .App.Type }}</p>
+          <p>Release State: {{ .App.ReleaseState }}</p>
+          <p>OS': {{ .App.OSList }}</p>
+
+          {{ if gt .App.MetacriticScore 0 }}
+          <p>Metacritic Score:
+            <a href="{{ .App.MetacriticFullURL }}">{{ .App.MetacriticScore }}</a>
+          </p>
+          {{end}}
+
+          <p>Store Tags: {{ .App.StoreTags }}</p>
+          <p>Homepage: {{ .App.Homepage }}</p>
+          <p>Change Number:
+            <a href="/changes/{{ .App.ChangeNumber }}">{{ .App.ChangeNumber }}</a>
+          </p>
+
+          <h5>Included in these packages</h5>
+          <table class="table table-hover table-sm">
+            <thead>
+              <th scope="col">Package ID</th>
+              <th scope="col">Billing</th>
+              <th scope="col">License</th>
+              <th scope="col">Status</th>
+              <th scope="col">Apps</th>
+            </thead>
+            {{ range $key, $value := .Packages }}
+            <tr>
+              <td>
+                <a href="/packages/{{.PackageID}}">{{.PackageID}}</a>
+              </td>
+              <td>{{ .BillingType }}</td>
+              <td>{{ .LicenseType }}</td>
+              <td>{{ .Status }}</td>
+              <td>{{ len .Apps }}</td>
+              <!-- <td>{{.ChangeID}}</td> -->
+            </tr>
+            {{ end }}
+          </table>
+
+        </div>
+        <div class="tab-pane" id="media" role="tabpanel">
+
+          <div style="width:70%;">
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+              <ol class="carousel-indicators">
+                {{ range $key, $value := .App.ScreenshotStruct }}
+                <li data-target="#carouselExampleIndicators" data-slide-to="{{ $key }}" class="{{if eq $key 0}}active{{end}}"></li>
+                {{ end }}
+              </ol>
+              <div class="carousel-inner">
+                {{ range $key, $value := .App.ScreenshotStruct }}
+                <div class="carousel-item {{if eq $key 0}}active{{end}}">
+                  <img class="d-block w-100" style="width:50%;" src="{{ .PathFull }}" alt="Slide {{ $key }}">
+                </div>
+                {{ end }}
+              </div>
+              <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="achievements" role="tabpanel">Achs</div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 {{ template "footer" }} {{end}}

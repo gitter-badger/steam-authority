@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"path"
 	"strconv"
 	"time"
 
@@ -74,23 +73,21 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 		if err.Error() == "datastore: no such entity" || err.Error() == "expired" {
 
 			//Get summary
-			summary, _ := steam.GetPlayerSummaries([]int{idx})
+			summary, err := steam.GetPlayerSummaries([]int{idx})
+			if err != nil {
+				logger.Error(err)
+			}
+			dsPlayer.FillFromSummary(summary)
 
 			id64, _ := strconv.Atoi(summary.Response.Players[0].SteamID)
-
 			dsPlayer.ID64 = id64
-			dsPlayer.Avatar = summary.Response.Players[0].AvatarFull
-			dsPlayer.ValintyURL = path.Base(summary.Response.Players[0].ProfileURL)
-			dsPlayer.RealName = summary.Response.Players[0].RealName
+
 			dsPlayer.TimeUpdated = time.Now().Unix()
-			dsPlayer.CountryCode = summary.Response.Players[0].LOCCountryCode
-			dsPlayer.StateCode = summary.Response.Players[0].LOCStateCode
-			dsPlayer.PersonaName = summary.Response.Players[0].PersonaName
 
 			// todo, get friends, player bans, groups
 
 			// todo, clear latest players cache
-			err := datastore.SavePlayer(dsPlayer)
+			_, err = datastore.SaveKind(dsPlayer.GetKey(), dsPlayer)
 			if err != nil {
 				logger.Error(err)
 			}
@@ -103,8 +100,6 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := playerTemplate{}
 	template.Player = dsPlayer
-
-	dsPlayer.Reflect()
 
 	returnTemplate(w, "player", template)
 }
@@ -150,7 +145,7 @@ func reRankHandler(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 
 			rank := &datastore.DsRank{}
-			rank.UpdateFromPlayer(v)
+			rank.FillFromPlayer(v)
 
 			newRanks[v.ID64] = rank
 		}

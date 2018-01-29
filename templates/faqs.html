@@ -1,36 +1,40 @@
 {{define "faqs"}} {{ template "header" }}
 
-<div class="jumbotron">
-  <h1 class="display-4">FAQs</h1>
-  <p class="lead">If something has gone unanswered, please
-    <a href="/contact">contact us</a>.</p>
+<div class="container">
+
+  <div class="jumbotron">
+    <h1 class="display-4">FAQs</h1>
+    <p class="lead">If something has gone unanswered, please
+      <a href="/contact">contact us</a>.</p>
+  </div>
+
+  <h5>I can not find a player</h5>
+  <p>We only find out about players when they get searched for or via a friend already in our database.</p>
+
+  <h5>A player exists but does not have a rank</h5>
+  <p>Ranks are not live and get calculated at midnight (GMT), so new players may not have a rank right away.
+    <br />We may not have access to your stats, you can allow access at by editing your profile on
+    <a href="http://steamcommunity.com">steamcommunity.com</a> and clicking "My Privacy Settings".</p>
+
+  <h5>How can I help out?</h5>
+  <p>Programmers can submit
+    <a href="https://github.com/steam-authority/steam-authority">pull requests</a>.
+    <a href="/donate">Donations</a> are always welome for everyone else.</p>
+
+  <h5>How do we gather user data?</h5>
+  <p>Steam has dozens of APIs we can call to get data from them. Everything on Steam Authority is also availible using the steam app.</p>
+
+  <h5>I found a website bug</h5>
+  <p>Please file an issue on
+    <a href="https://github.com/steam-authority/steam-authority/issues/new">GitHub</a>. Or
+    <a href="/contact">send us an email</a>.</p>
+
+  <h5>What are future plans for Steam Authority?</h5>
+  <p>See our
+    <a href="https://trello.com/b/mi2sDpBS/steam-authority">Trello</a> workboard or
+    <a href="/contact">email</a> us for ideas.
+  </p>
+
 </div>
-
-<h5>I can not find a player</h5>
-<p>We only find out about players when they get searched for or via a friend already in our database.</p>
-
-<h5>A player exists but does not have a rank</h5>
-<p>Ranks are not live and get calculated at midnight (GMT), so new players may not have a rank right away.
-  <br />We may not have access to your stats, you can allow access at by editing your profile on
-  <a href="http://steamcommunity.com">steamcommunity.com</a> and clicking "My Privacy Settings".</p>
-
-<h5>How can I help out?</h5>
-<p>Programmers can submit
-  <a href="https://github.com/steam-authority/steam-authority">pull requests</a>.
-  <a href="/donate">Donations</a> are always welome for everyone else.</p>
-
-<h5>How do we gather user data?</h5>
-<p>Steam has dozens of APIs we can call to get data from them. Everything on Steam Authority is also availible using the steam app.</p>
-
-<h5>I found a website bug</h5>
-<p>Please file an issue on
-  <a href="https://github.com/steam-authority/steam-authority/issues/new">GitHub</a>. Or
-  <a href="/contact">send us an email</a>.</p>
-
-<h5>What are future plans for Steam Authority?</h5>
-<p>See our
-  <a href="https://trello.com/b/mi2sDpBS/steam-authority">Trello</a> workboard or
-  <a href="/contact">email</a> us for ideas.
-</p>
 
 {{ template "footer" }} {{end}}

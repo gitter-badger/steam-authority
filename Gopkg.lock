@@ -74,6 +74,12 @@
   version = "v1.2.0"
 
 [[projects]]
+  name = "github.com/gosimple/slug"
+  packages = ["."]
+  revision = "e9f42fa127660e552d0ad2b589868d403a9be7c6"
+  version = "v1.1.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/kardianos/osext"
   packages = ["."]
@@ -90,6 +96,12 @@
   name = "github.com/kr/text"
   packages = ["."]
   revision = "7cafcd837844e784b526369c9bce262804aebc60"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/rainycape/unidecode"
+  packages = ["."]
+  revision = "cb7f23ec59bec0d61b19c56cd88cee3d0cc1870c"
 
 [[projects]]
   name = "github.com/stvp/rollbar"
@@ -142,6 +154,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c6332c89bccdbe71b421d4efe710aa1cb9342e1f8d19585de89f6a3787ce71a2"
+  inputs-digest = "6985c13767ef57c91a81f11443433584963db93ec6db13b824e7932d35ecfab5"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,17 +1,21 @@
 {{define "changes"}} {{ template "header" }}
 
-<div class="jumbotron">
-  <h1 class="display-4">Changes</h1>
-  <p class="lead">Every time the Steam library gets updated, a change record is created. We use these to keep website information up to date.</p>
+<div class="container">
+
+  <div class="jumbotron">
+    <h1 class="display-4">Changes</h1>
+    <p class="lead">Every time the Steam library gets updated, a change record is created. We use these to keep website information up to date.</p>
+  </div>
+
+  {{ range $key, $value := .Changes }}
+
+  <h5>
+    <a href="/changes/{{ .ChangeID }}">{{ .ChangeID }}</a>
+  </h5>
+
+  {{ end }}
+
 </div>
-
-{{ range $key, $value := .Changes }}
-
-<h5>
-  <a href="/changes/{{ .ChangeID }}">{{ .ChangeID }}</a>
-</h5>
-
-{{ end }}
 
 <script>
   // Handle WebSockets

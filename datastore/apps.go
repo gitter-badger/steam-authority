@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 
 	"cloud.google.com/go/datastore"
@@ -46,14 +47,18 @@ func GetApp(id string) (app DsApp, err error) {
 	return app, nil
 }
 
-func GetLatestUpdatedApps(limit int) (apps []DsApp, err error) {
+func SearchApps(query url.Values, limit int) (apps []DsApp, err error) {
 
 	client, context, err := getDSClient()
 	if err != nil {
 		return apps, err
 	}
 
-	q := datastore.NewQuery(APP).Order("-change_number").Limit(limit)
+	q := datastore.NewQuery(APP).Limit(limit)
+
+	addFilter(q, query, "os", "oslist")
+	addFilter(q, query, "tag", "store_tags")
+
 	it := client.Run(context, q)
 
 	for {
@@ -70,6 +75,16 @@ func GetLatestUpdatedApps(limit int) (apps []DsApp, err error) {
 	}
 
 	return apps, err
+}
+
+func addFilter(q *datastore.Query, query url.Values, formName string, dbName string) *datastore.Query {
+
+	formValue := query.Get(formName)
+	if formValue != "" {
+		q = q.Filter(dbName+" =", formValue)
+	}
+
+	return q
 }
 
 func BulkAddApps(changes []*DsApp) (err error) {

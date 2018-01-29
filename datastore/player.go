@@ -9,6 +9,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
+// todo, Only return 1 player not slice
 func GetPlayer(id64 string) (player DsPlayer, err error) {
 
 	client, context, err := getDSClient()
@@ -71,14 +72,4 @@ func CountPlayers() (count int, err error) {
 	}
 
 	return count, nil
-}
-
-func SavePlayer(dsPlayer DsPlayer) (err error) {
-
-	_, err = SaveKind(dsPlayer.GetKey(), &dsPlayer)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

@@ -2,16 +2,18 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/steam"
 )
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get apps
-	apps, err := datastore.GetLatestUpdatedApps(96)
+	apps, err := datastore.SearchApps(r.URL.Query(), 96)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -38,25 +40,54 @@ type appsTemplate struct {
 
 func appHandler(w http.ResponseWriter, r *http.Request) {
 
-	// Get app
-	app, err := datastore.GetApp(chi.URLParam(r, "id"))
+	id := chi.URLParam(r, "id")
+	idx, err := strconv.Atoi(id)
 	if err != nil {
 		logger.Error(err)
+		returnErrorTemplate(w, 404, err.Error())
+		return
+	}
+
+	// Get app
+	dsApp, err := datastore.GetApp(id)
+	if err != nil {
 		if err.Error() == "datastore: no such entity" {
-			returnErrorTemplate(w, 404, "We can't find this app in our database, there may not be one with this ID.")
+
+			dsApp.AppID = idx
+
+			// Get app details
+			details, err := steam.GetAppDetails(id)
+			if err != nil {
+				if err.Error() == "no app with id" {
+					returnErrorTemplate(w, 404, "Sorry but there is no app with this ID")
+					return
+				}
+				logger.Error(err)
+			}
+			dsApp.FillFromAppDetails(details)
+
+			dsApp.Tidy()
+			_, err = datastore.SaveKind(dsApp.GetKey(), &dsApp)
+			if err != nil {
+				logger.Error(err)
+			}
+		} else {
+			logger.Error(err)
+			returnErrorTemplate(w, 404, err.Error())
 			return
 		}
 	}
+	dsApp.FillFromJSON()
 
 	// Get packages
-	packages, err := datastore.GetPackagesAppIsIn(app.AppID)
+	packages, err := datastore.GetPackagesAppIsIn(dsApp.AppID)
 	if err != nil {
 		logger.Error(err)
 	}
 
 	// Template
 	template := appTemplate{}
-	template.App = app
+	template.App = dsApp
 	template.Packages = packages
 
 	returnTemplate(w, "app", template)

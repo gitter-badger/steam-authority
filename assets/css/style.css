@@ -3,11 +3,12 @@ body {
 }
 
 nav.navbar {
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 .jumbotron {
     padding: 2rem;
+    margin-top: 2rem;
 }
 
 .jumbotron .lead{
@@ -50,4 +51,20 @@ nav.navbar {
 .app-results img{
     width: 100%;
     border-radius: .3rem;
+}
+
+.app-header{
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: black;
+    padding: 2rem 0;
+}
+
+.app-header .jumbotron {
+    margin-top: 0;
+}
+
+.transparent {
+    opacity: 0.8;
 }

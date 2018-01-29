@@ -1,61 +1,65 @@
 {{define "donate"}} {{ template "header" }}
 
-<div class="jumbotron">
-  <h1 class="display-4">Donate</h1>
-  <p class="lead">Help pay for the server costs or just buy me a beer.</p>
-</div>
+<div class="container">
 
-<h5>
-  <i class="fa fa-usd" aria-hidden="true"></i> Patreon</h5>
-<p>
-  <a href="https://www.patreon.com/jimeagle">https://www.patreon.com/jimeagle</a>
-</p>
+  <div class="jumbotron">
+    <h1 class="display-4">Donate</h1>
+    <p class="lead">Help pay for the server costs or just buy me a beer.</p>
+  </div>
 
-<h5>
-  <i class="fa fa-paypal" aria-hidden="true"></i> PayPal</h5>
-<p>
-  <a href="https://paypal.me/jimeagle/10">https://paypal.me/jimeagle</a>
-</p>
+  <h5>
+    <i class="fa fa-usd" aria-hidden="true"></i> Patreon</h5>
+  <p>
+    <a href="https://www.patreon.com/jimeagle">https://www.patreon.com/jimeagle</a>
+  </p>
 
-<h5>
-  <i class="fa fa-btc" aria-hidden="true"></i> Bitcoin</h5>
-<p>
-  <a href="bitcoin:1fEzg5JTUhyo6Pe1gpuRZp3gLTyTU22cf" data-toggle="modal" data-target="#bcModal">Bitcoin</a>
-</p>
+  <h5>
+    <i class="fa fa-paypal" aria-hidden="true"></i> PayPal</h5>
+  <p>
+    <a href="https://paypal.me/jimeagle/10">https://paypal.me/jimeagle</a>
+  </p>
 
-<!-- Modal -->
-<div class="modal fade" id="bcModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
+  <h5>
+    <i class="fa fa-btc" aria-hidden="true"></i> Bitcoin</h5>
+  <p>
+    <a href="bitcoin:1fEzg5JTUhyo6Pe1gpuRZp3gLTyTU22cf" data-toggle="modal" data-target="#bcModal">Bitcoin</a>
+  </p>
 
-        <h5 class="modal-title" id="exampleModalLabel">Donate Bitcoin</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+  <!-- Modal -->
+  <div class="modal fade" id="bcModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
 
-      </div>
-      <div class="modal-body">
+          <h5 class="modal-title" id="exampleModalLabel">Donate Bitcoin</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
 
-        <a href="bitcoin:1fEzg5JTUhyo6Pe1gpuRZp3gLTyTU22cf">
-          <img src="/assets/images/bitcoin-qr-code.png" alt="1fEzg5JTUhyo6Pe1gpuRZp3gLTyTU22cf" style=" display: block; margin: 0 auto;">
-        </a>
-
-      </div>
-      <div class="modal-footer">
-
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">
-              <i class="fa fa-btc" aria-hidden="true"></i>
-            </span>
-          </div>
-          <input type="text" class="form-control" placeholder="Bitcoin Address" value="1fEzg5JTUhyo6Pe1gpuRZp3gLTyTU22cf" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
+        <div class="modal-body">
 
+          <a href="bitcoin:1fEzg5JTUhyo6Pe1gpuRZp3gLTyTU22cf">
+            <img src="/assets/images/bitcoin-qr-code.png" alt="1fEzg5JTUhyo6Pe1gpuRZp3gLTyTU22cf" style=" display: block; margin: 0 auto;">
+          </a>
+
+        </div>
+        <div class="modal-footer">
+
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">
+                <i class="fa fa-btc" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input type="text" class="form-control" placeholder="Bitcoin Address" value="1fEzg5JTUhyo6Pe1gpuRZp3gLTyTU22cf" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
+
 </div>
 
 {{ template "footer" }} {{end}}

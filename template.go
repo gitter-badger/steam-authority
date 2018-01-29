@@ -55,7 +55,7 @@ func getTemplateFuncMap() map[string]interface{} {
 		"join":  func(a []string) string { return strings.Join(a, ", ") },
 		"title": func(a string) string { return strings.Title(a) },
 		"comma": func(a int) string { return humanize.Comma(int64(a)) },
-		"slug": func(a string) string { return slug.Make(a) },
+		"slug":  func(a string) string { return slug.Make(a) },
 	}
 }
 

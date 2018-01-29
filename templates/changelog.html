@@ -1,30 +1,30 @@
 {{define "changelog"}} {{ template "header" }}
+<div class="container">
+  <div class="jumbotron">
+    <h1 class="display-4">Changelog</h1>
+    <p class="lead">
+      The latest commits to the code base. If a commit is on this list it does not mean it's in the latest deployment. Future plans can be found on our
+      <a href="https://trello.com/b/mi2sDpBS/steam-authority">Trello</a>.
+    </p>
+  </div>
 
-<div class="jumbotron">
-  <h1 class="display-4">Changelog</h1>
-  <p class="lead">
-    The latest commits to the code base. If a commit is on this list it does not mean it's in the latest deployment. Future plans can be found on our
-    <a href="https://trello.com/b/mi2sDpBS/steam-authority">Trello</a>.
-  </p>
+  <ul class="list-unstyled">
+
+    {{ range $key, $value := .Commits }}
+
+    <li class="media">
+      <img class="mr-3" src="{{ .Author.AvatarURL }}" alt="{{ .Author.Login }}" style="width: 36px; margin-bottom: 1rem;">
+      <div class="media-body">
+        <h5 class="mt-0 mb-1">{{ .Commit.Message }}</h5>
+        {{ .Commit.Author.Date.Unix }}
+        <a href="{{ .HTMLURL }}">
+          <i class="fa fa-paperclip" aria-hidden="true"></i>
+        </a>
+      </div>
+    </li>
+
+    {{ end }}
+
+  </ul>
 </div>
-
-<ul class="list-unstyled">
-
-  {{ range $key, $value := .Commits }}
-
-  <li class="media">
-    <img class="mr-3" src="{{ .Author.AvatarURL }}" alt="{{ .Author.Login }}" style="width: 36px; margin-bottom: 1rem;">
-    <div class="media-body">
-      <h5 class="mt-0 mb-1">{{ .Commit.Message }}</h5>
-      {{ .Commit.Author.Date.Unix }}
-      <a href="{{ .HTMLURL }}">
-        <i class="fa fa-paperclip" aria-hidden="true"></i>
-      </a>
-    </div>
-  </li>
-
-  {{ end }}
-
-</ul>
-
 {{ template "footer" }} {{end}}
