@@ -100,12 +100,14 @@ func (player *DsPlayer) Tidy() *DsPlayer {
 
 func (player *DsPlayer) FillFromSummary(summary steam.PlayerSummariesBody) *DsPlayer {
 
-	player.Avatar = summary.Response.Players[0].AvatarFull
-	player.ValintyURL = path.Base(summary.Response.Players[0].ProfileURL)
-	player.RealName = summary.Response.Players[0].RealName
-	player.CountryCode = summary.Response.Players[0].LOCCountryCode
-	player.StateCode = summary.Response.Players[0].LOCStateCode
-	player.PersonaName = summary.Response.Players[0].PersonaName
+	if len(summary.Response.Players) > 0 {
+		player.Avatar = summary.Response.Players[0].AvatarFull
+		player.ValintyURL = path.Base(summary.Response.Players[0].ProfileURL)
+		player.RealName = summary.Response.Players[0].RealName
+		player.CountryCode = summary.Response.Players[0].LOCCountryCode
+		player.StateCode = summary.Response.Players[0].LOCStateCode
+		player.PersonaName = summary.Response.Players[0].PersonaName
+	}
 
 	return player
 }

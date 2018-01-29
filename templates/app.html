@@ -1,4 +1,4 @@
-{{define "app"}} {{ template "header" }} {{if ne .App.Background "" }}
+{{define "app"}} {{ template "header" }}
 
 <div class="container">
 
@@ -7,7 +7,7 @@
     <p class="lead">x</p>
   </div>
 
-  {{ end }} {{if eq .App.ReleaseState "prerelease"}}
+  {{if eq .App.ReleaseState "prerelease"}}
   <div class="alert alert-primary" role="alert">This game is not released yet!</div>
   {{end}}
 

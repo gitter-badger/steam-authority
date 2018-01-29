@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
-
 	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/steam"
+	slugify "github.com/gosimple/slug"
 )
 
 func playersHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,6 +61,8 @@ type playersTemplate struct {
 func playerHandler(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
+	slug := chi.URLParam(r, "slug")
+
 	idx, err := strconv.Atoi(id)
 	if err != nil {
 		logger.Error(err)
@@ -76,18 +78,20 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 			summary, err := steam.GetPlayerSummaries([]int{idx})
 			if err != nil {
 				logger.Error(err)
+				returnErrorTemplate(w, 404, err.Error())
+				return
 			}
+
 			dsPlayer.FillFromSummary(summary)
 
-			id64, _ := strconv.Atoi(summary.Response.Players[0].SteamID)
-			dsPlayer.ID64 = id64
-
+			dsPlayer.ID64 = idx
 			dsPlayer.TimeUpdated = time.Now().Unix()
 
 			// todo, get friends, player bans, groups
 
 			// todo, clear latest players cache
-			_, err = datastore.SaveKind(dsPlayer.GetKey(), dsPlayer)
+			dsPlayer.Tidy()
+			_, err = datastore.SaveKind(dsPlayer.GetKey(), &dsPlayer)
 			if err != nil {
 				logger.Error(err)
 			}
@@ -98,6 +102,14 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Redirect to correct slug
+	correctSLug := slugify.Make(dsPlayer.PersonaName)
+	if slug != "" && slug != correctSLug {
+		http.Redirect(w, r, "/players/"+id+"/"+correctSLug, 302)
+		return
+	}
+
+	// Template
 	template := playerTemplate{}
 	template.Player = dsPlayer
 
@@ -115,7 +127,7 @@ func playerIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/players/"+id, 302) // Temp redirect
+	http.Redirect(w, r, "/players/"+id, 302)
 }
 
 type playerTemplate struct {

@@ -25,9 +25,16 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 		return app, err
 	}
 
+	// Check for no app
 	if string(bytes) == "null" {
 		return app, errors.New("invalid app id")
 	}
+
+	// Fix values that can change type, causing unmarshal errors
+	b := strings.Replace(string(bytes), "\"pc_requirements\":[],", "\"pc_requirements\":null,", 1)
+	b = strings.Replace(b, "\"mac_requirements\":[],", "\"mac_requirements\":null,", 1)
+	b = strings.Replace(b, "\"linux_requirements\":[],", "\"linux_requirements\":null,", 1)
+	bytes = []byte(b)
 
 	// Unmarshal JSON
 	resp := make(map[string]AppDetailsBody)
@@ -47,7 +54,7 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 
 type AppDetailsBody struct {
 	Success bool `json:"success"`
-	Data    struct {
+	Data struct {
 		Type                string `json:"type"`
 		Name                string `json:"name"`
 		SteamAppid          int    `json:"steam_appid"`
@@ -61,7 +68,7 @@ type AppDetailsBody struct {
 		SupportedLanguages  string `json:"supported_languages"`
 		HeaderImage         string `json:"header_image"`
 		Website             string `json:"website"`
-		PcRequirements      struct {
+		PcRequirements struct {
 			Minimum     string `json:"minimum"`
 			Recommended string `json:"recommended"`
 		} `json:"pc_requirements"`
@@ -73,16 +80,16 @@ type AppDetailsBody struct {
 			Minimum     string `json:"minimum"`
 			Recommended string `json:"recommended"`
 		} `json:"linux_requirements"`
-		LegalNotice   string   `json:"legal_notice"`
-		Developers    []string `json:"developers"`
-		Publishers    []string `json:"publishers"`
+		LegalNotice string   `json:"legal_notice"`
+		Developers  []string `json:"developers"`
+		Publishers  []string `json:"publishers"`
 		PriceOverview struct {
 			Currency        string `json:"currency"`
 			Initial         int    `json:"initial"`
 			Final           int    `json:"final"`
 			DiscountPercent int    `json:"discount_percent"`
 		} `json:"price_overview"`
-		Packages      []int `json:"packages"`
+		Packages []int `json:"packages"`
 		PackageGroups []struct {
 			Name                    string `json:"name"`
 			Title                   string `json:"title"`
@@ -91,7 +98,7 @@ type AppDetailsBody struct {
 			SaveText                string `json:"save_text"`
 			DisplayType             int    `json:"display_type"`
 			IsRecurringSubscription string `json:"is_recurring_subscription"`
-			Subs                    []struct {
+			Subs []struct {
 				Packageid                int    `json:"packageid"`
 				PercentSavingsText       string `json:"percent_savings_text"`
 				PercentSavings           int    `json:"percent_savings"`
@@ -120,11 +127,11 @@ type AppDetailsBody struct {
 			Description string `json:"description"`
 		} `json:"genres"`
 		Screenshots []AppDetailsScreenshot `json:"screenshots"`
-		Movies      []struct {
+		Movies []struct {
 			ID        int    `json:"id"`
 			Name      string `json:"name"`
 			Thumbnail string `json:"thumbnail"`
-			Webm      struct {
+			Webm struct {
 				Num480 string `json:"480"`
 				Max    string `json:"max"`
 			} `json:"webm"`
@@ -134,7 +141,7 @@ type AppDetailsBody struct {
 			Total int `json:"total"`
 		} `json:"recommendations"`
 		Achievements AppDetailsAchievements `json:"achievements"`
-		ReleaseDate  struct {
+		ReleaseDate struct {
 			ComingSoon bool   `json:"coming_soon"`
 			Date       string `json:"date"`
 		} `json:"release_date"`
@@ -153,7 +160,7 @@ type AppDetailsScreenshot struct {
 }
 
 type AppDetailsAchievements struct {
-	Total       int `json:"total"`
+	Total int `json:"total"`
 	Highlighted []struct {
 		Name string `json:"name"`
 		Path string `json:"path"`

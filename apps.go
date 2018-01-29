@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/steam"
+	slugify "github.com/gosimple/slug"
 )
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +42,8 @@ type appsTemplate struct {
 func appHandler(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
+	slug := chi.URLParam(r, "slug")
+
 	idx, err := strconv.Atoi(id)
 	if err != nil {
 		logger.Error(err)
@@ -78,6 +81,13 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	dsApp.FillFromJSON()
+
+	// Redirect to correct slug
+	correctSLug := slugify.Make(dsApp.Name)
+	if slug != "" && slug != correctSLug {
+		http.Redirect(w, r, "/apps/"+id+"/"+correctSLug, 302)
+		return
+	}
 
 	// Get packages
 	packages, err := datastore.GetPackagesAppIsIn(dsApp.AppID)
