@@ -52,7 +52,7 @@ module.exports = function (grunt) {
                 src: [
                     'assets/css/third-party/*.css',
                     'assets/css/*.css',
-                    'assets/tmp/*.css',
+                    'assets/tmp/concatenate.scss.css',
                 ],
                 dest: 'assets/tmp/all-css.css'
             }
