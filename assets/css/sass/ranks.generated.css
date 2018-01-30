@@ -1,0 +1,15 @@
+.table-ranks tr[data-link] {
+  cursor: pointer; }
+
+.table-ranks td.img {
+  padding: 0; }
+
+.table-ranks td.img span {
+  display: inline-block;
+  margin: .3rem; }
+
+.table-ranks img {
+  height: 36px; }
+
+.table-ranks img.avatar {
+  margin-right: 5px; }

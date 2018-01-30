@@ -3,65 +3,50 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        uglify: {
-            options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-            },
-            build: {
-                src: 'assets/tmp/*.js',
-                dest: 'assets/_compiled.min.js'
-            }
-        },
-        less: {
-            options: {
-                paths: ['assets/css/*.less'],
-                modifyVars: {
-                    imgPath: '"http://mycdn.com/path/to/images"',
-                    bgColor: 'red'
-                }
-            },
-            files: {
-                'path/to/result.css': 'path/to/source.less'
-            }
-        },
         sass: {
+            options: {
+                sourceMap: false
+            },
             dist: {
-                options: {
-                    sourcemap: 'none'
-                },
-                files: {
-                    'assets/tmp/concatenate.scss.css': 'assets/tmp/concatenate.scss',
-                }
+                files: [{
+                    expand: true,
+                    cwd: 'assets/sass',
+                    src: '*.scss',
+                    dest: 'assets/css/sass',
+                    ext: '.generated.css'
+                }]
             }
         },
         concat: {
             js: {
                 src: [
                     'assets/js/third-party/*.js',
-                    'assets/js/*.js',
+                    'assets/js/*.js'
                 ],
-                dest: 'assets/tmp/concatenate.js',
-            },
-            sass: {
-                src: [
-                    'assets/sass/*.scss',
-                ],
-                dest: 'assets/tmp/concatenate.scss'
+                dest: 'assets/tmp/concatenate.js'
             },
             css: {
                 src: [
                     'assets/css/third-party/*.css',
-                    'assets/css/*.css',
-                    'assets/tmp/concatenate.scss.css',
+                    'assets/css/sass/*.css'
                 ],
-                dest: 'assets/tmp/all-css.css'
+                dest: 'assets/tmp/concatenate.css'
             }
         },
         cssmin: {
             target: {
                 files: {
-                    'assets/_compiled.min.css': ['assets/tmp/all-css.css']
+                    'assets/compiled.min.css': ['assets/tmp/concatenate.css']
                 }
+            }
+        },
+        uglify: {
+            options: {
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+            },
+            build: {
+                src: 'assets/tmp/*.js',
+                dest: 'assets/compiled.min.js'
             }
         },
         watch: {
@@ -78,27 +63,24 @@ module.exports = function (grunt) {
 
     // Load the plugin that provides the tasks
     grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
-
-    //
-    // grunt.task.run('notify_hooks');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-sass');
 
     // Default tasks.
     grunt.registerTask('default', [
         // CSS
-        'concat:sass',
         'sass',
         'concat:css',
         'cssmin',
 
         // JS
         'concat:js',
-        'uglify',
+        'uglify'
 
         // Watch
-        'watch'
+        // 'watch'
     ]);
 };
