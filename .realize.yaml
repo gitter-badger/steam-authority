@@ -38,3 +38,4 @@ schema:
     ignored_paths:
     - .git
     - vendor
+    - third-party

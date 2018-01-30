@@ -19,7 +19,6 @@ func main() {
 	logger.SetRollbarKey(os.Getenv("STEAM_ROLLBAR_PRIVATE"))
 
 	r := chi.NewRouter()
-	r.Get("/", homeHandler)
 
 	// Apps
 	r.Get("/apps", appsHandler)
@@ -56,6 +55,7 @@ func main() {
 	r.Get("/chat/{id}", chatHandler)
 
 	// Other
+	r.Get("/", homeHandler)
 	r.Get("/websocket", websockets.Handler)
 	r.Get("/changelog", changelogHandler)
 

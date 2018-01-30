@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// todo, https://github.com/Acidic9/go-steam/blob/master/steamapi/steamapi.go
 func get(path string, query url.Values, useKey ...bool) (bytes []byte, err error) {
 
 	if path != "" {

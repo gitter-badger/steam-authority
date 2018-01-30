@@ -6,8 +6,10 @@ import (
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 
-	template := homeTemplate{}
+	http.Redirect(w, r, "/players", 302)
+	return
 
+	template := homeTemplate{}
 	returnTemplate(w, "home", template)
 }
 

@@ -1,0 +1,22 @@
+.table-ranks {
+
+    tr[data-link] {
+        cursor: pointer;
+    }
+
+    td.img {
+        padding: 0;
+    }
+    td.img span {
+        display: inline-block;
+        margin: .3rem;
+    }
+
+    img {
+        height: 36px;
+    }
+
+    img.avatar {
+        margin-right: 5px;
+    }
+}
