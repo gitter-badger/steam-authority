@@ -1,0 +1,21 @@
+@import "mixins";
+
+.app-results {
+
+    a {
+        /*color: #212529;*/
+        text-decoration: none;
+    }
+
+    span {
+        display: block;
+        height: 24px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    img {
+        @include rounded;
+        width: 100%;
+    }
+}

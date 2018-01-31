@@ -1,0 +1,13 @@
+@import "mixins";
+
+.app-header {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: black;
+    padding: 2rem 0;
+}
+
+.app-header .jumbotron {
+    margin-top: 0;
+}

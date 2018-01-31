@@ -1,14 +1,12 @@
+@import "mixins";
+
 body {
     overflow-y: scroll;
 }
 
-.rounded {
-    border-radius: .3rem !important;
-}
-
 /* Navbar */
 .navbar-brand {
-    border-radius: 50%;
+    @include rounded;
     background-color: #5cb85c;
     display: inline-block;
     height: 36px;
@@ -20,44 +18,13 @@ body {
 }
 
 .jumbotron {
+    @include rounded;
     padding: 2rem;
     margin-top: 2rem;
 
     .lead {
         margin: 0;
     }
-}
-
-.app-results {
-
-    a {
-        /*color: #212529;*/
-        text-decoration: none;
-    }
-
-    span {
-        display: block;
-        height: 24px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    img {
-        width: 100%;
-    }
-}
-
-/* App */
-.app-header {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: black;
-    padding: 2rem 0;
-}
-
-.app-header .jumbotron {
-    margin-top: 0;
 }
 
 /* Media lists */
