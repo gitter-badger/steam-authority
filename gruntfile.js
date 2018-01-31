@@ -52,7 +52,7 @@ module.exports = function (grunt) {
         watch: {
             css: {
                 files: ['assets/css/*.css', 'assets/css/third-party/*.css', 'assets/sass/*.scss'],
-                tasks: ['concat:sass', 'sass', 'concat:css', 'cssmin']
+                tasks: ['sass', 'concat:css', 'cssmin']
             },
             js: {
                 files: ['assets/js/*.js', 'assets/js/third-party/*.js'],
@@ -78,9 +78,9 @@ module.exports = function (grunt) {
 
         // JS
         'concat:js',
-        'uglify'
+        'uglify',
 
         // Watch
-        // 'watch'
+        'watch'
     ]);
 };
