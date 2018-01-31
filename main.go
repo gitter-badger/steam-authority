@@ -73,7 +73,9 @@ func main() {
 
 func adminRouter() http.Handler {
 	r := chi.NewRouter()
-	r.Use(basicauth.NewFromEnv("Steam", "STEAM_ADMIN_"))
+	r.Use(basicauth.New("Steam", map[string][]string{
+		os.Getenv("STEAM_AUTH_USER"): {os.Getenv("STEAM_AUTH_PASS")},
+	}))
 	r.Get("/rerank", reRankHandler)
 	return r
 }
