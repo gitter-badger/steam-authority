@@ -23,42 +23,54 @@ module.exports = function (grunt) {
                     'assets/js/third-party/*.js',
                     'assets/js/*.js'
                 ],
-                dest: 'assets/tmp/concatenate.js'
+                dest: 'assets/concatenate.js'
             },
             css: {
                 src: [
-                    'assets/css/third-party/*.css',
+                    'assets/css/*.css',
                     'assets/css/sass/*.css'
                 ],
-                dest: 'assets/tmp/concatenate.css'
+                dest: 'assets/concatenate.css'
             }
         },
         cssmin: {
+            options: {
+                sourceMap: true,
+                roundingPrecision: -1
+            },
             target: {
                 files: {
-                    'assets/compiled.min.css': ['assets/tmp/concatenate.css']
+                    'assets/compiled.min.css': ['assets/concatenate.css']
                 }
             }
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */',
+                compress: true,
+                sourceMap: true,
+                'mangle.properties': true
             },
             build: {
-                src: 'assets/tmp/*.js',
+                src: 'assets/concatenate.js',
                 dest: 'assets/compiled.min.js'
             }
         },
         watch: {
-            css: {
-                files: ['assets/css/*.css', 'assets/css/third-party/*.css', 'assets/sass/*.scss'],
-                tasks: ['sass', 'concat:css', 'cssmin']
+            sass: {
+                files: ['assets/sass/*.scss'],
+                tasks: ['sass', 'concat:css', 'cssmin', 'clean']
             },
             js: {
-                files: ['assets/js/*.js', 'assets/js/third-party/*.js'],
-                tasks: ['concat:js', 'uglify']
+                files: ['assets/js/*.js'],
+                tasks: ['concat:js', 'uglify', 'clean']
             }
-        }
+        },
+        clean: [
+            'assets/css/sass/',
+            'assets/concatenate.js',
+            'assets/concatenate.css',
+        ]
     });
 
     // Load the plugin that provides the tasks
@@ -67,6 +79,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-sass');
 
     // Default tasks.
@@ -80,7 +93,8 @@ module.exports = function (grunt) {
         'concat:js',
         'uglify',
 
-        // Watch
+        //
+        'clean',
         'watch'
     ]);
 };

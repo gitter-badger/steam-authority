@@ -1,5 +1,4 @@
 config/
 generated/
-assets/tmp/
 node_modules/
 steam-authority
