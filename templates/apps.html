@@ -4,24 +4,22 @@
     <form action="/apps" method="get" class="mb-3" data-persist="garlic" data-destroy="false">
 
         <div class="jumbotron">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-6">
+            <div class="row">
+                <div class="col-sm-6">
 
-                        <h1 class="display-4">Games</h1>
-                        <p class="lead">A live database of {{ .Count }} Steam games</p>
+                    <h1 class="display-4">Games</h1>
+                    <p class="lead">A live database of {{ .Count }} Steam games</p>
 
-                    </div>
-                    <div class="col-sm-6">
+                </div>
+                <div class="col-sm-6">
 
-                        <div class="input-group input-group-lg mt-4">
-                            <input class="form-control" type="text" placeholder="Search for a Game" name="name">
-                            <div class="input-group-append">
-                                <input type="submit" value="Search" class="input-group-text">
-                            </div>
+                    <div class="input-group input-group-lg mt-4">
+                        <input class="form-control" type="text" placeholder="Search for a Game" name="name">
+                        <div class="input-group-append">
+                            <input type="submit" value="Search" class="input-group-text">
                         </div>
-
                     </div>
+
                 </div>
             </div>
         </div>
@@ -137,7 +135,7 @@
     </form>
 
     <div class="row app-results">
-        {{ range $key, $value := .Apps }}
+    {{ range $key, $value := .Apps }}
 
         <div class="col-sm-3 mb-3">
             <a href="{{ .GetPath }}">
@@ -146,7 +144,7 @@
             </a>
         </div>
 
-        {{ end }}
+    {{ end }}
     </div>
 
 </div>
