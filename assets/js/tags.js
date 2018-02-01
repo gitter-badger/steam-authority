@@ -1,16 +1,13 @@
 if ($('#tags-page').length > 0) {
 
     var options = {
-        valueNames: ['tag-name'],
+        valueNames: ['tag-name', 'tag-games', 'tag-votes'],
         listClass: 'tags-list',
         page: 1000,
-        pagination: false,
         fuzzySearch: {
             searchClass: 'tags-search',
             location: 0,
-            // distance: 100,
-            threshold: 0.5,
-            // multiSearch: true
+            threshold: 0.5
         }
     };
 

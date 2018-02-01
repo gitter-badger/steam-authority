@@ -1,14 +1,22 @@
-#tags-page .list-group {
+#tags-page {
 
-    svg, i {
-        float: left;
-        width: 30px;
-        height: 30px;
-        margin: 13px 10px 0px -6px;
+    .list-group {
+
+        svg, i {
+            float: left;
+            width: 30px;
+            height: 30px;
+            margin: 10px 10px 0 -2px;
+        }
+
+        h6 {
+            @include text-truncate;
+            height: 19px;
+        }
     }
 
-    h6 {
-        @include text-truncate;
-        height: 19px;
+    span[data-sort] {
+        text-decoration: underline;
+        cursor: pointer;
     }
 }

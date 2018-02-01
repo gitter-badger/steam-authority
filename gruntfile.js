@@ -32,7 +32,7 @@ module.exports = function (grunt) {
         },
         cssmin: {
             options: {
-                sourceMap: true,
+                sourceMap: false,
                 roundingPrecision: -1
             },
             target: {
@@ -45,7 +45,7 @@ module.exports = function (grunt) {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */',
                 compress: true,
-                sourceMap: true,
+                sourceMap: false,
                 mangleProperties: true
             },
             build: {
