@@ -6,4 +6,9 @@
         height: 30px;
         margin: 13px 10px 0px -6px;
     }
+
+    h6 {
+        @include text-truncate;
+        height: 19px;
+    }
 }

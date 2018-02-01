@@ -8,13 +8,9 @@ module.exports = function (grunt) {
                 sourceMap: false
             },
             dist: {
-                files: [{
-                    expand: true,
-                    cwd: 'assets/sass',
-                    src: '*.scss',
-                    dest: 'assets/css/sass',
-                    ext: '.generated.css'
-                }]
+                files: {
+                    'assets/css/sass/index.css': 'assets/sass/index.scss'
+                }
             }
         },
         concat: {
@@ -59,19 +55,26 @@ module.exports = function (grunt) {
         },
         watch: {
             sass: {
-                files: ['assets/sass/*.scss'],
-                tasks: ['sass', 'concat:css', 'cssmin', 'clean']
+                files: ['assets/sass/**/*.scss'],
+                tasks: ['sass', 'concat:css', 'cssmin', 'clean', 'notify:done']
             },
             js: {
                 files: ['assets/js/*.js'],
-                tasks: ['concat:js', 'uglify', 'clean']
+                tasks: ['concat:js', 'uglify', 'clean', 'notify:done']
             }
         },
         clean: [
             'assets/css/sass/',
             'assets/concatenate.js',
             'assets/concatenate.css',
-        ]
+        ],
+        notify: {
+            done: {
+                options: {
+                    message: 'Done @ ' + new Date().getMinutes() + ":" + new Date().getSeconds() + '!'
+                }
+            }
+        }
     });
 
     // Load the plugin that provides the tasks
@@ -81,7 +84,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-sass');
+
+    // For notify
+    grunt.task.run('notify_hooks');
 
     // Default tasks.
     grunt.registerTask('default', [
@@ -96,6 +103,7 @@ module.exports = function (grunt) {
 
         //
         'clean',
+        'notify:done',
         'watch'
     ]);
 };

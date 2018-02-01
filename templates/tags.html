@@ -28,12 +28,12 @@
 
     <div class="row tags-list">
     {{ range $key, $value := .Tags }}
-        <div class="col-sm-4 mb-1" id="tag_{{ .ID }}">
+        <div class="col-sm-4 mb-2" id="tag_{{ .ID }}">
 
             <div class="list-group">
-                <a href="{{ .GetPath }}" class="list-group-item list-group-item-action flex-column align-items-start active">
+                <a href="{{ .GetPath }}" class="list-group-item list-group-item-action list-group-item-secondary">
                     <i class="fas fa-tag"></i>
-                    <h5 class="mb-1 tag-name"> {{ .Name }}</h5>
+                    <h6 class="mb-1 tag-name"> {{ .Name }}</h6>
                     {{/*<p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>*/}}
                     <small>{{ comma .Games }} Games / {{ comma .Votes }} Votes</small>
                 </a>
