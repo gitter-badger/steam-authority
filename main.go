@@ -58,6 +58,7 @@ func main() {
 	r.Get("/", homeHandler)
 	r.Get("/websocket", websockets.Handler)
 	r.Get("/changelog", changelogHandler)
+	r.Get("/tags", tagsHandler)
 
 	// Admin
 	r.Mount("/admin", adminRouter())

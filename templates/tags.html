@@ -1,0 +1,48 @@
+{{define "tags"}} {{ template "header" }}
+
+<div class="container" id="tags-page">
+
+    <div class="jumbotron">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-sm-6">
+
+                    <h1 class="display-4">Tags</h1>
+                    <p class="lead">xx</p>
+
+                </div>
+                <div class="col-sm-6">
+
+                    <form class="mt-4">
+                        <div class="input-group input-group-lg mb-4">
+                            <input class="form-control tags-search" type="text" placeholder="Search for a Tag" required="required">
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row tags-list">
+    {{ range $key, $value := .Tags }}
+        <div class="col-sm-4 mb-1" id="tag_{{ .ID }}">
+
+            <div class="list-group">
+                <a href="{{ .GetPath }}" class="list-group-item list-group-item-action flex-column align-items-start active">
+                    <i class="fas fa-tag"></i>
+                    <h5 class="mb-1 tag-name"> {{ .Name }}</h5>
+                    {{/*<p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>*/}}
+                    <small>{{ comma .Games }} Games / {{ comma .Votes }} Votes</small>
+                </a>
+            </div>
+
+        </div>
+    {{ end }}
+    </div>
+
+</div>
+
+{{ template "footer" }} {{end}}

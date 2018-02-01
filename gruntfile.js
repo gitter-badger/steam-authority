@@ -27,8 +27,9 @@ module.exports = function (grunt) {
             },
             css: {
                 src: [
-                    'assets/css/*.css',
-                    'assets/css/sass/*.css'
+                    'assets/css/third-party/*.css',
+                    'assets/css/sass/*.css',
+                    'assets/css/*.css'
                 ],
                 dest: 'assets/concatenate.css'
             }
@@ -49,7 +50,7 @@ module.exports = function (grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */',
                 compress: true,
                 sourceMap: true,
-                'mangle.properties': true
+                mangleProperties: true
             },
             build: {
                 src: 'assets/concatenate.js',
