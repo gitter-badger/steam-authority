@@ -3,11 +3,12 @@ package main
 import (
 	"net/http"
 	"strconv"
+
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
+	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/steam"
-	slugify "github.com/gosimple/slug"
 )
 
 func playersHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +74,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 		if err.Error() == "datastore: no such entity" || err.Error() == "expired" {
 
 			dsPlayer.ID64 = idx
-			
+
 			//Get summary
 			summary, err := steam.GetPlayerSummaries([]int{idx})
 			if err != nil {

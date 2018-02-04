@@ -6,6 +6,7 @@ import (
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/mysql"
 )
 
 func changesHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,8 +71,8 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 type changesTemplate struct {
 	GlobalTemplate
 	Changes  []datastore.DsChange
-	Apps     map[int]datastore.DsApp
-	Packages map[int]datastore.DsPackage
+	Apps     map[int]mysql.App
+	Packages map[int]mysql.Package
 }
 
 type changeTemplate struct {

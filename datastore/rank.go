@@ -3,6 +3,7 @@ package datastore
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
@@ -10,6 +11,61 @@ import (
 )
 
 var ranksLimit = 500
+
+type DsRank struct {
+	CreatedAt       time.Time `datastore:"created_at"`
+	UpdatedAt       time.Time `datastore:"updated_at"`
+	ID64            int       `datastore:"id64"`
+	ValintyURL      string    `datastore:"vality_url"`
+	Avatar          string    `datastore:"avatar"`
+	PersonaName     string    `datastore:"persona_name"`
+	CountryCode     string    `datastore:"country_code"`
+	Level           int       `datastore:"level"`
+	LevelRank       int       `datastore:"level_rank"`
+	Games           int       `datastore:"games"`
+	GamesRank       int       `datastore:"games_rank"`
+	Badges          int       `datastore:"badges"`
+	BadgesRank      int       `datastore:"badges_rank"`
+	PlayTime        int       `datastore:"play_time"`
+	PlayTimeRank    int       `datastore:"play_time_rank"`
+	TimeCreated     int       `datastore:"time_created"`
+	TimeCreatedRank int       `datastore:"time_created_rank"`
+	Friends         int       `datastore:"friends"`
+	FriendsRank     int       `datastore:"friends_rank"`
+
+	Rank int `datastore:"-"` // Just for the frontend
+}
+
+func (rank DsRank) GetKey() (key *datastore.Key) {
+	return datastore.NameKey(RANK, strconv.Itoa(rank.ID64), nil)
+}
+
+func (rank *DsRank) Tidy() *DsRank {
+
+	rank.UpdatedAt = time.Now()
+	if rank.CreatedAt.IsZero() {
+		rank.CreatedAt = time.Now()
+	}
+
+	return rank
+}
+
+func (rank *DsRank) FillFromPlayer(player DsPlayer) *DsRank {
+
+	rank.ID64 = player.ID64
+	rank.ValintyURL = player.ValintyURL
+	rank.Avatar = player.Avatar
+	rank.PersonaName = player.PersonaName
+	rank.CountryCode = player.CountryCode
+	rank.Level = player.Level
+	rank.Games = player.Games
+	rank.Badges = player.Badges
+	rank.PlayTime = player.PlayTime
+	rank.TimeCreated = player.TimeCreated
+	rank.Friends = len(player.Friends)
+
+	return rank
+}
 
 func GetRanksBy(order string) (ranks []DsRank, err error) {
 

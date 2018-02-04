@@ -2,15 +2,16 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
-	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/mysql"
 )
 
 func packagesHandler(w http.ResponseWriter, r *http.Request) {
 
-	packages, err := datastore.GetLatestUpdatedPackages(10)
+	packages, err := mysql.GetLatestPackages()
 	if err != nil {
 		logger.Error(err)
 	}
@@ -24,20 +25,31 @@ func packagesHandler(w http.ResponseWriter, r *http.Request) {
 
 func packageHandler(w http.ResponseWriter, r *http.Request) {
 
-	packagex, err := datastore.GetPackage(chi.URLParam(r, "id"))
+	idx, err := strconv.ParseUint(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		logger.Error(err)
+	}
 
-		if err.Error() == "datastore: no such entity" {
+	packagex, err := mysql.GetPackage(uint(idx))
+	if err != nil {
+
+		if err.Error() == "sql: no rows in result set" {
 			returnErrorTemplate(w, 404, "We can't find this package in our database, there may not be one with this ID.")
 			return
 		}
+
+		logger.Error(err)
 
 		returnErrorTemplate(w, 404, err.Error())
 		return
 	}
 
-	apps, err := datastore.GetMultiAppsByKey(packagex.Apps)
+	appIDs, err := packagex.GetApps()
+	if err != nil {
+		logger.Error(err)
+	}
+
+	apps, err := mysql.GetApps(appIDs)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -51,11 +63,11 @@ func packageHandler(w http.ResponseWriter, r *http.Request) {
 
 type packagesTemplate struct {
 	GlobalTemplate
-	Packages []datastore.DsPackage
+	Packages []mysql.Package
 }
 
 type packageTemplate struct {
 	GlobalTemplate
-	Package datastore.DsPackage
-	Apps    []datastore.DsApp
+	Package mysql.Package
+	Apps    []mysql.App
 }

@@ -6,21 +6,20 @@ import (
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
-	"github.com/steam-authority/steam-authority/datastore"
-	"github.com/steam-authority/steam-authority/steam"
 	slugify "github.com/gosimple/slug"
+	"github.com/steam-authority/steam-authority/mysql"
 )
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get apps
-	apps, err := datastore.SearchApps(r.URL.Query(), 96)
+	apps, err := mysql.SearchApps(r.URL.Query())
 	if err != nil {
 		logger.Error(err)
 	}
 
 	// Get apps count
-	count, err := datastore.CountApps()
+	count, err := mysql.CountTable("apps")
 	if err != nil {
 		logger.Error(err)
 	}
@@ -35,8 +34,8 @@ func appsHandler(w http.ResponseWriter, r *http.Request) {
 
 type appsTemplate struct {
 	GlobalTemplate
-	Apps  []datastore.DsApp
-	Count int
+	Apps  []mysql.App
+	Count uint
 }
 
 func appHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,14 +51,12 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get app
-	dsApp, err := datastore.GetApp(id)
+	app, err := mysql.GetApp(uint(idx))
 	if err != nil {
-		if err.Error() == "datastore: no such entity" {
-
-			dsApp.AppID = idx
+		if err.Error() == "sql: no rows in result set" {
 
 			// Get app details
-			details, err := steam.GetAppDetails(id)
+			app.FillFromAppDetails()
 			if err != nil {
 				if err.Error() == "no app with id" {
 					returnErrorTemplate(w, 404, "Sorry but there is no app with this ID")
@@ -67,10 +64,8 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				logger.Error(err)
 			}
-			dsApp.FillFromAppDetails(details)
 
-			dsApp.Tidy()
-			_, err = datastore.SaveKind(dsApp.GetKey(), &dsApp)
+			err = app.Save(idx)
 			if err != nil {
 				logger.Error(err)
 			}
@@ -80,24 +75,23 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	dsApp.FillFromJSON()
 
 	// Redirect to correct slug
-	correctSLug := slugify.Make(dsApp.Name)
+	correctSLug := slugify.Make(app.Name)
 	if slug != "" && slug != correctSLug {
 		http.Redirect(w, r, "/apps/"+id+"/"+correctSLug, 302)
 		return
 	}
 
 	// Get packages
-	packages, err := datastore.GetPackagesAppIsIn(dsApp.AppID)
+	packages, err := mysql.GetPackagesAppIsIn(app.ID)
 	if err != nil {
 		logger.Error(err)
 	}
 
 	// Template
 	template := appTemplate{}
-	template.App = dsApp
+	template.App = app
 	template.Packages = packages
 
 	returnTemplate(w, "app", template)
@@ -105,6 +99,6 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 
 type appTemplate struct {
 	GlobalTemplate
-	App      datastore.DsApp
-	Packages []datastore.DsPackage
+	App      mysql.App
+	Packages []mysql.Package
 }

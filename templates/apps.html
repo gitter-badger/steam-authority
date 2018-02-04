@@ -1,7 +1,7 @@
 {{define "apps"}} {{ template "header" }}
 <div class="container">
 
-    <form action="/apps" method="get" class="mb-3" data-persist="garlic" data-destroy="false">
+    <form action="/apps" method="get" class="mb-3" data-persist="garlicx" data-destroy="false">
 
         <div class="jumbotron">
             <div class="row">
@@ -28,7 +28,7 @@
             <div class="col-sm">
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Operating System</label>
-                    <select multiple data-placeholder="Choose an OS" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="os">
+                    <select multiple data-placeholder="Choose an OS" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="platforms f">
                         <option value=""></option>
                         <option value="windows">Windows</option>
                         <option value="macos">MacOS</option>
@@ -39,7 +39,7 @@
             <div class="col-sm">
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Tag</label>
-                    <select multiple data-placeholder="Choose Tags" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="tag">
+                    <select multiple data-placeholder="Choose Tags" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="tags">
                         <option value=""></option>
                         <option value="windows">Windows</option>
                         <option value="macos">MacOS</option>
@@ -50,7 +50,7 @@
             <div class="col-sm">
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Genre</label>
-                    <select multiple data-placeholder="Choose Genres" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="genre">
+                    <select multiple data-placeholder="Choose Genres" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="genres">
                         <option value=""></option>
                         <option value="windows">Windows</option>
                         <option value="macos">MacOS</option>
@@ -61,7 +61,7 @@
             <div class="col-sm">
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Type</label>
-                    <select multiple data-placeholder="Choose Types" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="type">
+                    <select multiple data-placeholder="Choose Types" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="types">
                         <option value=""></option>
                         <option value="windows">Windows</option>
                         <option value="macos">MacOS</option>
@@ -72,7 +72,7 @@
             <div class="col-sm">
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Release State</label>
-                    <select multiple data-placeholder="Choose States" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="state">
+                    <select multiple data-placeholder="Choose States" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="states">
                         <option value=""></option>
                         <option value="windows">Windows</option>
                         <option value="macos">MacOS</option>
@@ -96,7 +96,7 @@
             <div class="col-sm">
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Developer</label>
-                    <select multiple data-placeholder="Choose Developers" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="developer">
+                    <select multiple data-placeholder="Choose Developers" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="developers">
                         <option value=""></option>
                         <option value="windows">Windows</option>
                         <option value="macos">MacOS</option>
@@ -107,7 +107,7 @@
             <div class="col-sm">
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Publisher</label>
-                    <select multiple data-placeholder="Choose Publishers" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="publisher">
+                    <select multiple data-placeholder="Choose Publishers" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="publishers">
                         <option value=""></option>
                         <option value="windows">Windows</option>
                         <option value="macos">MacOS</option>
@@ -118,7 +118,7 @@
             <div class="col-sm">
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Language</label>
-                    <select multiple data-placeholder="Choose Languages" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="language">
+                    <select multiple data-placeholder="Choose Languages" class="form-control form-control-chosen" id="exampleFormControlSelect1" name="languages">
                         <option value=""></option>
                         <option value="windows">Windows</option>
                         <option value="macos">MacOS</option>
@@ -139,8 +139,8 @@
 
         <div class="col-sm-3 mb-3">
             <a href="{{ .GetPath }}">
-                <span>{{ .Name }}</span>
-                <img src="http://cdn.akamai.steamstatic.com/steam/apps/{{ .AppID }}/header.jpg" alt="{{ .Name }}" onError="this.onerror=null;this.src='/assets/img/no-app-image.jpg';">
+                <span>{{ .GetName }}</span>
+                <img src="http://cdn.akamai.steamstatic.com/steam/apps/{{ .ID }}/header.jpg" alt="{{ .GetName }}" onError="this.onerror=null;this.src='/assets/img/no-app-image.jpg';">
             </a>
         </div>
 

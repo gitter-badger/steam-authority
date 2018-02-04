@@ -3,11 +3,35 @@ package datastore
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
 	"google.golang.org/api/iterator"
 )
+
+type DsChange struct {
+	CreatedAt time.Time `datastore:"created_at"`
+	UpdatedAt time.Time `datastore:"updated_at"`
+	ChangeID  int       `datastore:"change_id"`
+	Apps      []int     `datastore:"apps"`
+	Packages  []int     `datastore:"packages"`
+}
+
+func (change DsChange) GetKey() (key *datastore.Key) {
+	return datastore.NameKey(CHANGE, strconv.Itoa(change.ChangeID), nil)
+}
+
+func (change *DsChange) Tidy() *DsChange {
+
+	change.UpdatedAt = time.Now()
+	if change.CreatedAt.IsZero() {
+		change.CreatedAt = time.Now()
+	}
+
+	return change
+}
+
 
 func GetLatestChanges(limit int) (changes []DsChange, err error) {
 

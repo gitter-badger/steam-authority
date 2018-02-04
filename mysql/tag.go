@@ -1,6 +1,10 @@
 package mysql
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/Jleagle/go-helpers/logger"
+)
 
 type Tag struct {
 	ID    int
@@ -11,4 +15,21 @@ type Tag struct {
 
 func (tag Tag) GetPath() string {
 	return "/apps?tag=" + strconv.Itoa(tag.ID)
+}
+
+func GetAllTags() (tags []Tag, err error) {
+
+	conn, err := getDB()
+	if err != nil {
+		logger.Error(err)
+		return tags, err
+	}
+
+	err = conn.Select(&tags, "SELECT * FROM tags ORDER BY games DESC LIMIT 1000")
+	if err != nil {
+		logger.Error(err)
+		return tags, err
+	}
+
+	return tags, nil
 }
