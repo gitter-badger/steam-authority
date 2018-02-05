@@ -168,19 +168,18 @@ func GetApps(ids []uint) (apps []App, err error) {
 	return apps, nil
 }
 
-// todo, use args in JSON function queries when its fixed in sqlx
 func SearchApps(query url.Values) (apps []App, err error) {
 
 	searchQuery := squirrel.Select("*").From("apps").Limit(96).OrderBy("id DESC") // todo, order by popularity
 
 	// Platforms
 	if _, ok := query["platforms"]; ok {
-		searchQuery = searchQuery.Where("JSON_CONTAINS(platforms, '[\"" + query.Get("platforms") + "\"]')")
+		searchQuery = searchQuery.Where("JSON_CONTAINS(platforms, ?)", "[\""+query.Get("platforms")+"\"]")
 	}
 
 	// Tag
 	if _, ok := query["tags"]; ok {
-		searchQuery = searchQuery.Where("JSON_CONTAINS(tags, '[\"" + query.Get("tags") + "\"]')")
+		searchQuery = searchQuery.Where("JSON_CONTAINS(tags, ?)", "[\""+query.Get("tags")+"\"]")
 	}
 
 	// Query

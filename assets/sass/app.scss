@@ -1,13 +1,22 @@
-@import "mixins";
-
 .app-header {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-color: black;
     padding: 2rem 0;
+
+    .jumbotron {
+        margin-top: 0;
+    }
 }
 
-.app-header .jumbotron {
-    margin-top: 0;
+#app-page {
+    .jumbotron {
+        img {
+            @include rounded;
+            float: right;
+            height: 169px;
+            margin: -2rem;
+        }
+    }
 }
