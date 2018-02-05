@@ -55,30 +55,24 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 
-			// Get app details
-			app.FillFromAppDetails()
+			// Create the app
+			app, err = mysql.CreateApp(idx)
 			if err != nil {
-				if err.Error() == "no app with id" {
-					returnErrorTemplate(w, 404, "Sorry but there is no app with this ID")
-					return
-				}
 				logger.Error(err)
+				returnErrorTemplate(w, 404, err.Error())
+				return
 			}
 
-			err = app.Save(idx)
-			if err != nil {
-				logger.Error(err)
-			}
 		} else {
 			logger.Error(err)
-			returnErrorTemplate(w, 404, err.Error())
+			returnErrorTemplate(w, 500, err.Error())
 			return
 		}
 	}
 
 	// Redirect to correct slug
 	correctSLug := slugify.Make(app.Name)
-	if slug != "" && slug != correctSLug {
+	if slug != "" && app.Name != "" && slug != correctSLug {
 		http.Redirect(w, r, "/apps/"+id+"/"+correctSLug, 302)
 		return
 	}

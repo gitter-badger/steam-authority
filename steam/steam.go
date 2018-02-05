@@ -1,6 +1,7 @@
 package steam
 
 import (
+	"errors"
 	"io/ioutil"
 	"math/big"
 	"net/http"
@@ -8,9 +9,9 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
 )
 
-// todo, https://github.com/Acidic9/go-steam/blob/master/steamapi/steamapi.go
 func get(path string, query url.Values, useKey ...bool) (bytes []byte, err error) {
 
 	if path != "" {
@@ -35,6 +36,11 @@ func get(path string, query url.Values, useKey ...bool) (bytes []byte, err error
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	// todo, test this works
+	if string(contents) == "<html><head><title>Forbidden</title></head><body><h1>Forbidden</h1>Access is denied. Retrying will not help. Please verify your <pre>key=</pre> parameter.</body></html>"{
+		errors.New("invalid api key")
 	}
 
 	return contents, nil

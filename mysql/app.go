@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"reflect"
 	"strconv"
@@ -21,21 +20,21 @@ type App struct {
 	Name              string `db:"name"`
 	Type              string `db:"type"`
 	IsFree            bool   `db:"is_free"`
-	DLC               string `db:"dlc"` // []int
+	DLC               string `db:"dlc"` // JSON
 	ShortDescription  string `db:"description_short"`
 	HeaderImage       string `db:"image_header"`
-	Developers        string `db:"developer"` // []string
-	Publishers        string `db:"publisher"` // []string
-	Packages          string `db:"packages"`  // []int
+	Developers        string `db:"developer"` // JSON
+	Publishers        string `db:"publisher"` // JSON
+	Packages          string `db:"packages"`  // JSON
 	MetacriticScore   int8   `db:"metacritic_score"`
 	MetacriticFullURL string `db:"metacritic_url"`
-	Categories        string `db:"categories"`  // []int8
-	Genres            string `db:"genres"`      // []int8
-	Screenshots       string `db:"screenshots"` // []
+	Categories        string `db:"categories"`  // JSON
+	Genres            string `db:"genres"`      // JSON
+	Screenshots       string `db:"screenshots"` // JSON
 	Movies            string `db:"movies"`
 	Achievements      string `db:"achievements"`
 	Background        string `db:"background"`
-	Platforms         string `db:"platforms"` // []string
+	Platforms         string `db:"platforms"` // JSON
 
 	// These are not in the api call, only in pics
 	ReleaseState string `dbx:"releasestate"`
@@ -56,47 +55,7 @@ func (app App) GetPath() (ret string) {
 	return ret
 }
 
-func GetApp(id uint) (app App, err error) {
-
-	db, err := getDB()
-	if err != nil {
-		return app, err
-	}
-
-	err = db.Get(&app, "SELECT * FROM apps WHERE id = ?", id)
-	if err != nil {
-		return app, err
-	}
-
-	app.tidyJSON()
-
-	return app, nil
-}
-
-func GetApps(ids []uint) (apps []App, err error) {
-
-	db, err := getDB()
-	if err != nil {
-		return apps, err
-	}
-
-	// Build query
-	query, args, err := squirrel.Select("*").From("apps").Where(squirrel.Eq{"id": ids}).ToSql()
-
-	// Query
-	err = db.Select(apps, query, args...)
-	if err != nil {
-		return apps, err
-	}
-
-	return apps, nil
-}
-
 func (app App) GetScreenshots() (screenshots []steam.AppDetailsScreenshot, err error) {
-
-	fmt.Println("xx")
-	fmt.Println(app.Screenshots)
-	fmt.Println("xx")
 
 	bytes := []byte(app.Screenshots)
 	if err := json.Unmarshal(bytes, &screenshots); err != nil {
@@ -126,6 +85,46 @@ func (app App) GetPlatforms() (platforms []string, err error) {
 	return platforms, nil
 }
 
+func (app App) GetDLC() (dlcs []int, err error) {
+
+	bytes := []byte(app.DLC)
+	if err := json.Unmarshal(bytes, &dlcs); err != nil {
+		return dlcs, err
+	}
+
+	return dlcs, nil
+}
+
+func (app App) GetPackages() (packages []int, err error) {
+
+	bytes := []byte(app.Packages)
+	if err := json.Unmarshal(bytes, &packages); err != nil {
+		return packages, err
+	}
+
+	return packages, nil
+}
+
+func (app App) GetGenres() (genres []steam.AppDetailsGenre, err error) {
+
+	bytes := []byte(app.Genres)
+	if err := json.Unmarshal(bytes, &genres); err != nil {
+		return genres, err
+	}
+
+	return genres, nil
+}
+
+func (app App) GetCategories() (categories []string, err error) {
+
+	bytes := []byte(app.Categories)
+	if err := json.Unmarshal(bytes, &categories); err != nil {
+		return categories, err
+	}
+
+	return categories, nil
+}
+
 func (app App) GetName() (name string) {
 
 	if app.Name == "" {
@@ -135,35 +134,38 @@ func (app App) GetName() (name string) {
 	return app.Name
 }
 
-func (app *App) tidyJSON() {
+func GetApp(id uint) (app App, err error) {
 
-	if app.DLC == "" {
-		app.DLC = "[]"
+	db, err := getDB()
+	if err != nil {
+		return app, err
 	}
 
-	if app.Packages == "" {
-		app.Packages = "[]"
+	err = db.Get(&app, "SELECT * FROM apps WHERE id = ?", id)
+	if err != nil {
+		return app, err
 	}
 
-	if app.Categories == "" {
-		app.Categories = "[]"
+	return app, nil
+}
+
+func GetApps(ids []uint) (apps []App, err error) {
+
+	db, err := getDB()
+	if err != nil {
+		return apps, err
 	}
 
-	if app.Genres == "" {
-		app.Genres = "[]"
+	// Build query
+	query, args, err := squirrel.Select("*").From("apps").Where(squirrel.Eq{"id": ids}).ToSql()
+
+	// Query
+	err = db.Select(apps, query, args...)
+	if err != nil {
+		return apps, err
 	}
 
-	if app.Platforms == "" {
-		app.Platforms = "[]"
-	}
-
-	if app.Screenshots == "" {
-		app.Screenshots = "[]"
-	}
-
-	if app.Achievements == "" {
-		app.Achievements = "{}"
-	}
+	return apps, nil
 }
 
 // todo, use args in JSON function queries when its fixed in sqlx
@@ -197,18 +199,54 @@ func SearchApps(query url.Values) (apps []App, err error) {
 	return apps, err
 }
 
-func (app App) Save(id int) (err error) {
+func (app *App) Save() (err error) {
 
 	// Tidy
-	app.ID = id
-
 	now := int(time.Now().Unix())
 	app.UpdatedAt = now
 	if app.CreatedAt == 0 {
 		app.CreatedAt = now
 	}
 
-	app.tidyJSON()
+	if app.Developers == "" {
+		app.Developers = "[]"
+	}
+
+	if app.Publishers == "" {
+		app.Publishers = "[]"
+	}
+
+	if app.Categories == "" {
+		app.Categories = "[]"
+	}
+
+	if app.Genres == "" {
+		app.Genres = "[]"
+	}
+
+	if app.Screenshots == "" {
+		app.Screenshots = "[]"
+	}
+
+	if app.Movies == "" {
+		app.Movies = "[]"
+	}
+
+	if app.Achievements == "" {
+		app.Achievements = "{}"
+	}
+
+	if app.Platforms == "" {
+		app.Platforms = "[]"
+	}
+
+	if app.DLC == "" {
+		app.DLC = "[]"
+	}
+
+	if app.Packages == "" {
+		app.Packages = "[]"
+	}
 
 	app.Type = strings.ToLower(app.Type)
 	app.ReleaseState = strings.ToLower(app.ReleaseState)
@@ -217,8 +255,8 @@ func (app App) Save(id int) (err error) {
 	var fields []string
 	var values []interface{}
 
-	v := reflect.ValueOf(app)
-	t := reflect.TypeOf(app)
+	v := reflect.ValueOf(app).Elem()
+	t := reflect.TypeOf(app).Elem()
 
 	for i := 0; i < v.NumField(); i++ {
 
@@ -232,19 +270,14 @@ func (app App) Save(id int) (err error) {
 	// Make SQL query
 	sqlString, args, err := squirrel.Insert("apps").Columns(fields...).Values(values...).ToSql()
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 
 	// Save
 	db, err := getDB()
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
-
-	fmt.Println(sqlString)
-	fmt.Println(args)
 
 	_, err = db.Query(sqlString, args...)
 	if err != nil {
@@ -254,54 +287,72 @@ func (app App) Save(id int) (err error) {
 	return nil
 }
 
-func (app *App) FillFromAppDetails() (ret *App, err error) {
+func CreateApp(id int) (app App, err error) {
+
+	app.ID = id
+
+	// Get app details
+	err = app.FillFromAppDetails()
+	if err != nil {
+		return app, err
+	}
+
+	err = app.Save()
+	if err != nil {
+		return app, err
+	}
+
+	return app, nil
+}
+
+func (app *App) FillFromAppDetails() (err error) {
 
 	// Get data
-	appDetails, err := steam.GetAppDetails(strconv.Itoa(int(app.ID)))
+	appDetails, err := steam.GetAppDetails(strconv.Itoa(app.ID))
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Screenshots
 	screenshotsString, err := json.Marshal(appDetails.Data.Screenshots)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Movies
 	moviesString, err := json.Marshal(appDetails.Data.Movies)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Achievements
 	achievementsString, err := json.Marshal(appDetails.Data.Achievements)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// DLC
 	dlcString, err := json.Marshal(appDetails.Data.DLC)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Developers
 	developersString, err := json.Marshal(appDetails.Data.Developers)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Publishers
 	publishersString, err := json.Marshal(appDetails.Data.Publishers)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Packages
 	packagesString, err := json.Marshal(appDetails.Data.Packages)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Categories
@@ -312,7 +363,7 @@ func (app *App) FillFromAppDetails() (ret *App, err error) {
 
 	categoriesString, err := json.Marshal(categories)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Genres
@@ -324,7 +375,7 @@ func (app *App) FillFromAppDetails() (ret *App, err error) {
 
 	genresString, err := json.Marshal(genres)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	// Platforms
@@ -341,7 +392,7 @@ func (app *App) FillFromAppDetails() (ret *App, err error) {
 
 	platformsString, err := json.Marshal(platforms)
 	if err != nil {
-		return ret, err
+		return err
 	}
 
 	//
@@ -364,5 +415,5 @@ func (app *App) FillFromAppDetails() (ret *App, err error) {
 	app.Background = appDetails.Data.Background
 	app.Platforms = string(platformsString)
 
-	return ret, nil
+	return nil
 }

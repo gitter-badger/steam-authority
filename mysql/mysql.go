@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"database/sql"
 	"os"
 
 	"github.com/Jleagle/go-helpers/logger"
@@ -39,4 +40,20 @@ func CountTable(table string) (count uint, err error) {
 	}
 
 	return count, nil
+}
+
+func ExecQuery(query string, args []interface{}) (result sql.Result, err error) {
+
+	db, err := getDB()
+	if err != nil {
+		return result, err
+	}
+
+	result, err = db.Exec(query, args...)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	return result, nil
 }

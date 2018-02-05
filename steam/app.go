@@ -117,14 +117,8 @@ type AppDetailsBody struct {
 			Score int8   `json:"score"`
 			URL   string `json:"url"`
 		} `json:"metacritic"`
-		Categories []struct {
-			ID          int8   `json:"id"`
-			Description string `json:"description"`
-		} `json:"categories"`
-		Genres []struct {
-			ID          string `json:"id"`
-			Description string `json:"description"`
-		} `json:"genres"`
+		Categories  []AppDetailsCategory   `json:"categories"`
+		Genres      []AppDetailsGenre      `json:"genres"`
 		Screenshots []AppDetailsScreenshot `json:"screenshots"`
 		Movies []struct {
 			ID        int    `json:"id"`
@@ -166,7 +160,17 @@ type AppDetailsAchievements struct {
 	} `json:"highlighted"`
 }
 
-func GetAppList() (apps GetAppListBody, err error) {
+type AppDetailsGenre struct {
+	ID          string `json:"id"`
+	Description string `json:"description"`
+}
+
+type AppDetailsCategory struct {
+	ID          int8   `json:"id"`
+	Description string `json:"description"`
+}
+
+func GetAppList() (apps []GetAppListApp, err error) {
 
 	bytes, err := get("ISteamApps/GetAppList/v2/", url.Values{})
 	if err != nil {
@@ -174,15 +178,15 @@ func GetAppList() (apps GetAppListBody, err error) {
 	}
 
 	// Unmarshal JSON
-	info := GetAppListBody{}
-	if err := json.Unmarshal(bytes, &info); err != nil {
+	resp := GetAppListBody{}
+	if err := json.Unmarshal(bytes, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			pretty.Print(string(bytes))
 		}
 		return apps, err
 	}
 
-	return apps, nil
+	return resp.AppList.Apps, nil
 }
 
 type GetAppListBody struct {

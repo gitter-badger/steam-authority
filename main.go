@@ -78,6 +78,7 @@ func adminRouter() http.Handler {
 		os.Getenv("STEAM_AUTH_USER"): {os.Getenv("STEAM_AUTH_PASS")},
 	}))
 	r.Get("/rerank", reRankHandler)
+	r.Get("/fill-apps", fillAppsHandler)
 	return r
 }
 
