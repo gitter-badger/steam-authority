@@ -1,10 +1,17 @@
 # Steam Authority
 
 #### Running on local
-export STEAM_GOOGLE_PROJECT="google-cloud-project-id"
-export STEAM_GOOGLE_APPLICATION_CREDENTIALS="/path/to/key.json"
-export STEAM_PICS_PATH="/path/to/steam-authority/steam-pics-api"
-export STEAM_GITHUB_TOKEN="github-token" # https://github.com/settings/tokens
+- export STEAM_GOOGLE_PROJECT=""
+- export STEAM_GOOGLE_APPLICATION_CREDENTIALS=""
+- export STEAM_PICS_PATH=""
+- export STEAM_ROLLBAR_PRIVATE=""
+- export STEAM_GITHUB_TOKEN=""
+- export STEAM_API_KEY=""
+- export STEAM_SENDGRID=""
+- export STEAM_AUTH_USER=""
+- export STEAM_AUTH_PASS=""
+- export STEAM_DISCORD_SECRET=""
+- export STEAM_SQL_DSN=""
 
 ##### Setup
 - git clone git@github.com:steam-authority/steam-authority.git

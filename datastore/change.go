@@ -10,7 +10,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-type DsChange struct {
+type Change struct {
 	CreatedAt time.Time `datastore:"created_at"`
 	UpdatedAt time.Time `datastore:"updated_at"`
 	ChangeID  int       `datastore:"change_id"`
@@ -18,11 +18,11 @@ type DsChange struct {
 	Packages  []int     `datastore:"packages"`
 }
 
-func (change DsChange) GetKey() (key *datastore.Key) {
+func (change Change) GetKey() (key *datastore.Key) {
 	return datastore.NameKey(CHANGE, strconv.Itoa(change.ChangeID), nil)
 }
 
-func (change *DsChange) Tidy() *DsChange {
+func (change *Change) Tidy() *Change {
 
 	change.UpdatedAt = time.Now()
 	if change.CreatedAt.IsZero() {
@@ -33,7 +33,7 @@ func (change *DsChange) Tidy() *DsChange {
 }
 
 
-func GetLatestChanges(limit int) (changes []DsChange, err error) {
+func GetLatestChanges(limit int) (changes []Change, err error) {
 
 	client, context, err := getDSClient()
 	if err != nil {
@@ -44,7 +44,7 @@ func GetLatestChanges(limit int) (changes []DsChange, err error) {
 	it := client.Run(context, q)
 
 	for {
-		var change DsChange
+		var change Change
 		_, err := it.Next(&change)
 		if err == iterator.Done {
 			break
@@ -59,7 +59,7 @@ func GetLatestChanges(limit int) (changes []DsChange, err error) {
 	return changes, err
 }
 
-func GetChange(id string) (change *DsChange, err error) {
+func GetChange(id string) (change *Change, err error) {
 
 	client, context, err := getDSClient()
 	if err != nil {
@@ -68,7 +68,7 @@ func GetChange(id string) (change *DsChange, err error) {
 
 	key := datastore.NameKey(CHANGE, id, nil)
 
-	change = &DsChange{}
+	change = &Change{}
 	err = client.Get(context, key, change)
 	if err != nil {
 		logger.Error(err)
@@ -77,7 +77,7 @@ func GetChange(id string) (change *DsChange, err error) {
 	return change, nil
 }
 
-func BulkAddChanges(changes []*DsChange) (err error) {
+func BulkAddChanges(changes []*Change) (err error) {
 
 	changesLen := len(changes)
 	if changesLen == 0 {

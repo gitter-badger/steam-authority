@@ -70,12 +70,12 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 
 type changesTemplate struct {
 	GlobalTemplate
-	Changes  []datastore.DsChange
+	Changes  []datastore.Change
 	Apps     map[int]mysql.App
 	Packages map[int]mysql.Package
 }
 
 type changeTemplate struct {
 	GlobalTemplate
-	Change *datastore.DsChange
+	Change *datastore.Change
 }

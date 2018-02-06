@@ -19,7 +19,7 @@ func reRankHandler(w http.ResponseWriter, r *http.Request) {
 	// Get keys, will delete any that are not removed from this map
 	oldKeys, err := datastore.GetRankKeys()
 
-	newRanks := make(map[int]*datastore.DsRank)
+	newRanks := make(map[int]*datastore.Rank)
 
 	// Get players by level
 	players, err := datastore.GetPlayers("-level", playersToRank)
@@ -30,24 +30,24 @@ func reRankHandler(w http.ResponseWriter, r *http.Request) {
 
 	for k, v := range players {
 
-		_, ok := newRanks[v.ID64]
+		_, ok := newRanks[v.PlayerID]
 		if !ok {
 
-			rank := &datastore.DsRank{}
+			rank := &datastore.Rank{}
 			rank.FillFromPlayer(v)
 
-			newRanks[v.ID64] = rank
+			newRanks[v.PlayerID] = rank
 		}
-		newRanks[v.ID64].LevelRank = k + 1
+		newRanks[v.PlayerID].LevelRank = k + 1
 
-		_, ok = oldKeys[strconv.Itoa(v.ID64)]
+		_, ok = oldKeys[strconv.Itoa(v.PlayerID)]
 		if ok {
-			delete(oldKeys, strconv.Itoa(v.ID64))
+			delete(oldKeys, strconv.Itoa(v.PlayerID))
 		}
 	}
 
 	// Convert new ranks to slice
-	var ranks []*datastore.DsRank
+	var ranks []*datastore.Rank
 	for _, v := range newRanks {
 		ranks = append(ranks, v)
 	}

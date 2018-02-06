@@ -14,7 +14,7 @@ import (
 func playersHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Normalise the order
-	var ranks []datastore.DsRank
+	var ranks []datastore.Rank
 	var err error
 
 	switch chi.URLParam(r, "id") {
@@ -54,7 +54,7 @@ func playersHandler(w http.ResponseWriter, r *http.Request) {
 
 type playersTemplate struct {
 	GlobalTemplate
-	Ranks []datastore.DsRank
+	Ranks []datastore.Rank
 }
 
 func playerHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +73,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err.Error() == "datastore: no such entity" || err.Error() == "expired" {
 
-			dsPlayer.ID64 = idx
+			dsPlayer.PlayerID = idx
 
 			//Get summary
 			summary, err := steam.GetPlayerSummaries([]int{idx})
@@ -137,5 +137,5 @@ func playerIDHandler(w http.ResponseWriter, r *http.Request) {
 
 type playerTemplate struct {
 	GlobalTemplate
-	Player datastore.DsPlayer
+	Player datastore.Player
 }

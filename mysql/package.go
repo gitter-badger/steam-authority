@@ -14,10 +14,10 @@ type Package struct {
 	CreatedAt   time.Time `db:"created_at"`
 	UpdatedAt   time.Time `db:"updated_at"`
 	Name        string    `db:"name"`
-	BillingType int8      `db:"billingtype"`
-	LicenseType int8      `db:"licensetype"`
+	BillingType int8      `db:"billing_type"`
+	LicenseType int8      `db:"license_type"`
 	Status      int8      `db:"status"`
-	Apps        string    `db:"apps"` // []int
+	Apps        string    `db:"apps"` // JSON
 	ChangeID    int       `db:"change_id"`
 }
 

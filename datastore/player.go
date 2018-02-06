@@ -13,36 +13,33 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-type DsPlayer struct {
+type Player struct {
 	CreatedAt   time.Time `datastore:"created_at"`
 	UpdatedAt   time.Time `datastore:"updated_at"`
-	ID64        int       `datastore:"id64"`
+	PlayerID    int       `datastore:"player_id"`
 	ValintyURL  string    `datastore:"vality_url"`
 	Avatar      string    `datastore:"avatar"`
 	RealName    string    `datastore:"real_name"`
 	PersonaName string    `datastore:"persona_name"`
 	CountryCode string    `datastore:"country_code"`
 	StateCode   string    `datastore:"status_code"`
-	TimeUpdated int64     `datastore:"time_updated"` // todo, Remove?
 	Level       int       `datastore:"level"`
 	Games       int       `datastore:"games"`
 	Badges      int       `datastore:"badges"`
 	PlayTime    int       `datastore:"play_time"`
-	TimeCreated int       `datastore:"time_created"`
+	TimeCreated int       `datastore:"time_created"` // In Steam's DB
 	Friends     []int     `datastore:"friends"`
-
-	Rank int `datastore:"-"`
 }
 
-func (player DsPlayer) GetKey() (key *datastore.Key) {
-	return datastore.NameKey(PLAYER, strconv.Itoa(player.ID64), nil)
+func (player Player) GetKey() (key *datastore.Key) {
+	return datastore.NameKey(PLAYER, strconv.Itoa(player.PlayerID), nil)
 }
 
-func (player DsPlayer) GetPath() string {
-	return "/players/" + strconv.Itoa(player.ID64) + "/" + slug.Make(player.PersonaName)
+func (player Player) GetPath() string {
+	return "/players/" + strconv.Itoa(player.PlayerID) + "/" + slug.Make(player.PersonaName)
 }
 
-func (player *DsPlayer) Tidy() *DsPlayer {
+func (player *Player) Tidy() *Player {
 
 	player.UpdatedAt = time.Now()
 	if player.CreatedAt.IsZero() {
@@ -52,7 +49,7 @@ func (player *DsPlayer) Tidy() *DsPlayer {
 	return player
 }
 
-func (player *DsPlayer) FillFromSummary(summary steam.PlayerSummariesBody) *DsPlayer {
+func (player *Player) FillFromSummary(summary steam.PlayerSummariesBody) *Player {
 
 	if len(summary.Response.Players) > 0 {
 		player.Avatar = summary.Response.Players[0].AvatarFull
@@ -66,7 +63,7 @@ func (player *DsPlayer) FillFromSummary(summary steam.PlayerSummariesBody) *DsPl
 	return player
 }
 
-func (player *DsPlayer) FillFromFriends(summary []steam.GetFriendListFriend) *DsPlayer {
+func (player *Player) FillFromFriends(summary []steam.GetFriendListFriend) *Player {
 
 	var friends []int
 	for _, v := range summary {
@@ -79,7 +76,7 @@ func (player *DsPlayer) FillFromFriends(summary []steam.GetFriendListFriend) *Ds
 }
 
 // todo, Only return 1 player not slice
-func GetPlayer(id64 string) (player DsPlayer, err error) {
+func GetPlayer(id64 string) (player Player, err error) {
 
 	client, context, err := getDSClient()
 	if err != nil {
@@ -94,14 +91,14 @@ func GetPlayer(id64 string) (player DsPlayer, err error) {
 	}
 
 	// Error if data is older than a day
-	if player.TimeUpdated < (time.Now().Unix() - int64(86400)) {
+	if player.UpdatedAt.Unix() < (time.Now().Unix() - int64(86400)) {
 		return player, errors.New("expired")
 	}
 
 	return player, nil
 }
 
-func GetPlayers(order string, limit int) (players []DsPlayer, err error) {
+func GetPlayers(order string, limit int) (players []Player, err error) {
 
 	client, ctx, err := getDSClient()
 	if err != nil {
@@ -112,7 +109,7 @@ func GetPlayers(order string, limit int) (players []DsPlayer, err error) {
 	it := client.Run(ctx, q)
 
 	for {
-		var dsPlayer DsPlayer
+		var dsPlayer Player
 		_, err := it.Next(&dsPlayer)
 		if err == iterator.Done {
 			break

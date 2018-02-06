@@ -46,7 +46,7 @@ func Run() {
 	}
 }
 
-func getChangesJSON(latestChange datastore.DsChange) (jsChange JsChange, err error) {
+func getChangesJSON(latestChange datastore.Change) (jsChange JsChange, err error) {
 
 	latestChange.ChangeID = 3955150
 
@@ -71,7 +71,7 @@ func getChangesJSON(latestChange datastore.DsChange) (jsChange JsChange, err err
 	return jsChange, nil
 }
 
-func getInfoJSON(change *datastore.DsChange) (jsInfo JsInfo, err error) {
+func getInfoJSON(change *datastore.Change) (jsInfo JsInfo, err error) {
 
 	var apps []string
 	var packages []string
@@ -109,15 +109,15 @@ func getInfoJSON(change *datastore.DsChange) (jsInfo JsInfo, err error) {
 	return info, nil
 }
 
-func saveChangesFromJSON(jsChange JsChange) (changes []*datastore.DsChange, err error) {
+func saveChangesFromJSON(jsChange JsChange) (changes []*datastore.Change, err error) {
 
 	// Make a list of changes to add
-	dsChanges := make(map[int]*datastore.DsChange, 0)
+	dsChanges := make(map[int]*datastore.Change, 0)
 
 	for k, v := range jsChange.Apps {
 		_, ok := dsChanges[v]
 		if !ok {
-			dsChanges[v] = &datastore.DsChange{ChangeID: v}
+			dsChanges[v] = &datastore.Change{ChangeID: v}
 		}
 
 		intx, _ := strconv.Atoi(k)
@@ -127,7 +127,7 @@ func saveChangesFromJSON(jsChange JsChange) (changes []*datastore.DsChange, err 
 	for k, v := range jsChange.Packages {
 		_, ok := dsChanges[v]
 		if !ok {
-			dsChanges[v] = &datastore.DsChange{ChangeID: v}
+			dsChanges[v] = &datastore.Change{ChangeID: v}
 		}
 
 		intx, _ := strconv.Atoi(k)
@@ -150,7 +150,7 @@ func saveChangesFromJSON(jsChange JsChange) (changes []*datastore.DsChange, err 
 	count := int(math.Min(float64(len(ChangeIDs)), changesLimit))
 	ChangeIDs = ChangeIDs[:count]
 
-	dsChangesSlice := make([]*datastore.DsChange, 0)
+	dsChangesSlice := make([]*datastore.Change, 0)
 
 	for _, v := range ChangeIDs {
 		dsChangesSlice = append(dsChangesSlice, dsChanges[v])

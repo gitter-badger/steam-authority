@@ -12,35 +12,37 @@ import (
 
 var ranksLimit = 500
 
-type DsRank struct {
-	CreatedAt       time.Time `datastore:"created_at"`
-	UpdatedAt       time.Time `datastore:"updated_at"`
-	ID64            int       `datastore:"id64"`
-	ValintyURL      string    `datastore:"vality_url"`
-	Avatar          string    `datastore:"avatar"`
-	PersonaName     string    `datastore:"persona_name"`
-	CountryCode     string    `datastore:"country_code"`
-	Level           int       `datastore:"level"`
-	LevelRank       int       `datastore:"level_rank"`
-	Games           int       `datastore:"games"`
-	GamesRank       int       `datastore:"games_rank"`
-	Badges          int       `datastore:"badges"`
-	BadgesRank      int       `datastore:"badges_rank"`
-	PlayTime        int       `datastore:"play_time"`
-	PlayTimeRank    int       `datastore:"play_time_rank"`
-	TimeCreated     int       `datastore:"time_created"`
-	TimeCreatedRank int       `datastore:"time_created_rank"`
-	Friends         int       `datastore:"friends"`
-	FriendsRank     int       `datastore:"friends_rank"`
+type Rank struct {
+	CreatedAt   time.Time `datastore:"created_at"`
+	UpdatedAt   time.Time `datastore:"updated_at"`
+	PlayerID    int       `datastore:"player_id"`
+	ValintyURL  string    `datastore:"vality_url"`
+	Avatar      string    `datastore:"avatar"`
+	PersonaName string    `datastore:"persona_name"`
+	CountryCode string    `datastore:"country_code"`
+
+	// Ranks
+	Level           int `datastore:"level"`
+	LevelRank       int `datastore:"level_rank"`
+	Games           int `datastore:"games"`
+	GamesRank       int `datastore:"games_rank"`
+	Badges          int `datastore:"badges"`
+	BadgesRank      int `datastore:"badges_rank"`
+	PlayTime        int `datastore:"play_time"`
+	PlayTimeRank    int `datastore:"play_time_rank"`
+	TimeCreated     int `datastore:"time_created"`
+	TimeCreatedRank int `datastore:"time_created_rank"`
+	Friends         int `datastore:"friends"`
+	FriendsRank     int `datastore:"friends_rank"`
 
 	Rank int `datastore:"-"` // Just for the frontend
 }
 
-func (rank DsRank) GetKey() (key *datastore.Key) {
-	return datastore.NameKey(RANK, strconv.Itoa(rank.ID64), nil)
+func (rank Rank) GetKey() (key *datastore.Key) {
+	return datastore.NameKey(RANK, strconv.Itoa(rank.PlayerID), nil)
 }
 
-func (rank *DsRank) Tidy() *DsRank {
+func (rank *Rank) Tidy() *Rank {
 
 	rank.UpdatedAt = time.Now()
 	if rank.CreatedAt.IsZero() {
@@ -50,9 +52,9 @@ func (rank *DsRank) Tidy() *DsRank {
 	return rank
 }
 
-func (rank *DsRank) FillFromPlayer(player DsPlayer) *DsRank {
+func (rank *Rank) FillFromPlayer(player Player) *Rank {
 
-	rank.ID64 = player.ID64
+	rank.PlayerID = player.PlayerID
 	rank.ValintyURL = player.ValintyURL
 	rank.Avatar = player.Avatar
 	rank.PersonaName = player.PersonaName
@@ -67,7 +69,7 @@ func (rank *DsRank) FillFromPlayer(player DsPlayer) *DsRank {
 	return rank
 }
 
-func GetRanksBy(order string) (ranks []DsRank, err error) {
+func GetRanksBy(order string) (ranks []Rank, err error) {
 
 	client, context, err := getDSClient()
 	if err != nil {
@@ -78,7 +80,7 @@ func GetRanksBy(order string) (ranks []DsRank, err error) {
 	it := client.Run(context, q)
 
 	for {
-		var dsRank DsRank
+		var dsRank Rank
 		_, err := it.Next(&dsRank)
 		if err == iterator.Done {
 			break
@@ -93,7 +95,7 @@ func GetRanksBy(order string) (ranks []DsRank, err error) {
 	return ranks, err
 }
 
-func BulkSaveRanks(ranks []*DsRank) (err error) {
+func BulkSaveRanks(ranks []*Rank) (err error) {
 
 	RanksLen := len(ranks)
 	if RanksLen == 0 {

@@ -56,7 +56,7 @@ type AppDetailsBody struct {
 	Data struct {
 		Type                string `json:"type"`
 		Name                string `json:"name"`
-		SteamAppid          int    `json:"steam_appid"`
+		SteamAppID          int    `json:"steam_appid"`
 		RequiredAge         int    `json:"required_age"`
 		IsFree              bool   `json:"is_free"`
 		DLC                 []int  `json:"dlc"`
@@ -82,6 +82,10 @@ type AppDetailsBody struct {
 		LegalNotice string   `json:"legal_notice"`
 		Developers  []string `json:"developers"`
 		Publishers  []string `json:"publishers"`
+		Demos             []struct {
+			Appid       int    `json:"appid"`
+			Description string `json:"description"`
+		} `json:"demos"`
 		PriceOverview struct {
 			Currency        string `json:"currency"`
 			Initial         int    `json:"initial"`
