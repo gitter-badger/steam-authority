@@ -2,6 +2,7 @@ package steam
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"math/big"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
 )
 
 func get(path string, query url.Values, useKey ...bool) (bytes []byte, err error) {
@@ -25,6 +25,9 @@ func get(path string, query url.Values, useKey ...bool) (bytes []byte, err error
 		path = "http://store.steampowered.com/api/appdetails"
 	}
 
+	// Debug
+	fmt.Println("STEAM: " + path + "?" + query.Encode())
+
 	// Grab the JSON from node
 	response, err := http.Get(path + "?" + query.Encode())
 	if err != nil {
@@ -39,7 +42,7 @@ func get(path string, query url.Values, useKey ...bool) (bytes []byte, err error
 	}
 
 	// todo, test this works
-	if string(contents) == "<html><head><title>Forbidden</title></head><body><h1>Forbidden</h1>Access is denied. Retrying will not help. Please verify your <pre>key=</pre> parameter.</body></html>"{
+	if string(contents) == "<html><head><title>Forbidden</title></head><body><h1>Forbidden</h1>Access is denied. Retrying will not help. Please verify your <pre>key=</pre> parameter.</body></html>" {
 		errors.New("invalid api key")
 	}
 

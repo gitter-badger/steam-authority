@@ -12,10 +12,13 @@ const (
 	CHANGE = "Change"
 
 	// APP datastore kind
-	APP = "App"
+	//APP = "App"
 
 	// PACKAGE datastore kind
-	PACKAGE = "Package"
+	//PACKAGE = "Package"
+
+	// ARTICLE is a news article for an app
+	ARTICLE = "Article"
 
 	// PLAYER datastore kind
 	PLAYER = "Player"

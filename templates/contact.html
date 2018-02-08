@@ -2,19 +2,43 @@
 
 <div class="container">
 
-  <div class="jumbotron">
-    <h1 class="display-4">Contact</h1>
-    <p class="lead">Get in touch.</p>
-  </div>
+    <div class="jumbotron">
+        <h1 class="display-4">Contact</h1>
+        <p class="lead">Get in touch.</p>
+    </div>
 
-  <p>If you have found an issue with the website, please file an issue on
-    <a href="https://github.com/steam-authority/steam-authority/issues/new">GitHub</a>.
-  </p>
+    <form action="/contact" method="post">
 
-  <p>
-    If you would like to contact me, please do so
-    <a href="mailto:jimeagle@gmail.com?subject=Steam Authority">here</a>.
-  </p>
+        <div class="row">
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" placeholder="Name" name="name" required>
+                </div>
+
+            </div>
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Email" name="email" required>
+                </div>
+
+            </div>
+            <div class="col-sm-12">
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea class="form-control" id="message" rows="3" name="message" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+
+            </div>
+        </div>
+
+    </form>
 
 </div>
 

@@ -296,6 +296,7 @@ func CreateApp(id int) (app App, err error) {
 		return app, err
 	}
 
+	// Save
 	err = app.Save()
 	if err != nil {
 		return app, err

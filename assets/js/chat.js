@@ -25,10 +25,10 @@ if ($('#chat-page').length > 0) {
 
                 $('ul.list-unstyled').prepend($(
                     '<li class="media">' +
-                    '    <img class="mr-3" src="https://cdn.discordapp.com/avatars/' + data.author.id + '/' + data.author.avatar + '.png?size=128" alt="' + data.author.username + '">' +
+                    '    <img class="mr-3" src="https://cdn.discordapp.com/avatars/' + data.author_id + '/' + data.author_avatar + '.png?size=64" alt="' + data.author_user + '">' +
                     '    <div class="media-body">' +
                     '        <h5 class="mt-0 mb-1">' + data.content + '</h5>' +
-                    '        <p class="text-muted">By ' + data.author.username + '</p>' +
+                    '        <p class="text-muted">By ' + data.author_user + '</p>' +
                     '    </div>' +
                     '</li>'));
 

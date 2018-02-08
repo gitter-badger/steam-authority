@@ -7,6 +7,7 @@ import (
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
 	slugify "github.com/gosimple/slug"
+	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
 )
 
@@ -63,12 +64,21 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			// Get app articles
+			_, err = datastore.GetArticlesFromSteam(idx)
+			if err != nil {
+				logger.Error(err)
+			}
+
 		} else {
 			logger.Error(err)
 			returnErrorTemplate(w, 500, err.Error())
 			return
 		}
 	}
+
+	// Get news
+	news, err := datastore.GetArticles(idx, 1000)
 
 	// Redirect to correct slug
 	correctSLug := slugify.Make(app.Name)
@@ -87,6 +97,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	template := appTemplate{}
 	template.App = app
 	template.Packages = packages
+	template.Articles = news
 
 	returnTemplate(w, "app", template)
 }
@@ -95,4 +106,5 @@ type appTemplate struct {
 	GlobalTemplate
 	App      mysql.App
 	Packages []mysql.Package
+	Articles []datastore.Article
 }

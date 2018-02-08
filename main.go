@@ -44,8 +44,11 @@ func main() {
 	r.Get("/experience", experienceHandler)
 	r.Get("/experience/{id}", experienceHandler)
 
-	// Static pages
+	// Contact
 	r.Get("/contact", contactHandler)
+	r.Post("/contact", postContactHandler)
+
+	// Static pages
 	r.Get("/donate", donateHandler)
 	r.Get("/faqs", faqsHandler)
 	r.Get("/credits", creditsHandler)

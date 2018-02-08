@@ -38,7 +38,7 @@
         <th scope="col">Friends</th>
         </thead>
     {{ range $key, $value := .Ranks }}
-        <tr data-link="/players/{{ .ID64 }}/{{ .PersonaName }}">
+        <tr data-link="/players/{{ .PlayerID }}/{{ .PersonaName }}">
             <td>{{ .Rank }}</td>
             <td class="img">
                 <img src="{{ .Avatar }}" alt="{{ .PersonaName }}" class="avatar">

@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/bwmarrin/discordgo"
@@ -10,12 +11,12 @@ import (
 )
 
 const (
-	GUILD_ID   = "407493776597057538"
-	GENERAL_ID = "407493777058693121"
+	guildID          = "407493776597057538"
+	generalChannelID = "407493777058693121"
 )
 
 var (
-	discord *discordgo.Session
+	discordSession *discordgo.Session
 )
 
 func init() {
@@ -23,20 +24,25 @@ func init() {
 	var err error
 
 	// Get client
-	discord, err = discordgo.New("Bot NDA1MDQ4MTc1OTI2MzEyOTcx.DVD2tQ.ZsyCsJ6jjYE4Hw6QNP58LWz3GqA")
+	discordSession, err = discordgo.New("Bot " + os.Getenv("STEAM_DISCORD_BOT_TOKEN"))
 	if err != nil {
 		logger.Error(err)
 	}
 
 	// Add websocket listener
-	discord.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+	discordSession.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if !m.Author.Bot {
-			websockets.Send(websockets.CHAT, m)
+			websockets.Send(websockets.CHAT, chatPayload{
+				AuthorID:     m.Author.ID,
+				AuthorUser:   m.Author.Username,
+				AuthorAvatar: m.Author.Avatar,
+				Content:      m.Content,
+			})
 		}
 	})
 
 	// Open connection
-	err = discord.Open()
+	err = discordSession.Open()
 	if err != nil {
 		logger.Error(err)
 	}
@@ -47,11 +53,11 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 	// Get ID from URL
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		id = GENERAL_ID
+		id = generalChannelID
 	}
 
 	// Get channels
-	channelsResponse, err := discord.GuildChannels(GUILD_ID)
+	channelsResponse, err := discordSession.GuildChannels(guildID)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -64,7 +70,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get messages
-	messagesResponse, err := discord.ChannelMessages(id, 10, "", "", "")
+	messagesResponse, err := discordSession.ChannelMessages(id, 10, "", "", "")
 	if err != nil {
 		logger.Error(err)
 	}
@@ -90,4 +96,11 @@ type chatTemplate struct {
 	Channels  []*discordgo.Channel
 	Messages  []*discordgo.Message
 	ChannelID string
+}
+
+type chatPayload struct {
+	AuthorID     string `json:"author_id"`
+	AuthorUser   string `json:"author_user"`
+	AuthorAvatar string `json:"author_avatar"`
+	Content      string `json:"content"`
 }
