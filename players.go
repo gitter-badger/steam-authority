@@ -59,6 +59,9 @@ type playersTemplate struct {
 
 func playerHandler(w http.ResponseWriter, r *http.Request) {
 
+	// todo test
+	//queue.AddPlayerToQueue()
+
 	id := chi.URLParam(r, "id")
 	slug := chi.URLParam(r, "slug")
 
@@ -69,11 +72,11 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dsPlayer, err := datastore.GetPlayer(id)
+	player, err := datastore.GetPlayer(id)
 	if err != nil {
 		if err.Error() == "datastore: no such entity" || err.Error() == "expired" {
 
-			dsPlayer.PlayerID = idx
+			player.PlayerID = idx
 
 			//Get summary
 			summary, err := steam.GetPlayerSummaries([]int{idx})
@@ -82,7 +85,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 				returnErrorTemplate(w, 404, err.Error())
 				return
 			}
-			dsPlayer.FillFromSummary(summary)
+			player.FillFromSummary(summary)
 
 			//Get friends
 			friends, err := steam.GetFriendList(id)
@@ -91,12 +94,12 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 				returnErrorTemplate(w, 404, err.Error())
 				return
 			}
-			dsPlayer.FillFromFriends(friends)
+			player.FillFromFriends(friends)
 
 			// todo, get player bans, groups
 			// todo, clear latest players cache
-			dsPlayer.Tidy()
-			_, err = datastore.SaveKind(dsPlayer.GetKey(), &dsPlayer)
+			player.Tidy()
+			_, err = datastore.SaveKind(player.GetKey(), &player)
 			if err != nil {
 				logger.Error(err)
 			}
@@ -108,7 +111,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Redirect to correct slug
-	correctSLug := slugify.Make(dsPlayer.PersonaName)
+	correctSLug := slugify.Make(player.PersonaName)
 	if slug != "" && slug != correctSLug {
 		http.Redirect(w, r, "/players/"+id+"/"+correctSLug, 302)
 		return
@@ -116,7 +119,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := playerTemplate{}
-	template.Player = dsPlayer
+	template.Player = player
 
 	returnTemplate(w, "player", template)
 }
@@ -124,6 +127,8 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 func playerIDHandler(w http.ResponseWriter, r *http.Request) {
 
 	post := r.PostFormValue("id")
+
+	// todo, check DB before doing api call
 
 	id, err := steam.GetID(post)
 	if err != nil {

@@ -3,17 +3,17 @@ package queue
 import (
 	"fmt"
 
-	"github.com/Jleagle/canihave/logger"
+	"github.com/Jleagle/go-helpers/logger"
 	"github.com/streadway/amqp"
 )
 
 func AddPlayerToQueue() {
-	
+
 }
 
 func failOnError(err error, msg string) {
 	if err != nil {
-		logger.Err(msg, err)
+		logger.Error(err)
 		panic(fmt.Sprintf("%s: %s", msg, err))
 	}
 }
