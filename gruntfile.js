@@ -16,6 +16,7 @@ module.exports = function (grunt) {
         concat: {
             js: {
                 src: [
+                    'assets/js/third-party/moment.js', // Put above livestamp
                     'assets/js/third-party/*.js',
                     'assets/js/*.js'
                 ],

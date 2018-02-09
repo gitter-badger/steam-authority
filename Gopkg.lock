@@ -20,6 +20,12 @@
   revision = "09f37256ce848a12afb351459d2ea99755571e88"
 
 [[projects]]
+  name = "github.com/Masterminds/squirrel"
+  packages = ["."]
+  revision = "a6b93000bd219143c56c16e6cb1c4b91da3f224b"
+  version = "v1.0"
+
+[[projects]]
   name = "github.com/bugsnag/bugsnag-go"
   packages = [".","errors"]
   revision = "036f1af2a63f8133e596d1c127c86100b4642ba1"
@@ -117,9 +123,39 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/lann/builder"
+  packages = ["."]
+  revision = "f22ce00fd9394014049dad11c244859432bd6820"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lann/ps"
+  packages = ["."]
+  revision = "62de8c46ede02a7675c4c79c84883eb164cb71e3"
+
+[[projects]]
+  branch = "master"
   name = "github.com/rainycape/unidecode"
   packages = ["."]
   revision = "cb7f23ec59bec0d61b19c56cd88cee3d0cc1870c"
+
+[[projects]]
+  name = "github.com/sendgrid/rest"
+  packages = ["."]
+  revision = "80b39aaf5a30edab5bf2f99d56052abe01a0d41d"
+  version = "v2.4.0"
+
+[[projects]]
+  name = "github.com/sendgrid/sendgrid-go"
+  packages = [".","helpers/mail"]
+  revision = "8caf17aa96b4a98bae8bd216878dd50ff12897b5"
+  version = "v3.4.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/streadway/amqp"
+  packages = ["."]
+  revision = "fc7fda2371f5327ad39211e09482845b8734cc72"
 
 [[projects]]
   name = "github.com/stvp/rollbar"
@@ -178,6 +214,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fbaee479fc3e977fc9f9eaec322fee5092fdfe3a9d22ec9738b76ab18c36fcfa"
+  inputs-digest = "60117571990dbaeabfac557de2f96e7aad5aa8c4db3161d7b814a4424a41858d"
   solver-name = "gps-cdcl"
   solver-version = 1

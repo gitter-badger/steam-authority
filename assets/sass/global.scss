@@ -2,7 +2,6 @@ body {
     overflow-y: scroll;
 }
 
-/* Navbar */
 .navbar-brand {
     @include rounded;
     background-color: #5cb85c;
@@ -23,30 +22,4 @@ body {
     .lead {
         margin: 0;
     }
-}
-
-/* Media lists */
-li.media {
-
-    img {
-        width: 52px;
-        height: 52px;
-    }
-
-    p {
-        margin-bottom: 1rem;
-    }
-}
-
-li.media:last-child p {
-    margin-bottom: 0;
-}
-
-.card-body .list-unstyled {
-    margin-bottom: 0;
-}
-
-#player-page .jumbotron img {
-    height: 3.5rem;
-    vertical-align: text-bottom;
 }

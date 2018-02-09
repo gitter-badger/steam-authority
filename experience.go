@@ -14,7 +14,7 @@ const (
 	ROWS = 3000
 
 	// CHUNK into tables of this size
-	CHUNK = 10
+	CHUNK = 100
 )
 
 func experienceHandler(w http.ResponseWriter, r *http.Request) {

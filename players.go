@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi"
 	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/steam"
 )
 
@@ -60,7 +61,9 @@ type playersTemplate struct {
 func playerHandler(w http.ResponseWriter, r *http.Request) {
 
 	// todo test
-	//queue.AddPlayerToQueue()
+	queue.AddPlayer(76561197968626192)
+	queue.AddPlayer(76561197968626192)
+	queue.AddPlayer(76561197968626192)
 
 	id := chi.URLParam(r, "id")
 	slug := chi.URLParam(r, "slug")
@@ -95,6 +98,11 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			player.FillFromFriends(friends)
+
+			for _, v := range friends {
+				vv, _ := strconv.Atoi(v.Steamid)
+				queue.AddPlayer(vv)
+			}
 
 			// todo, get player bans, groups
 			// todo, clear latest players cache

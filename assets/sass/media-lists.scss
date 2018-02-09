@@ -1,0 +1,19 @@
+.card-body ul.list-unstyled {
+    margin-bottom: 0;
+}
+
+li.media {
+
+    img {
+        width: 52px;
+        height: 52px;
+    }
+
+    p {
+        margin-bottom: 1rem;
+    }
+}
+
+li.media:last-child p {
+    margin-bottom: 0;
+}
