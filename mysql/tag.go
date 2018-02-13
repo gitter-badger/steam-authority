@@ -2,15 +2,13 @@ package mysql
 
 import (
 	"strconv"
-
-	"github.com/Jleagle/go-helpers/logger"
 )
 
 type Tag struct {
-	ID    int
-	Name  string
-	Games int
-	Votes int
+	ID    int    `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
+	Name  string `gorm:"not null;column:name"`
+	Games int    `gorm:"not null;column:games"`
+	Votes int    `gorm:"not null;column:votes"`
 }
 
 func (tag Tag) GetPath() string {
@@ -19,15 +17,13 @@ func (tag Tag) GetPath() string {
 
 func GetAllTags() (tags []Tag, err error) {
 
-	conn, err := getDB()
+	db, err := getDB()
 	if err != nil {
-		logger.Error(err)
 		return tags, err
 	}
 
-	err = conn.Select(&tags, "SELECT * FROM tags ORDER BY games DESC LIMIT 1000")
-	if err != nil {
-		logger.Error(err)
+	db = db.Limit(1000).Order("id DESC").Find(&tags)
+	if db.Error != nil {
 		return tags, err
 	}
 

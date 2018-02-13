@@ -5,63 +5,64 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/gosimple/slug"
 )
 
 type Package struct {
-	ID          uint      `db:"id"`
-	CreatedAt   time.Time `db:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at"`
-	Name        string    `db:"name"`
-	BillingType int8      `db:"billing_type"`
-	LicenseType int8      `db:"license_type"`
-	Status      int8      `db:"status"`
-	Apps        string    `db:"apps"` // JSON
-	ChangeID    int       `db:"change_id"`
+	ID          int       `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
+	CreatedAt   time.Time `gorm:"not null;column:created_at"`
+	UpdatedAt   time.Time `gorm:"not null;column:updated_at"`
+	Name        string    `gorm:"not null;column:name"`
+	BillingType int8      `gorm:"not null;column:billing_type"`
+	LicenseType int8      `gorm:"not null;column:license_type"`
+	Status      int8      `gorm:"not null;column:status"`
+	Apps        string    `gorm:"not null;column:apps"` // JSON
+	ChangeID    int       `gorm:"not null;column:change_id"`
 }
 
-func (packagex Package) GetPath() string {
-	return "/packages/" + strconv.Itoa(int(packagex.ID)) + "/" + slug.Make(packagex.Name)
+func (pack Package) GetPath() string {
+	return "/packages/" + strconv.Itoa(int(pack.ID)) + "/" + slug.Make(pack.Name)
 }
 
-func GetPackage(id uint) (packagex Package, err error) {
+func GetPackage(id int) (pack Package, err error) {
 
 	db, err := getDB()
 	if err != nil {
-		return packagex, err
+		return pack, err
 	}
 
-	err = db.Get(packagex, "SELECT * FROM apps WHERE id = $1;", id)
-	if err != nil {
-		return packagex, err
+	db.First(&pack, id)
+	if db.Error != nil {
+		return pack, err
 	}
 
-	return packagex, nil
+	if pack.UpdatedAt.Unix() < time.Now().AddDate(0, 0, -1).Unix() {
+
+	}
+
+	// Don't bother checking steam to see if it exists, we should know about all packs.
+
+	return pack, nil
 }
 
-func GetPackages(ids []uint) (packages []Package, err error) {
+func GetPackages(ids []int) (packages []Package, err error) {
 
 	db, err := getDB()
 	if err != nil {
 		return packages, err
 	}
 
-	// Build query
-	query, args, err := squirrel.Select("*").From("packages").Where(squirrel.Eq{"id": ids}).ToSql()
-
-	// Query
-	err = db.Select(packages, query, args...)
-	if err != nil {
+	db.Where("id IN (?)", ids).Find(&packages)
+	if db.Error != nil {
 		return packages, err
 	}
 
 	return packages, nil
 }
 
-func (packagex Package) GetApps() (apps []uint, err error) {
+func (pack Package) GetApps() (apps []int, err error) {
 
-	bytes := []byte(packagex.Apps)
+	bytes := []byte(pack.Apps)
 	if err := json.Unmarshal(bytes, apps); err != nil {
 		return apps, err
 	}
@@ -69,14 +70,14 @@ func (packagex Package) GetApps() (apps []uint, err error) {
 	return apps, nil
 }
 
-func (packagex *Package) Tidy() *Package {
+func (pack *Package) Tidy() *Package {
 
-	packagex.UpdatedAt = time.Now()
-	if packagex.CreatedAt.IsZero() {
-		packagex.CreatedAt = time.Now()
+	pack.UpdatedAt = time.Now()
+	if pack.CreatedAt.IsZero() {
+		pack.CreatedAt = time.Now()
 	}
 
-	return packagex
+	return pack
 }
 
 func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
@@ -86,8 +87,8 @@ func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
 		return packages, err
 	}
 
-	err = db.Select(&packages, "SELECT * FROM packages WHERE JSON_CONTAINS(apps, '[\""+strconv.Itoa(appID)+"\"]')")
-	if err != nil {
+	db = db.Where("JSON_CONTAINS(apps, '[\"?\"]')", appID).Limit(96).Order("id DESC").Find(&packages)
+	if db.Error != nil {
 		return packages, err
 	}
 
@@ -101,38 +102,10 @@ func GetLatestPackages() (packages []Package, err error) {
 		return packages, err
 	}
 
-	err = db.Select(packages, "SELECT * FROM packages ORDER BY created_at LIMIT 20")
-	if err != nil {
+	db.Limit(20).Order("created_at DESC").Find(&packages)
+	if db.Error != nil {
 		return packages, err
 	}
 
 	return packages, nil
 }
-
-//func BulkAddPackages(changes []*Package) (err error) {
-//
-//	packagesLen := len(changes)
-//	if packagesLen == 0 {
-//		return nil
-//	}
-//
-//	client, context, err := getDSClient()
-//	if err != nil {
-//		return err
-//	}
-//
-//	keys := make([]*datastore.Key, 0, packagesLen)
-//
-//	for _, v := range changes {
-//		keys = append(keys, v.GetKey())
-//	}
-//
-//	fmt.Println("Saving " + strconv.Itoa(packagesLen) + " packages")
-//
-//	_, err = client.PutMulti(context, keys, changes)
-//	if err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}

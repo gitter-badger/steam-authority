@@ -205,3 +205,11 @@ type GetAppListApp struct {
 	AppID int    `json:"appid"`
 	Name  string `json:"name"`
 }
+
+func GetCheatingReports()(){
+
+}
+
+func GetPlayersBanned()(){
+
+}

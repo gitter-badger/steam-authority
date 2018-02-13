@@ -25,12 +25,12 @@ func packagesHandler(w http.ResponseWriter, r *http.Request) {
 
 func packageHandler(w http.ResponseWriter, r *http.Request) {
 
-	idx, err := strconv.ParseUint(chi.URLParam(r, "id"), 10, 64)
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		logger.Error(err)
 	}
 
-	packagex, err := mysql.GetPackage(uint(idx))
+	pack, err := mysql.GetPackage(id)
 	if err != nil {
 
 		if err.Error() == "sql: no rows in result set" {
@@ -44,7 +44,7 @@ func packageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	appIDs, err := packagex.GetApps()
+	appIDs, err := pack.GetApps()
 	if err != nil {
 		logger.Error(err)
 	}
@@ -55,7 +55,7 @@ func packageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := packageTemplate{}
-	template.Package = packagex
+	template.Package = pack
 	template.Apps = apps
 
 	returnTemplate(w, "package", template)

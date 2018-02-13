@@ -76,7 +76,12 @@ func GetArticles(appID int, limit int) (articles []Article, err error) {
 		return articles, err
 	}
 
-	q := datastore.NewQuery(ARTICLE).Order("app_id").Limit(limit).Filter("app_id =", appID) // Order by date, needs index
+	q := datastore.NewQuery(ARTICLE).Order("app_id").Limit(limit) // Order by date, needs index
+
+	if appID != 0 {
+		q = q.Filter("app_id =", appID)
+	}
+
 	it := client.Run(ctx, q)
 
 	for {

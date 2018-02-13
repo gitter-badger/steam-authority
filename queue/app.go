@@ -89,7 +89,9 @@ func appConsumer() {
 				logger.Info("Reading player " + id + " from rabbit")
 
 				idx, _ := strconv.Atoi(id)
-				_, err := mysql.CreateOrUpdateApp(idx)
+
+				app := mysql.NewApp(idx)
+				err = app.Save()
 
 				if err != nil {
 					logger.Error(err)

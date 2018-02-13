@@ -7,8 +7,8 @@ import (
 )
 
 type Genre struct {
-	ID   int
-	Name string
+	ID   int    `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
+	Name string `gorm:"not null;column:name"`
 }
 
 func (genre Genre) GetPath() string {

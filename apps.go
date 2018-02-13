@@ -9,6 +9,7 @@ import (
 	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
+	"fmt"
 )
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +21,7 @@ func appsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get apps count
-	count, err := mysql.CountTable("apps")
+	count, err := mysql.CountApps()
 	if err != nil {
 		logger.Error(err)
 	}
@@ -36,7 +37,7 @@ func appsHandler(w http.ResponseWriter, r *http.Request) {
 type appsTemplate struct {
 	GlobalTemplate
 	Apps  []mysql.App
-	Count uint
+	Count int
 }
 
 func appHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,33 +53,39 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//TEMP
-	mysql.CreateOrUpdateApp(idx)
+	//mysql.CreateOrUpdateApp(idx)
 
 	// Get app
 	app, err := mysql.GetApp(idx)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-
-			// Create the app
-			app, err = mysql.CreateApp(idx)
-			if err != nil {
-				logger.Error(err)
-				returnErrorTemplate(w, 404, err.Error())
-				return
-			}
-
-			// Get app articles
-			_, err = datastore.GetArticlesFromSteam(idx)
-			if err != nil {
-				logger.Error(err)
-			}
-
-		} else {
-			logger.Error(err)
-			returnErrorTemplate(w, 500, err.Error())
-			return
-		}
+		logger.Error(err)
 	}
+
+	fmt.Println(app)
+
+	//if err != nil {
+	//	if err.Error() == "sql: no rows in result set" {
+	//
+	//		// Create the app
+	//		app, err = mysql.CreateApp(idx)
+	//		if err != nil {
+	//			logger.Error(err)
+	//			returnErrorTemplate(w, 404, err.Error())
+	//			return
+	//		}
+	//
+	//		// Get app articles
+	//		_, err = datastore.GetArticlesFromSteam(idx)
+	//		if err != nil {
+	//			logger.Error(err)
+	//		}
+	//
+	//	} else {
+	//		logger.Error(err)
+	//		returnErrorTemplate(w, 500, err.Error())
+	//		return
+	//	}
+	//}
 
 	// Get news
 	news, err := datastore.GetArticles(idx, 1000)
