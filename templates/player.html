@@ -2,12 +2,37 @@
 
 <div class="container" id="player-page">
 
-  <div class="jumbotron">
-    <h1 class="display-4"><img src="{{ .Player.Avatar }}" alt="{{ .Player.PersonaName }}"> {{ .Player.PersonaName }}
-      <span class="badge badge-secondary">{{ .Player.Level }}</span>
-    </h1>
-    <p class="lead">x</p>
-  </div>
+    <div class="jumbotron">
+        <h1 class="display-4"><img src="{{ .Player.Avatar }}" alt="{{ .Player.PersonaName }}"> {{ .Player.PersonaName }}
+            <span class="badge badge-secondary">{{ .Player.Level }}</span>
+        </h1>
+        <p class="lead">x</p>
+    </div>
+
+    <div class="row">
+        <div class="col-sm">
+            One of three columns
+        </div>
+        <div class="col-sm">
+            One of three columns
+        </div>
+        <div class="col-sm">
+
+            <div class="list-group list-group-flush">
+            {{ range $key, $value := .Friends }}
+                <a href="{{.GetPath}}" class="list-group-item list-group-item-action">
+
+                {{ if ne .PersonaName "" }}
+                    {{ .PersonaName }}
+                  {{else}}
+                    <span class="text-muted">Queued <i class="fas fa-spinner fa-spin"></i></span>
+                {{end}}
+                </a>
+            {{ end }}
+            </div>
+
+        </div>
+    </div>
 
 </div>
 

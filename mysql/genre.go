@@ -17,15 +17,14 @@ func (genre Genre) GetPath() string {
 
 func GetAllGenres() (tags []Tag, err error) {
 
-	conn, err := getDB()
+	db, err := getDB()
 	if err != nil {
 		logger.Error(err)
 		return tags, err
 	}
 
-	err = conn.Select(&tags, "SELECT * FROM genres ORDER BY name DESC LIMIT 1000")
-	if err != nil {
-		logger.Error(err)
+	db.Limit(1000).Order("name DESC").Find(&tags)
+	if db.Error != nil {
 		return tags, err
 	}
 

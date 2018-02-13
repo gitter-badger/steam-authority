@@ -4,39 +4,51 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Jleagle/go-helpers/logger"
 	"github.com/streadway/amqp"
 )
 
 var (
+	connection   *amqp.Connection
+	channel      *amqp.Channel
 	closeChannel chan *amqp.Error
 	namespace    = "STEAM_"
 )
 
 func init() {
-	go playerConsumer()
+	closeChannel = make(chan *amqp.Error)
 }
 
-func getChannel() (conn *amqp.Connection, channel *amqp.Channel, err error) {
+func Consumers() {
+	fmt.Println("## Running consumers")
 
-	//time.Sleep(1 * time.Second)
+	forever := make(chan bool)
 
-	closeChannel = make(chan *amqp.Error)
+	//go playerConsumer()
+	go appConsumer()
 
-	conn, err = amqp.Dial(os.Getenv("STEAM_RABBIT"))
-	conn.NotifyClose(closeChannel)
+	<-forever
+}
+
+func connect() (err error) {
+
+	if connection != nil && channel != nil {
+		return nil
+	}
+
+	connection, err = amqp.Dial(os.Getenv("STEAM_RABBIT"))
+	connection.NotifyClose(closeChannel)
 	if err != nil {
-		logger.Error(err)
+		return err
 	}
 	//defer amqpConn.Close()
 
-	channel, err = conn.Channel()
+	channel, err = connection.Channel()
 	if err != nil {
-		logger.Error(err)
+		return err
 	}
 	//defer ch.Close()
 
 	fmt.Println("connected")
 
-	return conn, channel, err
+	return nil
 }

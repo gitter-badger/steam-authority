@@ -42,6 +42,8 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 
 func returnErrorTemplate(w http.ResponseWriter, code int, message string) {
 
+	w.WriteHeader(code)
+
 	tmpl := errorTemplate{
 		Code:    code,
 		Message: message,

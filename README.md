@@ -19,6 +19,7 @@ export STEAM_SQL_DSN=""
 ##### Setup
 ```bash
 git clone git@github.com:steam-authority/steam-authority.git
+npm install
 dep ensure
 go build
 ```

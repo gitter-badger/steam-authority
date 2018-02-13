@@ -3,46 +3,44 @@ package mysql
 import (
 	"encoding/json"
 	"net/url"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/steam"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type App struct {
-	ID                int    `db:"id"`
-	CreatedAt         int    `db:"created_at"`
-	UpdatedAt         int    `db:"updated_at"`
-	Name              string `db:"name"`
-	Type              string `db:"type"`
-	IsFree            bool   `db:"is_free"`
-	DLC               string `db:"dlc"` // JSON
-	ShortDescription  string `db:"description_short"`
-	HeaderImage       string `db:"image_header"`
-	Developers        string `db:"developer"` // JSON
-	Publishers        string `db:"publisher"` // JSON
-	Packages          string `db:"packages"`  // JSON
-	MetacriticScore   int8   `db:"metacritic_score"`
-	MetacriticFullURL string `db:"metacritic_url"`
-	Categories        string `db:"categories"`  // JSON
-	Genres            string `db:"genres"`      // JSON
-	Screenshots       string `db:"screenshots"` // JSON
-	Movies            string `db:"movies"`
-	Achievements      string `db:"achievements"`
-	Background        string `db:"background"`
-	Platforms         string `db:"platforms"` // JSON
-
-	// These are not in the api call, only in pics
-	ReleaseState string `dbx:"releasestate"`
-	StoreTags    []int  `dbx:"store_tags"`
-	Homepage     string `dbx:"homepage"`
-	ChangeNumber int    `dbx:"change_number"`
-	Logo         string `dbx:"logo"`
-	Icon         string `dbx:"icon"`
+	ID                int    `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
+	CreatedAt         int    `gorm:"not null;column:created_at"`
+	UpdatedAt         int    `gorm:"not null;column:updated_at"`
+	Name              string `gorm:"not null;column:name"`
+	Type              string `gorm:"not null;column:type"`
+	IsFree            bool   `gorm:"not null;column:is_free"`
+	DLC               string `gorm:"not null;column:dlc"` // JSON
+	ShortDescription  string `gorm:"not null;column:description_short"`
+	HeaderImage       string `gorm:"not null;column:image_header"`
+	Developers        string `gorm:"not null;column:developer"` // JSON
+	Publishers        string `gorm:"not null;column:publisher"` // JSON
+	Packages          string `gorm:"not null;column:packages"`  // JSON
+	MetacriticScore   int8   `gorm:"not null;column:metacritic_score"`
+	MetacriticFullURL string `gorm:"not null;column:metacritic_url"`
+	Categories        string `gorm:"not null;column:categories"`  // JSON
+	Genres            string `gorm:"not null;column:genres"`      // JSON
+	Screenshots       string `gorm:"not null;column:screenshots"` // JSON
+	Movies            string `gorm:"not null;column:movies"`
+	Achievements      string `gorm:"not null;column:achievements"`
+	Background        string `gorm:"not null;column:background"`
+	Platforms         string `gorm:"not null;column:platforms"`    // JSON
+	ReleaseState      string `gorm:"not null;column:releasestate"` // These down are not in the api call, only in pics
+	StoreTags         []int  `gorm:"not null;column:store_tags"`
+	Homepage          string `gorm:"not null;column:homepage"`
+	ChangeNumber      int    `gorm:"not null;column:change_number"`
+	Logo              string `gorm:"not null;column:logo"`
+	Icon              string `gorm:"not null;column:icon"`
 }
 
 func (app App) GetPath() (ret string) {
@@ -134,34 +132,52 @@ func (app App) GetName() (name string) {
 	return app.Name
 }
 
-func GetApp(id uint) (app App, err error) {
+//func GetApp(id int) (app App, err error) {
+//
+//	db, err := getDB()
+//	if err != nil {
+//		return app, err
+//	}
+//
+//	err = db.Get(&app, "SELECT * FROM apps WHERE id = ?", id)
+//	if err != nil {
+//		return app, err
+//	}
+//
+//
+//
+//	return app, nil
+//}
+
+func GetApp() (app App, err error) {
 
 	db, err := getDB()
 	if err != nil {
 		return app, err
 	}
 
-	err = db.Get(&app, "SELECT * FROM apps WHERE id = ?", id)
-	if err != nil {
-		return app, err
+	app = App{}
+
+	db.First(&app, 10)
+
+	if int64(app.UpdatedAt) < (time.Now().Unix() - int64(time.Hour*24)) {
 	}
 
+	// Don't bother checking steam to see if it exists, we should know about all apps.
+
 	return app, nil
+
 }
 
-func GetApps(ids []uint) (apps []App, err error) {
+func GetApps(ids []int) (apps []App, err error) {
 
 	db, err := getDB()
 	if err != nil {
 		return apps, err
 	}
 
-	// Build query
-	query, args, err := squirrel.Select("*").From("apps").Where(squirrel.Eq{"id": ids}).ToSql()
-
-	// Query
-	err = db.Select(apps, query, args...)
-	if err != nil {
+	db.Where("id IN (?)", ids).Find(&apps)
+	if db.Error != nil {
 		return apps, err
 	}
 
@@ -170,32 +186,46 @@ func GetApps(ids []uint) (apps []App, err error) {
 
 func SearchApps(query url.Values) (apps []App, err error) {
 
-	searchQuery := squirrel.Select("*").From("apps").Limit(96).OrderBy("id DESC") // todo, order by popularity
-
-	// Platforms
-	if _, ok := query["platforms"]; ok {
-		searchQuery = searchQuery.Where("JSON_CONTAINS(platforms, ?)", "[\""+query.Get("platforms")+"\"]")
-	}
-
-	// Tag
-	if _, ok := query["tags"]; ok {
-		searchQuery = searchQuery.Where("JSON_CONTAINS(tags, ?)", "[\""+query.Get("tags")+"\"]")
-	}
-
-	// Query
 	db, err := getDB()
 	if err != nil {
 		return apps, err
 	}
 
-	sql, args, err := searchQuery.ToSql()
+	db = db.Limit(96).Order("id DESC") // todo, order by popularity?
 
-	err = db.Select(&apps, sql, args...)
-	if err != nil {
+	// Platforms
+	if _, ok := query["platforms"]; ok {
+		db = db.Where("JSON_CONTAINS(platforms, [\"?\"])", query.Get("platforms"))
+
+	}
+
+	// Tag
+	if _, ok := query["tags"]; ok {
+		db = db.Where("JSON_CONTAINS(tags, ?)", "[\""+query.Get("tags")+"\"]")
+	}
+
+	// Query
+	db = db.Find(&apps)
+	if db.Error != nil {
 		return apps, err
 	}
 
 	return apps, err
+}
+
+func CountApps() (count int, err error) {
+
+	db, err := getDB()
+	if err != nil {
+		return count, err
+	}
+
+	db.Model(&App{}).Count(&count)
+	if db.Error != nil {
+		return count, err
+	}
+
+	return count, nil
 }
 
 func (app *App) Save() (err error) {
@@ -250,24 +280,8 @@ func (app *App) Save() (err error) {
 	app.Type = strings.ToLower(app.Type)
 	app.ReleaseState = strings.ToLower(app.ReleaseState)
 
-	// Get values from struct
-	var fields []string
-	var values []interface{}
-
-	v := reflect.ValueOf(app).Elem()
-	t := reflect.TypeOf(app).Elem()
-
-	for i := 0; i < v.NumField(); i++ {
-
-		tag := t.Field(i).Tag.Get("db")
-		if tag != "" {
-			fields = append(fields, tag)
-			values = append(values, v.Field(i).Interface())
-		}
-	}
-
-	// Make SQL query
-	sqlString, args, err := squirrel.Insert("apps").Columns(fields...).Values(values...).ToSql()
+	// Get app details
+	err = app.FillFromAppDetails()
 	if err != nil {
 		return err
 	}
@@ -278,32 +292,138 @@ func (app *App) Save() (err error) {
 		return err
 	}
 
-	_, err = db.Query(sqlString, args...)
-	if err != nil {
+	db.Save(&app)
+	if db.Error != nil {
 		return err
 	}
 
 	return nil
 }
 
-func CreateApp(id int) (app App, err error) {
+//func (app *App) Save() (err error) {
+//
+//
+//
+//	// Get values from struct
+//	var fields []string
+//	var values []interface{}
+//
+//	v := reflect.ValueOf(app).Elem()
+//	t := reflect.TypeOf(app).Elem()
+//
+//	for i := 0; i < v.NumField(); i++ {
+//
+//		tag := t.Field(i).Tag.Get("db")
+//		if tag != "" {
+//			fields = append(fields, tag)
+//			values = append(values, v.Field(i).Interface())
+//		}
+//	}
+//
+//	// Make SQL query
+//	exists, err := app.ExistsInSQL()
+//	if err != nil {
+//		logger.Error(err)
+//	}
+//
+//	var sqlString string
+//	var args []interface{}
+//
+//	if exists {
+//		sqlString, args, err = squirrel.Update("apps").ToSql()
+//	} else {
+//		sqlString, args, err = squirrel.Insert("apps").Columns(fields...).Values(values...).ToSql()
+//	}
+//
+//	if err != nil {
+//		return err
+//	}
+//
+//	// Save
+//	db, err := getDB()
+//	if err != nil {
+//		return err
+//	}
+//
+//	_, err = db.Query(sqlString, args...)
+//	if err != nil {
+//		fmt.Println(sqlString)
+//		return err
+//	}
+//
+//	return nil
+//}
 
-	app.ID = id
+//func CreateApp(id int) (app App, err error) {
+//
+//	app.ID = id
+//
+//
+//
+//	// Save
+//	err = app.Save()
+//	if err != nil {
+//		return app, err
+//	}
+//
+//	return app, nil
+//}
 
-	// Get app details
-	err = app.FillFromAppDetails()
-	if err != nil {
-		return app, err
-	}
+//func CreateOrUpdateApp(id int) (app App, err error) {
+//
+//	app.ID = 9
+//	err = app.Save()
+//	if err != nil {
+//		fmt.Println(err.Error())
+//	}
+//	fmt.Println("xx")
+//
+//	//id = 9
+//	//
+//	//app, err = GetApp(id)
+//	//if err != nil {
+//	//	if err.Error() == "expired" {
+//	//
+//	//		app, err = GetApp(id)
+//	//
+//	//	} else if err.Error() == "sql: no rows in result set" {
+//	//
+//	//		app := App{}
+//	//		app.ID = id
+//	//		err = app.FillFromAppDetails()
+//	//		if err != nil {
+//	//			logger.Error(err)
+//	//		}
+//	//
+//	//	}
+//	//	logger.Error(err)
+//	//}
+//
+//	return app, err
+//
+//}
 
-	// Save
-	err = app.Save()
-	if err != nil {
-		return app, err
-	}
-
-	return app, nil
-}
+//func (app *App) ExistsInSQL() (exists bool, err error) {
+//
+//	sqlString, args, err := squirrel.Select("id").Where("id = ?", app.ID).ToSql()
+//	if err != nil {
+//		return false, err
+//	}
+//
+//	// Save
+//	db, err := getDB()
+//	if err != nil {
+//		return false, err
+//	}
+//
+//	_, err = db.Query(sqlString, args...)
+//	if err != nil {
+//		fmt.Println(sqlString)
+//		return false, err
+//	}
+//
+//	return true, nil
+//}
 
 func (app *App) FillFromAppDetails() (err error) {
 

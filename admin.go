@@ -3,12 +3,10 @@ package main
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
-	"github.com/Masterminds/squirrel"
 	"github.com/steam-authority/steam-authority/datastore"
-	"github.com/steam-authority/steam-authority/mysql"
+	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/steam"
 )
 
@@ -75,18 +73,8 @@ func fillAppsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, v := range apps {
-		// Build query
-		builder := squirrel.Insert("apps")
-		builder = builder.Columns("id", "created_at", "updated_at", "name", "type", "is_free", "packages", "dlc", "categories", "genres", "screenshots", "movies", "achievements", "platforms")
-		sql, args, err := builder.Values(v.AppID, int(time.Now().Unix()), int(time.Now().Unix()), v.Name, "", "0", "[]", "[]", "[]", "[]", "[]", "[]", "[]", "{}").ToSql()
-
-		// Query
-		_, err = mysql.ExecQuery(sql, args)
-		if err != nil {
-			logger.Error(err)
-			//return
-		}
+		queue.AppProducer(v.AppID)
 	}
 
-	logger.Info("Complete")
+	logger.Info(strconv.Itoa(len(apps)) + " apps added to rabbit")
 }

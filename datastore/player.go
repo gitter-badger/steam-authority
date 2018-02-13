@@ -4,6 +4,7 @@ import (
 	"errors"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -19,8 +20,8 @@ type Player struct {
 	PlayerID    int       `datastore:"player_id"`
 	ValintyURL  string    `datastore:"vality_url"`
 	Avatar      string    `datastore:"avatar"`
-	RealName    string    `datastore:"real_name"`
 	PersonaName string    `datastore:"persona_name"`
+	RealName    string    `datastore:"real_name"`
 	CountryCode string    `datastore:"country_code"`
 	StateCode   string    `datastore:"status_code"`
 	Level       int       `datastore:"level"`
@@ -122,6 +123,28 @@ func GetPlayers(order string, limit int) (players []Player, err error) {
 	}
 
 	return players, err
+}
+
+func GetPlayersByIDs(ids []int) (friends []Player, err error) {
+
+	client, context, err := getDSClient()
+	if err != nil {
+		return friends, err
+	}
+
+	var keys []*datastore.Key
+	for _, v := range ids {
+		key := datastore.NameKey(PLAYER, strconv.Itoa(v), nil)
+		keys = append(keys, key)
+	}
+
+	friends = make([]Player, len(keys))
+	err = client.GetMulti(context, keys, friends)
+	if err != nil && !strings.Contains(err.Error(), "no such entity") {
+		return friends, err
+	}
+
+	return friends, nil
 }
 
 func CountPlayers() (count int, err error) {

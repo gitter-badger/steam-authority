@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -9,12 +10,27 @@ import (
 	"github.com/99designs/basicauth-go"
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
+	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/websockets"
 )
 
 func main() {
 
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("STEAM_GOOGLE_APPLICATION_CREDENTIALS"))
+
+	arguments := os.Args[1:]
+
+	if len(arguments) > 0 {
+
+		switch arguments[0] {
+		case "consumers":
+			queue.Consumers()
+		default:
+			fmt.Println("No such CLI command")
+		}
+
+		os.Exit(0)
+	}
 
 	logger.SetRollbarKey(os.Getenv("STEAM_ROLLBAR_PRIVATE"))
 

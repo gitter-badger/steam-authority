@@ -8,7 +8,6 @@ import (
 	"github.com/go-chi/chi"
 	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
-	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/steam"
 )
 
@@ -60,11 +59,6 @@ type playersTemplate struct {
 
 func playerHandler(w http.ResponseWriter, r *http.Request) {
 
-	// todo test
-	queue.AddPlayer(76561197968626192)
-	queue.AddPlayer(76561197968626192)
-	queue.AddPlayer(76561197968626192)
-
 	id := chi.URLParam(r, "id")
 	slug := chi.URLParam(r, "slug")
 
@@ -99,10 +93,10 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			player.FillFromFriends(friends)
 
-			for _, v := range friends {
-				vv, _ := strconv.Atoi(v.Steamid)
-				queue.AddPlayer(vv)
-			}
+			//for _, v := range friends {
+			//	vv, _ := strconv.Atoi(v.Steamid)
+			//	queue.PlayerProducer(vv)
+			//}
 
 			// todo, get player bans, groups
 			// todo, clear latest players cache
@@ -125,9 +119,16 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get friends
+	friends, err := datastore.GetPlayersByIDs(player.Friends)
+	if err != nil {
+		logger.Error(err)
+	}
+
 	// Template
 	template := playerTemplate{}
 	template.Player = player
+	template.Friends = friends
 
 	returnTemplate(w, "player", template)
 }
@@ -150,5 +151,6 @@ func playerIDHandler(w http.ResponseWriter, r *http.Request) {
 
 type playerTemplate struct {
 	GlobalTemplate
-	Player datastore.Player
+	Player  datastore.Player
+	Friends []datastore.Player
 }

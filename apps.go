@@ -51,8 +51,11 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//TEMP
+	mysql.CreateOrUpdateApp(idx)
+
 	// Get app
-	app, err := mysql.GetApp(uint(idx))
+	app, err := mysql.GetApp(idx)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 

@@ -1,59 +1,37 @@
 package mysql
 
 import (
-	"database/sql"
 	"os"
 
 	"github.com/Jleagle/go-helpers/logger"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
+	"github.com/jinzhu/gorm"
 )
 
-var mysqlConnection *sqlx.DB
+var gormConnection *gorm.DB
 
-func getDB() (conn *sqlx.DB, err error) {
+func init() {
 
-	if mysqlConnection == nil {
-
-		db, err := sqlx.Connect("mysql", os.Getenv("STEAM_SQL_DSN")+"?parseTime=true")
-		if err != nil {
-			logger.Error(err)
-			return db, err
-		}
-
-		mysqlConnection = db
-	}
-
-	return mysqlConnection, nil
-}
-
-func CountTable(table string) (count uint, err error) {
-
-	db, err := getDB()
-	if err != nil {
-		return count, err
-	}
-
-	err = db.Get(&count, "SELECT count(*) as id FROM "+table)
-	if err != nil {
-		return count, err
-	}
-
-	return count, nil
-}
-
-func ExecQuery(query string, args []interface{}) (result sql.Result, err error) {
-
-	db, err := getDB()
-	if err != nil {
-		return result, err
-	}
-
-	result, err = db.Exec(query, args...)
+	var err error
+	gormConnection, err = gorm.Open("mysql", os.Getenv("STEAM_SQL_DSN")+"?parseTime=true")
 	if err != nil {
 		logger.Error(err)
-		return
 	}
 
-	return result, nil
+}
+
+func getDB() (conn *gorm.DB, err error) {
+
+	if gormConnection == nil {
+
+		db, err := gorm.Open("mysql", os.Getenv("STEAM_SQL_DSN")+"?parseTime=true")
+		if err != nil {
+			logger.Error(err)
+			return db, nil
+		}
+
+		gormConnection = db
+	}
+
+	return gormConnection, nil
 }
