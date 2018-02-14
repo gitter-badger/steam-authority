@@ -4,14 +4,12 @@ import (
 	"encoding/json"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/Jleagle/go-helpers/logger"
 	"github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/steam"
-
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"strings"
-	"github.com/Jleagle/go-helpers/logger"
 )
 
 type App struct {
@@ -36,6 +34,8 @@ type App struct {
 	Achievements      string    `gorm:"not null;column:achievements;default:'[]'"`     // JSON
 	Background        string    `gorm:"not null;column:background"`                    //
 	Platforms         string    `gorm:"not null;column:platforms;default:'[]'"`        // JSON
+	GameID            int       `gorm:"not null;column:game_id"`                       //
+	GameName          string    `gorm:"not null;column:game_name"`                     //
 	ReleaseState      string    `gorm:"not null;column:release_state"`                 // PICS
 	StoreTags         string    `gorm:"not null;column:tags;default:'[]';type:json"`   // PICS JSON
 	Homepage          string    `gorm:"not null;column:homepage"`                      // PICS
@@ -136,23 +136,25 @@ func (app App) GetName() (name string) {
 
 func GetApp(id int) (app App, err error) {
 
+	// Connect
 	db, err := getDB()
 	if err != nil {
 		return app, err
 	}
 
+	// Get app
 	db.FirstOrInit(&app, App{ID: id})
 	if db.Error != nil {
 		return app, db.Error
 	}
 
-	err = app.Save()
-	if err != nil {
-		logger.Error(err)
-	}
+	// If new or expired app
+	if app.UpdatedAt.IsZero() || (app.UpdatedAt.Unix() < time.Now().AddDate(0, 0, -1).Unix()) {
 
-	if app.UpdatedAt.Unix() < time.Now().AddDate(0, 0, -1).Unix() {
-
+		err = app.Save()
+		if err != nil {
+			return app, err
+		}
 	}
 
 	// Don't bother checking steam to see if it exists, we should know about all apps.
@@ -227,18 +229,6 @@ func NewApp(id int) (app App) {
 
 func (app *App) Save() (err error) {
 
-	// Tidy
-
-	// Get app details
-	err = app.FillFromAppDetails()
-	if err != nil {
-		return err
-	}
-
-	// Tidy
-	app.Type = strings.ToLower(app.Type)
-	app.ReleaseState = strings.ToLower(app.ReleaseState)
-
 	// Save
 	db, err := getDB()
 	if err != nil {
@@ -256,47 +246,61 @@ func (app *App) Save() (err error) {
 // GORM callback
 func (app *App) BeforeSave() {
 
-	if app.StoreTags == "" {
+	// Get app details
+	err := app.FillFromAppDetails()
+	if err != nil {
+		logger.Error(err)
+	}
+
+	//
+	app.Type = strings.ToLower(app.Type)
+	app.ReleaseState = strings.ToLower(app.ReleaseState)
+
+	if app.Name == "" {
+		app.Name = "App " + strconv.Itoa(app.ID)
+	}
+
+	if app.StoreTags == "" || app.StoreTags == "null" {
 		app.StoreTags = "[]"
 	}
 
-	if app.Developers == "" {
+	if app.Developers == "" || app.Developers == "null" {
 		app.Developers = "[]"
 	}
 
-	if app.Publishers == "" {
+	if app.Publishers == "" || app.Publishers == "null" {
 		app.Publishers = "[]"
 	}
 
-	if app.Categories == "" {
+	if app.Categories == "" || app.Categories == "null" {
 		app.Categories = "[]"
 	}
 
-	if app.Genres == "" {
+	if app.Genres == "" || app.Genres == "null" {
 		app.Genres = "[]"
 	}
 
-	if app.Screenshots == "" {
+	if app.Screenshots == "" || app.Screenshots == "null" {
 		app.Screenshots = "[]"
 	}
 
-	if app.Movies == "" {
+	if app.Movies == "" || app.Movies == "null" {
 		app.Movies = "[]"
 	}
 
-	if app.Achievements == "" {
+	if app.Achievements == "" || app.Achievements == "null" {
 		app.Achievements = "{}"
 	}
 
-	if app.Platforms == "" {
+	if app.Platforms == "" || app.Platforms == "null" {
 		app.Platforms = "[]"
 	}
 
-	if app.DLC == "" {
+	if app.DLC == "" || app.DLC == "null" {
 		app.DLC = "[]"
 	}
 
-	if app.Packages == "" {
+	if app.Packages == "" || app.Packages == "null" {
 		app.Packages = "[]"
 	}
 }
@@ -391,6 +395,9 @@ func (app *App) FillFromAppDetails() (err error) {
 		return err
 	}
 
+	// Game ID
+	gameID, _ := strconv.Atoi(appDetails.Data.Fullgame.AppID)
+
 	//
 	app.Name = appDetails.Data.Name
 	app.Type = appDetails.Data.Type
@@ -410,6 +417,8 @@ func (app *App) FillFromAppDetails() (err error) {
 	app.Achievements = string(achievementsString)
 	app.Background = appDetails.Data.Background
 	app.Platforms = string(platformsString)
+	app.GameID = gameID
+	app.GameName = appDetails.Data.Fullgame.Name
 
 	return nil
 }

@@ -8,9 +8,13 @@
         <p class="lead">x</p>
     </div>
 
-{{if eq .App.ReleaseState "prerelease"}}
-    <div class="alert alert-primary" role="alert">This game is not released yet!</div>
-{{end}}
+{{ range $k, $v := .Banners }}
+    <div class="alert alert-{{ $k }}" role="alert">
+    {{ range $kk, $vv := $v }}
+        <div>{{ $vv }}</div>
+    {{ end }}
+    </div>
+{{ end }}
 
     <div class="card">
         <div class="card-header bg-light text-white">
@@ -34,6 +38,7 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane show active" id="details" role="tabpanel">
 
+                    <p>Game: <a href="/apps/{{ .App.GameID }}">{{ .App.GameName }}</a></p>
                     <p>App Type: {{ .App.Type }}</p>
                     <p>Release State: {{ .App.ReleaseState }}</p>
                     <p>OS': {{ .App.GetPlatforms }}</p>

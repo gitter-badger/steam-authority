@@ -14,6 +14,8 @@ https://partner.steamgames.com/doc/webapi/ISteamApps#GetCheatingReports
 https://partner.steamgames.com/doc/webapi/ISteamApps#GetPlayersBanned
 */
 
+// todo, list of apps that wont unmarshal
+// 2130, 2720, 4720, 4580, 4580
 func GetAppDetails(id string) (app AppDetailsBody, err error) {
 
 	options := url.Values{}
@@ -64,7 +66,12 @@ type AppDetailsBody struct {
 		DetailedDescription string `json:"detailed_description"`
 		AboutTheGame        string `json:"about_the_game"`
 		ShortDescription    string `json:"short_description"`
+		Fullgame            struct {
+			AppID string `json:"appid"`
+			Name  string `json:"name"`
+		} `json:"fullgame"`
 		SupportedLanguages  string `json:"supported_languages"`
+		Reviews             string `json:"reviews"`
 		HeaderImage         string `json:"header_image"`
 		Website             string `json:"website"`
 		PcRequirements struct {
@@ -82,7 +89,7 @@ type AppDetailsBody struct {
 		LegalNotice string   `json:"legal_notice"`
 		Developers  []string `json:"developers"`
 		Publishers  []string `json:"publishers"`
-		Demos             []struct {
+		Demos []struct {
 			Appid       int    `json:"appid"`
 			Description string `json:"description"`
 		} `json:"demos"`
@@ -204,12 +211,4 @@ type GetAppListAppList struct {
 type GetAppListApp struct {
 	AppID int    `json:"appid"`
 	Name  string `json:"name"`
-}
-
-func GetCheatingReports()(){
-
-}
-
-func GetPlayersBanned()(){
-
 }

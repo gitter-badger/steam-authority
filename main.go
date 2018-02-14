@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/basicauth-go"
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
+	"github.com/steam-authority/steam-authority/pics"
 	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/websockets"
 )
@@ -24,7 +25,9 @@ func main() {
 
 		switch arguments[0] {
 		case "consumers":
-			queue.Consumers()
+			queue.RunConsumers()
+		case "pics":
+			pics.RunPICS()
 		default:
 			fmt.Println("No such CLI command")
 		}
@@ -87,8 +90,6 @@ func main() {
 	filesDir := filepath.Join(workDir, "assets")
 	fileServer(r, "/assets", http.Dir(filesDir))
 
-	// go pics.Run()
-
 	http.ListenAndServe(":8085", r)
 }
 
@@ -97,8 +98,8 @@ func adminRouter() http.Handler {
 	r.Use(basicauth.New("Steam", map[string][]string{
 		os.Getenv("STEAM_AUTH_USER"): {os.Getenv("STEAM_AUTH_PASS")},
 	}))
-	r.Get("/rerank", reRankHandler)
-	r.Get("/fill-apps", fillAppsHandler)
+	r.Get("/rerank", adminReRankHandler)
+	r.Get("/fill-apps", adminUpdateAllAppsHandler)
 	return r
 }
 

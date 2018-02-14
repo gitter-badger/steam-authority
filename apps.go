@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -9,7 +10,6 @@ import (
 	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
-	"fmt"
 )
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,10 +58,29 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	// Get app
 	app, err := mysql.GetApp(idx)
 	if err != nil {
-		logger.Error(err)
+		if err.Error() == "no app with id" {
+			logger.Error(err)
+			returnErrorTemplate(w, 404, err.Error())
+		} else {
+			logger.Error(err)
+			returnErrorTemplate(w, 500, err.Error())
+		}
+		return
 	}
 
-	fmt.Println(app)
+	// Make banners
+	banners := make(map[string][]string)
+	var primary []string
+
+	if app.ReleaseState == "prerelease" {
+		primary = append(primary, "This game is not released yet!")
+	}
+	if app.Type == "movie" {
+		primary = append(primary, "This listing is for a movie")
+	}
+	banners["primary"] = primary
+
+	fmt.Println(banners)
 
 	//if err != nil {
 	//	if err.Error() == "sql: no rows in result set" {
@@ -108,6 +127,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	template.App = app
 	template.Packages = packages
 	template.Articles = news
+	template.Banners = banners
 
 	returnTemplate(w, "app", template)
 }
@@ -117,4 +137,5 @@ type appTemplate struct {
 	App      mysql.App
 	Packages []mysql.Package
 	Articles []datastore.Article
+	Banners  map[string][]string
 }

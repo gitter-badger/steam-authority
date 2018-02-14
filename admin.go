@@ -10,7 +10,7 @@ import (
 	"github.com/steam-authority/steam-authority/steam"
 )
 
-func reRankHandler(w http.ResponseWriter, r *http.Request) {
+func adminReRankHandler(w http.ResponseWriter, r *http.Request) {
 
 	var playersToRank = 500
 
@@ -63,7 +63,7 @@ func reRankHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
-func fillAppsHandler(w http.ResponseWriter, r *http.Request) {
+func adminUpdateAllAppsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get apps
 	apps, err := steam.GetAppList()

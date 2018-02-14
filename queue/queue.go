@@ -18,7 +18,7 @@ func init() {
 	closeChannel = make(chan *amqp.Error)
 }
 
-func Consumers() {
+func RunConsumers() {
 	fmt.Println("## Running consumers")
 
 	forever := make(chan bool)
