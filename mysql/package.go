@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gosimple/slug"
+	"strings"
 )
 
 type Package struct {
@@ -108,4 +109,17 @@ func GetLatestPackages() (packages []Package, err error) {
 	}
 
 	return packages, nil
+}
+
+func (pack *Package) FillFromPICS() (err error) {
+
+	dsPackage := datastore.DsPackage{}
+	dsPackage.PackageID = js.PackageID
+	dsPackage.Apps = js.AppIDs
+	dsPackage.BillingType = js.BillingType
+	dsPackage.LicenseType = js.LicenseType
+	dsPackage.Status = js.Status
+
+	return &dsPackage
+
 }

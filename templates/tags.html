@@ -9,9 +9,10 @@
 
                 <h1 class="display-4">Tags</h1>
                 <p class="lead">
+                {{ len .Tags }} Tags.
                     Sort by <span class="sort" data-sort="tag-name">tag</span>.
                     Sort by <span class="sort" data-sort="tag-games">games</span>.
-                    Sort by <span class="sort" data-sort="tag-votes">votes</span>.
+                {{/*Sort by <span class="sort" data-sort="tag-votes">votes</span>.*/}}
                 </p>
 
             </div>
@@ -36,7 +37,10 @@
                 <a href="{{ .GetPath }}" class="list-group-item list-group-item-action list-group-item-secondary">
                     <i class="fas fa-tag"></i>
                     <h6 class="mb-1 tag-name">{{ .Name }}</h6>
-                    <small><span class="tag-games">{{ .Games }}</span> Games / <span class="tag-votes">{{ .Votes }}</span> Votes</small>
+                    <small>
+                        <span class="tag-games">{{ .Games }}</span> Games
+                    {{/*/ <span class="tag-votes">{{ .Votes }}</span> Votes*/}}
+                    </small>
                 </a>
             </div>
 

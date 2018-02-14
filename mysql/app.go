@@ -10,6 +10,12 @@ import (
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/steam"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"strings"
+	"github.com/Jleagle/go-helpers/logger"
+	"github.com/steam-authority/steam-authority/pics"
+	"errors"
 )
 
 type App struct {
@@ -303,6 +309,51 @@ func (app *App) BeforeSave() {
 	if app.Packages == "" || app.Packages == "null" {
 		app.Packages = "[]"
 	}
+}
+
+func (app *App) FillFromPICS() (err error) {
+
+	// Call PICS
+	resp, err := pics.GetInfo([]int{app.ID}, []int{})
+	if err != nil {
+		return err
+	}
+
+	var js pics.JsApp
+	if val, ok := resp.Apps[app.ID]; ok {
+		js = val
+	} else {
+		return errors.New("no app key in json")
+	}
+
+	// Tags
+	tags, err := json.Marshal(js.Common.StoreTags)
+	if err != nil {
+		return err
+	}
+
+	// String to int
+	metacriticScoreInt, err := strconv.Atoi(js.Common.MetacriticScore)
+	if err != nil {
+		return err
+	}
+
+	//
+	app.Name = js.Common.Name
+	app.Type = js.Common.Type
+	app.ReleaseState = js.Common.ReleaseState
+	//app.Platforms = strings.Split(js.Common.OSList, ",") // Can get from API
+	app.MetacriticScore = int8(metacriticScoreInt)
+	app.MetacriticFullURL = js.Common.MetacriticURL
+	app.StoreTags = string(tags)
+	app.Developers = js.Extended.Developer
+	app.Publishers = js.Extended.Publisher
+	app.Homepage = js.Extended.Homepage
+	app.ChangeNumber = js.ChangeNumber
+	app.Logo = js.Common.Logo
+	app.Icon = js.Common.Icon
+
+	return nil
 }
 
 func (app *App) FillFromAppDetails() (err error) {

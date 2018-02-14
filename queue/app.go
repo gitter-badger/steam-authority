@@ -28,7 +28,7 @@ func getAppQueue() (queue amqp.Queue, err error) {
 	return queue, err
 }
 
-func AppProducer(id int) (err error) {
+func AppProducer(id int, change int) (err error) {
 
 	logger.Info("Adding app " + strconv.Itoa(id) + " to rabbit")
 

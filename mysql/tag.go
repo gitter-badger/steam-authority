@@ -29,3 +29,18 @@ func GetAllTags() (tags []Tag, err error) {
 
 	return tags, nil
 }
+
+func CountTags() (count int, err error) {
+
+	db, err := getDB()
+	if err != nil {
+		return count, err
+	}
+
+	db.Model(&Tag{}).Count(&count)
+	if db.Error != nil {
+		return count, err
+	}
+
+	return count, nil
+}
