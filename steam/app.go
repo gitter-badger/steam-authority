@@ -66,14 +66,14 @@ type AppDetailsBody struct {
 		DetailedDescription string `json:"detailed_description"`
 		AboutTheGame        string `json:"about_the_game"`
 		ShortDescription    string `json:"short_description"`
-		Fullgame            struct {
+		Fullgame struct {
 			AppID string `json:"appid"`
 			Name  string `json:"name"`
 		} `json:"fullgame"`
-		SupportedLanguages  string `json:"supported_languages"`
-		Reviews             string `json:"reviews"`
-		HeaderImage         string `json:"header_image"`
-		Website             string `json:"website"`
+		SupportedLanguages string `json:"supported_languages"`
+		Reviews            string `json:"reviews"`
+		HeaderImage        string `json:"header_image"`
+		Website            string `json:"website"`
 		PcRequirements struct {
 			Minimum     string `json:"minimum"`
 			Recommended string `json:"recommended"`

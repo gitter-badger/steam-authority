@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gosimple/slug"
-	"strings"
 )
 
 type Package struct {

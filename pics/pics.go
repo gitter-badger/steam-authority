@@ -1,36 +1,39 @@
 package pics
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/queue"
+	"github.com/Jleagle/go-helpers/logger"
 )
 
 const (
 	changesLimit = 500
 )
 
-// RunPICS triggers the PICS updater to run forever
-func RunPICS() {
+// Run triggers the PICS updater to run forever
+func Run() {
 
 	for {
 		fmt.Println("Checking for changes")
 
-		//changes, err := datastore.GetLatestChanges(1)
-		//if err != nil {
-		//	logger.Error(err)
-		//}
-		//
-		//jsChange, err := getChangesJSON(changes[0])
-		//if err != nil {
-		//	logger.Error(err)
-		//}
-		//
+		jsChange, err := GetLatestChanges()
+		if err != nil {
+			logger.Error(err)
+		}
+
+		for k, v := range jsChange.Apps {
+			appID, _ := strconv.Atoi(k)
+			queue.AppProducer(appID, v)
+		}
+
+		for k, v := range jsChange.Packages {
+			packageID, _ := strconv.Atoi(k)
+			queue.PackageProducer(packageID, v)
+		}
+
 		//_, err = saveChangesFromJSON(jsChange)
 		//if err != nil {
 		//	logger.Error(err)
@@ -39,70 +42,6 @@ func RunPICS() {
 		time.Sleep(10 * time.Second)
 	}
 }
-
-func getChangesJSON(latestChange datastore.Change) (jsChange JsChange, err error) {
-
-	latestChange.ChangeID = 3955150
-
-	// Grab the JSON from node
-	response, err := http.Get("http://localhost:8086/changes/" + strconv.Itoa(latestChange.ChangeID))
-	if err != nil {
-		return jsChange, err
-	}
-	defer response.Body.Close()
-
-	// Convert to bytes
-	contents, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return jsChange, err
-	}
-
-	// Unmarshal JSON
-	if err := json.Unmarshal(contents, &jsChange); err != nil {
-		return jsChange, err
-	}
-
-	return jsChange, nil
-}
-
-//
-//func getInfoJSON(change *datastore.Change) (jsInfo JsInfo, err error) {
-//
-//	var apps []string
-//	var packages []string
-//
-//	for _, vv := range change.Apps {
-//		apps = append(apps, strconv.Itoa(vv))
-//	}
-//	for _, vv := range change.Packages {
-//		packages = append(packages, strconv.Itoa(vv))
-//	}
-//
-//	// Grab the JSON from node
-//	response, err := http.Get("http://localhost:8086/info?apps=" + strings.Join(apps, ",") + "&packages=" + strings.Join(packages, ",") + "&prettyprint=0")
-//	if err != nil {
-//		logger.Error(err)
-//		return jsInfo, err
-//	}
-//	defer response.Body.Close()
-//
-//	// Convert to bytes
-//	contents, err := ioutil.ReadAll(response.Body)
-//	if err != nil {
-//		logger.Error(err)
-//	}
-//
-//	// Unmarshal JSON
-//	info := JsInfo{}
-//	if err := json.Unmarshal(contents, &info); err != nil {
-//		if strings.Contains(err.Error(), "cannot unmarshal") {
-//			pretty.Print(string(contents))
-//		}
-//		logger.Error(err)
-//	}
-//
-//	return info, nil
-//}
 
 //func saveChangesFromJSON(jsChange JsChange) (changes []*datastore.Change, err error) {
 //
@@ -198,50 +137,4 @@ func getChangesJSON(latestChange datastore.Change) (jsChange JsChange, err error
 //	}
 //
 //	return nil, err
-//}
-
-//func createDsAppFromJsApp(js JsApp) *datastore.DsApp {
-//
-//	// Convert map of tags to slice
-//	jsTags := js.Common.StoreTags
-//	tags := make([]int, 0, len(jsTags))
-//	for _, value := range jsTags {
-//		valueInt, _ := strconv.Atoi(value)
-//		tags = append(tags, valueInt)
-//	}
-//
-//	// String to int
-//	appIDInt, _ := strconv.Atoi(js.AppID)
-//	metacriticScoreInt, _ := strconv.Atoi(js.Common.MetacriticScore)
-//
-//	//
-//	dsApp := datastore.DsApp{}
-//	dsApp.AppID = appIDInt
-//	dsApp.Name = js.Common.Name
-//	dsApp.Type = js.Common.Type
-//	dsApp.ReleaseState = js.Common.ReleaseState
-//	dsApp.OSList = strings.Split(js.Common.OSList, ",")
-//	dsApp.MetacriticScore = int8(metacriticScoreInt)
-//	dsApp.MetacriticFullURL = js.Common.MetacriticURL
-//	dsApp.StoreTags = tags
-//	dsApp.Developer = js.Extended.Developer
-//	dsApp.Publisher = js.Extended.Publisher
-//	dsApp.Homepage = js.Extended.Homepage
-//	dsApp.ChangeNumber = js.ChangeNumber
-//	dsApp.Logo = js.Common.Logo
-//	dsApp.Icon = js.Common.Icon
-//
-//	return &dsApp
-//}
-//
-//func createDsPackageFromJsPackage(js JsPackage) *datastore.DsPackage {
-//
-//	dsPackage := datastore.DsPackage{}
-//	dsPackage.PackageID = js.PackageID
-//	dsPackage.Apps = js.AppIDs
-//	dsPackage.BillingType = js.BillingType
-//	dsPackage.LicenseType = js.LicenseType
-//	dsPackage.Status = js.Status
-//
-//	return &dsPackage
 //}

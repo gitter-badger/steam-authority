@@ -12,8 +12,6 @@ import (
 	"github.com/steam-authority/steam-authority/steam"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"strings"
-	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/pics"
 	"errors"
 )

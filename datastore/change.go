@@ -32,7 +32,6 @@ func (change *Change) Tidy() *Change {
 	return change
 }
 
-
 func GetLatestChanges(limit int) (changes []Change, err error) {
 
 	client, context, err := getDSClient()

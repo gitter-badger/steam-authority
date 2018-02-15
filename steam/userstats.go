@@ -11,6 +11,7 @@ https://partner.steamgames.com/doc/webapi/ISteamUserStats#GetSchemaForGame
 func GetGlobalAchievementPercentagesForApp() {
 
 }
+
 // Retrieves the global achievement percentages for the specified app.
 func GetGlobalStatsForGame() {
 
