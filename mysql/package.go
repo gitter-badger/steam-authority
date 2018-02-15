@@ -2,10 +2,12 @@ package mysql
 
 import (
 	"encoding/json"
+	"errors"
 	"strconv"
 	"time"
 
 	"github.com/gosimple/slug"
+	"github.com/steam-authority/steam-authority/steam"
 )
 
 type Package struct {
@@ -112,13 +114,30 @@ func GetLatestPackages() (packages []Package, err error) {
 
 func (pack *Package) FillFromPICS() (err error) {
 
-	dsPackage := datastore.DsPackage{}
-	dsPackage.PackageID = js.PackageID
-	dsPackage.Apps = js.AppIDs
-	dsPackage.BillingType = js.BillingType
-	dsPackage.LicenseType = js.LicenseType
-	dsPackage.Status = js.Status
+	// Call PICS
+	resp, err := steam.GetPICSInfo([]int{}, []int{pack.ID})
+	if err != nil {
+		return err
+	}
 
-	return &dsPackage
+	var pics steam.JsPackage
+	if val, ok := resp.Packages[pack.ID]; ok {
+		pics = val
+	} else {
+		return errors.New("no package key in json")
+	}
 
+	// Apps
+	appsString, err := json.Marshal(pics.AppIDs)
+	if err != nil {
+		return err
+	}
+
+	pack.ID = pics.PackageID
+	pack.Apps = string(appsString)
+	pack.BillingType = pics.BillingType
+	pack.LicenseType = pics.LicenseType
+	pack.Status = pics.Status
+
+	return nil
 }

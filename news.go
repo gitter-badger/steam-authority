@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
-	"fmt"
 )
 
 func newsHandler(w http.ResponseWriter, r *http.Request) {

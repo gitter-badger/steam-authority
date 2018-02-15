@@ -1,14 +1,56 @@
-package pics
+package steam
 
-// JsChange ...
-type JsChange struct {
-	Success            int8           `json:"success"`
-	LatestChangeNumber int            `json:"current_changenumber"`
-	Apps               map[string]int `json:"apps"`
-	Packages           map[string]int `json:"packages"`
+import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"strings"
+
+	"github.com/Jleagle/go-helpers/logger"
+	"github.com/kr/pretty"
+)
+
+func GetPICSInfo(apps []int, packages []int) (jsInfo JsInfo, err error) {
+
+	var stringApps []string
+	var stringPackages []string
+
+	for _, vv := range apps {
+		stringApps = append(stringApps, strconv.Itoa(vv))
+	}
+	for _, vv := range packages {
+		stringPackages = append(stringPackages, strconv.Itoa(vv))
+	}
+
+	// Grab the JSON from node
+	url := "http://localhost:8086/info?apps=" + strings.Join(stringApps, ",") + "&packages=" + strings.Join(stringPackages, ",") + "&prettyprint=0"
+	logger.Info("PICS: " + url)
+	response, err := http.Get(url)
+	if err != nil {
+		logger.Error(err)
+		return jsInfo, err
+	}
+	defer response.Body.Close()
+
+	// Convert to bytes
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	// Unmarshal JSON
+	info := JsInfo{}
+	if err := json.Unmarshal(contents, &info); err != nil {
+		if strings.Contains(err.Error(), "cannot unmarshal") {
+			pretty.Print(string(contents))
+		}
+		logger.Error(err)
+	}
+
+	return info, nil
 }
 
-// JsInfo ...
 type JsInfo struct {
 	Success         int8              `json:"success"`
 	Apps            map[int]JsApp     `json:"apps"`
@@ -17,7 +59,6 @@ type JsInfo struct {
 	UnknownPackages []int             `json:"unknown_packages"`
 }
 
-// JsApp ...
 type JsApp struct {
 	AppID              string                  `json:"appid"`
 	PublicOnly         string                  `json:"public_only"`
@@ -30,7 +71,6 @@ type JsApp struct {
 	ChangeNumber       int                     `json:"change_number"`
 }
 
-// JsAppCommon ...
 type JsAppCommon struct {
 	ClientICNS            string                     `json:"clienticns"`
 	ClientIcon            string                     `json:"clienticon"`

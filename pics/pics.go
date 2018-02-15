@@ -1,17 +1,24 @@
 package pics
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/steam-authority/steam-authority/queue"
 	"github.com/Jleagle/go-helpers/logger"
+	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/queue"
 )
 
 const (
 	changesLimit = 500
+	checkSeconds = 10
 )
+
+var latestChangeSaved int
 
 // Run triggers the PICS updater to run forever
 func Run() {
@@ -19,7 +26,7 @@ func Run() {
 	for {
 		fmt.Println("Checking for changes")
 
-		jsChange, err := GetLatestChanges()
+		jsChange, err := getLatestChanges()
 		if err != nil {
 			logger.Error(err)
 		}
@@ -34,13 +41,59 @@ func Run() {
 			queue.PackageProducer(packageID, v)
 		}
 
-		//_, err = saveChangesFromJSON(jsChange)
-		//if err != nil {
-		//	logger.Error(err)
-		//}
+		// todo, make unique list of change IDs and call queue.ChangeProducer() on them
 
-		time.Sleep(10 * time.Second)
+		time.Sleep(checkSeconds * time.Second)
 	}
+}
+
+func getLatestChanges() (jsChange JsChange, err error) {
+
+	// Get the last change
+	if latestChangeSaved == 0 {
+
+		changes, err := datastore.GetLatestChanges(1)
+		if err != nil {
+			logger.Error(err)
+		}
+
+		if len(changes) > 0 {
+			latestChangeSaved = changes[0].ChangeID
+		} else {
+			latestChangeSaved = 4059093
+		}
+	}
+
+	// Grab the JSON from node
+	url := "http://localhost:8086/changes/" + strconv.Itoa(latestChangeSaved)
+	logger.Info("PICS: " + url)
+	response, err := http.Get(url)
+	if err != nil {
+		return jsChange, err
+	}
+	defer response.Body.Close()
+
+	// Convert to bytes
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return jsChange, err
+	}
+
+	// Unmarshal JSON
+	if err := json.Unmarshal(contents, &jsChange); err != nil {
+		return jsChange, err
+	}
+
+	latestChangeSaved = jsChange.LatestChangeNumber
+
+	return jsChange, nil
+}
+
+type JsChange struct {
+	Success            int8           `json:"success"`
+	LatestChangeNumber int            `json:"current_changenumber"`
+	Apps               map[string]int `json:"apps"`
+	Packages           map[string]int `json:"packages"`
 }
 
 //func saveChangesFromJSON(jsChange JsChange) (changes []*datastore.Change, err error) {

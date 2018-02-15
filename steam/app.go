@@ -14,8 +14,7 @@ https://partner.steamgames.com/doc/webapi/ISteamApps#GetCheatingReports
 https://partner.steamgames.com/doc/webapi/ISteamApps#GetPlayersBanned
 */
 
-// todo, list of apps that wont unmarshal
-// 2130, 2720, 4720, 4580, 4580
+// todo, list of apps that wont unmarshal: 2130, 2720, 4720, 4580, 4580
 func GetAppDetails(id string) (app AppDetailsBody, err error) {
 
 	options := url.Values{}

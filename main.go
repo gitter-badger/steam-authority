@@ -27,7 +27,7 @@ func main() {
 		case "consumers":
 			queue.RunConsumers()
 		case "pics":
-			pics.RunPICS()
+			pics.Run()
 		default:
 			fmt.Println("No such CLI command")
 		}

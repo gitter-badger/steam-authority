@@ -73,7 +73,7 @@ func adminUpdateAllAppsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, v := range apps {
-		queue.AppProducer(v.AppID)
+		queue.AppProducer(v.AppID, 0)
 	}
 
 	logger.Info(strconv.Itoa(len(apps)) + " apps added to rabbit")

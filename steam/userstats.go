@@ -2,18 +2,12 @@ package steam
 
 /**
 https://partner.steamgames.com/doc/webapi/ISteamUserStats#GetGlobalAchievementPercentagesForApp
-https://partner.steamgames.com/doc/webapi/ISteamUserStats#GetGlobalStatsForGame
 https://partner.steamgames.com/doc/webapi/ISteamUserStats#GetNumberOfCurrentPlayers
 https://partner.steamgames.com/doc/webapi/ISteamUserStats#GetSchemaForGame
 */
 
 // Retrieves the global achievement percentages for the specified app.
 func GetGlobalAchievementPercentagesForApp() {
-
-}
-
-// Retrieves the global achievement percentages for the specified app.
-func GetGlobalStatsForGame() {
 
 }
 

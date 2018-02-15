@@ -20,12 +20,6 @@
   revision = "09f37256ce848a12afb351459d2ea99755571e88"
 
 [[projects]]
-  name = "github.com/Masterminds/squirrel"
-  packages = ["."]
-  revision = "a6b93000bd219143c56c16e6cb1c4b91da3f224b"
-  version = "v1.0"
-
-[[projects]]
   name = "github.com/bugsnag/bugsnag-go"
   packages = [".","errors"]
   revision = "036f1af2a63f8133e596d1c127c86100b4642ba1"
@@ -98,10 +92,16 @@
   version = "v1.1.1"
 
 [[projects]]
+  name = "github.com/jinzhu/gorm"
+  packages = [".","dialects/mysql"]
+  revision = "5174cc5c242a728b435ea2be8a2f7f998e15429b"
+  version = "v1.0"
+
+[[projects]]
   branch = "master"
-  name = "github.com/jmoiron/sqlx"
-  packages = [".","reflectx"]
-  revision = "05cef0741ade10ca668982355b3f3f0bcf0ff0a8"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
 
 [[projects]]
   branch = "master"
@@ -120,18 +120,6 @@
   name = "github.com/kr/text"
   packages = ["."]
   revision = "7cafcd837844e784b526369c9bce262804aebc60"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/lann/builder"
-  packages = ["."]
-  revision = "f22ce00fd9394014049dad11c244859432bd6820"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/lann/ps"
-  packages = ["."]
-  revision = "62de8c46ede02a7675c4c79c84883eb164cb71e3"
 
 [[projects]]
   branch = "master"
@@ -214,6 +202,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "60117571990dbaeabfac557de2f96e7aad5aa8c4db3161d7b814a4424a41858d"
+  inputs-digest = "e1b615e3aa5df58819e6de8a08d6e71be12d47b85b7aff515253cf020e0ec3d3"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"encoding/json"
+	"errors"
 	"net/url"
 	"strconv"
 	"strings"
@@ -9,11 +10,8 @@ import (
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/gosimple/slug"
-	"github.com/steam-authority/steam-authority/steam"
-
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/steam-authority/steam-authority/pics"
-	"errors"
+	"github.com/steam-authority/steam-authority/steam"
 )
 
 type App struct {
@@ -312,12 +310,12 @@ func (app *App) BeforeSave() {
 func (app *App) FillFromPICS() (err error) {
 
 	// Call PICS
-	resp, err := pics.GetInfo([]int{app.ID}, []int{})
+	resp, err := steam.GetPICSInfo([]int{app.ID}, []int{})
 	if err != nil {
 		return err
 	}
 
-	var js pics.JsApp
+	var js steam.JsApp
 	if val, ok := resp.Apps[app.ID]; ok {
 		js = val
 	} else {
