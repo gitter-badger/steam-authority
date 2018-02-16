@@ -15,35 +15,35 @@ import (
 )
 
 type App struct {
-	ID                int       `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"` //
-	CreatedAt         time.Time `gorm:"not null;column:created_at"`                    //
-	UpdatedAt         time.Time `gorm:"not null;column:updated_at"`                    //
-	Name              string    `gorm:"not null;column:name"`                          //
-	Type              string    `gorm:"not null;column:type"`                          //
-	IsFree            bool      `gorm:"not null;column:is_free;type:tinyint(1)"`       //
-	DLC               string    `gorm:"not null;column:dlc;default:'[]'"`              // JSON
-	ShortDescription  string    `gorm:"not null;column:description_short"`             //
-	HeaderImage       string    `gorm:"not null;column:image_header"`                  //
-	Developers        string    `gorm:"not null;column:developer;default:'[]'"`        // JSON
-	Publishers        string    `gorm:"not null;column:publisher;default:'[]'"`        // JSON
-	Packages          string    `gorm:"not null;column:packages;default:'[]'"`         // JSON
-	MetacriticScore   int8      `gorm:"not null;column:metacritic_score"`              //
-	MetacriticFullURL string    `gorm:"not null;column:metacritic_url"`                //
-	Categories        string    `gorm:"not null;column:categories;default:'[]'"`       // JSON
-	Genres            string    `gorm:"not null;column:genres;default:'[]'"`           // JSON
-	Screenshots       string    `gorm:"not null;column:screenshots;default:'[]'"`      // JSON
-	Movies            string    `gorm:"not null;column:movies;default:'[]'"`           // JSON
-	Achievements      string    `gorm:"not null;column:achievements;default:'[]'"`     // JSON
-	Background        string    `gorm:"not null;column:background"`                    //
-	Platforms         string    `gorm:"not null;column:platforms;default:'[]'"`        // JSON
-	GameID            int       `gorm:"not null;column:game_id"`                       //
-	GameName          string    `gorm:"not null;column:game_name"`                     //
-	ReleaseState      string    `gorm:"not null;column:release_state"`                 // PICS
-	StoreTags         string    `gorm:"not null;column:tags;default:'[]';type:json"`   // PICS JSON
-	Homepage          string    `gorm:"not null;column:homepage"`                      // PICS
-	ChangeNumber      int       `gorm:"not null;column:change_number"`                 // PICS
-	Logo              string    `gorm:"not null;column:logo"`                          // PICS
-	Icon              string    `gorm:"not null;column:icon"`                          // PICS
+	ID                int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"` //
+	CreatedAt         *time.Time `gorm:"not null;column:created_at"`                    //
+	UpdatedAt         *time.Time `gorm:"not null;column:updated_at"`                    //
+	Name              string     `gorm:"not null;column:name"`                          //
+	Type              string     `gorm:"not null;column:type"`                          //
+	IsFree            bool       `gorm:"not null;column:is_free;type:tinyint(1)"`       //
+	DLC               string     `gorm:"not null;column:dlc;default:'[]'"`              // JSON
+	ShortDescription  string     `gorm:"not null;column:description_short"`             //
+	HeaderImage       string     `gorm:"not null;column:image_header"`                  //
+	Developers        string     `gorm:"not null;column:developer;default:'[]'"`        // JSON
+	Publishers        string     `gorm:"not null;column:publisher;default:'[]'"`        // JSON
+	Packages          string     `gorm:"not null;column:packages;default:'[]'"`         // JSON
+	MetacriticScore   int8       `gorm:"not null;column:metacritic_score"`              //
+	MetacriticFullURL string     `gorm:"not null;column:metacritic_url"`                //
+	Categories        string     `gorm:"not null;column:categories;default:'[]'"`       // JSON
+	Genres            string     `gorm:"not null;column:genres;default:'[]'"`           // JSON
+	Screenshots       string     `gorm:"not null;column:screenshots;default:'[]'"`      // JSON
+	Movies            string     `gorm:"not null;column:movies;default:'[]'"`           // JSON
+	Achievements      string     `gorm:"not null;column:achievements;default:'[]'"`     // JSON
+	Background        string     `gorm:"not null;column:background"`                    //
+	Platforms         string     `gorm:"not null;column:platforms;default:'[]'"`        // JSON
+	GameID            int        `gorm:"not null;column:game_id"`                       //
+	GameName          string     `gorm:"not null;column:game_name"`                     //
+	ReleaseState      string     `gorm:"not null;column:release_state"`                 // PICS
+	StoreTags         string     `gorm:"not null;column:tags;default:'[]';type:json"`   // PICS JSON
+	Homepage          string     `gorm:"not null;column:homepage"`                      // PICS
+	ChangeNumber      int        `gorm:"not null;column:change_number"`                 // PICS
+	Logo              string     `gorm:"not null;column:logo"`                          // PICS
+	Icon              string     `gorm:"not null;column:icon"`                          // PICS
 }
 
 func (app App) GetPath() (ret string) {
@@ -151,7 +151,7 @@ func GetApp(id int) (app App, err error) {
 	}
 
 	// If new or expired app
-	if app.UpdatedAt.IsZero() || (app.UpdatedAt.Unix() < time.Now().AddDate(0, 0, -1).Unix()) {
+	if app.UpdatedAt.Unix() < time.Now().AddDate(0, 0, -1).Unix() {
 
 		err = app.Save()
 		if err != nil {
@@ -356,7 +356,7 @@ func (app *App) FillFromAppDetails() (err error) {
 
 	// Get data
 	appDetails, err := steam.GetAppDetails(strconv.Itoa(app.ID))
-	if err != nil {
+	if err != nil && err.Error() != "invalid app id" {
 		return err
 	}
 

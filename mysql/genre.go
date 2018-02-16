@@ -2,13 +2,16 @@ package mysql
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
 )
 
 type Genre struct {
-	ID   int    `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
-	Name string `gorm:"not null;column:name"`
+	ID        int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
+	CreatedAt *time.Time `gorm:"not null;column:created_at"`
+	UpdatedAt *time.Time `gorm:"not null;column:updated_at"`
+	Name      string     `gorm:"not null;column:name"`
 }
 
 func (genre Genre) GetPath() string {

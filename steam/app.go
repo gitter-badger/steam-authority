@@ -15,6 +15,7 @@ https://partner.steamgames.com/doc/webapi/ISteamApps#GetPlayersBanned
 */
 
 // todo, list of apps that wont unmarshal: 2130, 2720, 4720, 4580, 4580
+// 33930, 221100 - cannot unmarshal string into Go struct field .required_age of type int
 func GetAppDetails(id string) (app AppDetailsBody, err error) {
 
 	options := url.Values{}

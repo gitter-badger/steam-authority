@@ -86,7 +86,7 @@ func appConsumer() {
 			case msg := <-messages:
 
 				id := string(msg.Body)
-				logger.Info("Reading player " + id + " from rabbit")
+				logger.Info("Reading app " + id + " from rabbit")
 
 				idx, _ := strconv.Atoi(id)
 

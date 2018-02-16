@@ -6,24 +6,35 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Jleagle/go-helpers/logger"
 	"github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/steam"
 )
 
 type Package struct {
-	ID          int       `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
-	CreatedAt   time.Time `gorm:"not null;column:created_at"`
-	UpdatedAt   time.Time `gorm:"not null;column:updated_at"`
-	Name        string    `gorm:"not null;column:name"`
-	BillingType int8      `gorm:"not null;column:billing_type"`
-	LicenseType int8      `gorm:"not null;column:license_type"`
-	Status      int8      `gorm:"not null;column:status"`
-	Apps        string    `gorm:"not null;column:apps"` // JSON
-	ChangeID    int       `gorm:"not null;column:change_id"`
+	ID          int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"` //
+	CreatedAt   *time.Time `gorm:"not null;column:created_at"`                    //
+	UpdatedAt   *time.Time `gorm:"not null;column:updated_at"`                    //
+	Name        string     `gorm:"not null;column:name"`                          //
+	BillingType int8       `gorm:"not null;column:billing_type"`                  //
+	LicenseType int8       `gorm:"not null;column:license_type"`                  //
+	Status      int8       `gorm:"not null;column:status"`                        //
+	Apps        string     `gorm:"not null;column:apps"`                          // JSON
+	ChangeID    int        `gorm:"not null;column:change_id"`                     //
 }
 
 func (pack Package) GetPath() string {
 	return "/packages/" + strconv.Itoa(int(pack.ID)) + "/" + slug.Make(pack.Name)
+}
+
+func (pack Package) GetApps() (apps []int, err error) {
+
+	bytes := []byte(pack.Apps)
+	if err := json.Unmarshal(bytes, apps); err != nil {
+		return apps, err
+	}
+
+	return apps, nil
 }
 
 func GetPackage(id int) (pack Package, err error) {
@@ -62,24 +73,19 @@ func GetPackages(ids []int) (packages []Package, err error) {
 	return packages, nil
 }
 
-func (pack Package) GetApps() (apps []int, err error) {
+func GetLatestPackages() (packages []Package, err error) {
 
-	bytes := []byte(pack.Apps)
-	if err := json.Unmarshal(bytes, apps); err != nil {
-		return apps, err
+	db, err := getDB()
+	if err != nil {
+		return packages, err
 	}
 
-	return apps, nil
-}
-
-func (pack *Package) Tidy() *Package {
-
-	pack.UpdatedAt = time.Now()
-	if pack.CreatedAt.IsZero() {
-		pack.CreatedAt = time.Now()
+	db.Limit(20).Order("created_at DESC").Find(&packages)
+	if db.Error != nil {
+		return packages, err
 	}
 
-	return pack
+	return packages, nil
 }
 
 func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
@@ -97,19 +103,36 @@ func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
 	return packages, nil
 }
 
-func GetLatestPackages() (packages []Package, err error) {
+func NewPackage(id int) (pack Package) {
 
+	pack.ID = id
+	return pack
+}
+
+func (pack *Package) Save() (err error) {
+
+	// Save
 	db, err := getDB()
 	if err != nil {
-		return packages, err
+		return err
 	}
 
-	db.Limit(20).Order("created_at DESC").Find(&packages)
+	db.Save(&pack)
 	if db.Error != nil {
-		return packages, err
+		return err
 	}
 
-	return packages, nil
+	return nil
+}
+
+// GORM callback
+func (pack *Package) BeforeSave() {
+
+	// Get app details
+	err := pack.FillFromPICS()
+	if err != nil {
+		logger.Error(err)
+	}
 }
 
 func (pack *Package) FillFromPICS() (err error) {

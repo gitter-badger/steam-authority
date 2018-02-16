@@ -2,13 +2,16 @@ package mysql
 
 import (
 	"strconv"
+	"time"
 )
 
 type Tag struct {
-	ID    int    `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
-	Name  string `gorm:"not null;column:name"`
-	Games int    `gorm:"not null;column:games"`
-	Votes int    `gorm:"not null;column:votes"`
+	ID        int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
+	CreatedAt *time.Time `gorm:"not null;column:created_at"`
+	UpdatedAt *time.Time `gorm:"not null;column:updated_at"`
+	Name      string     `gorm:"not null;column:name"`
+	Games     int        `gorm:"not null;column:games"`
+	Votes     int        `gorm:"not null;column:votes"`
 }
 
 func (tag Tag) GetPath() string {
@@ -28,19 +31,4 @@ func GetAllTags() (tags []Tag, err error) {
 	}
 
 	return tags, nil
-}
-
-func CountTags() (count int, err error) {
-
-	db, err := getDB()
-	if err != nil {
-		return count, err
-	}
-
-	db.Model(&Tag{}).Count(&count)
-	if db.Error != nil {
-		return count, err
-	}
-
-	return count, nil
 }

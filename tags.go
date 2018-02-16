@@ -19,6 +19,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 	// Template
 	template := tagsTemplate{}
 	template.Tags = tags
+
 	returnTemplate(w, "tags", template)
 	return
 }
