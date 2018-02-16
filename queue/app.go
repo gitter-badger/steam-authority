@@ -17,12 +17,12 @@ func getAppQueue() (queue amqp.Queue, err error) {
 	}
 
 	queue, err = channel.QueueDeclare(
-		namespace+"Update_App", // name
-		true,                   // durable
-		false,                  // delete when unused
-		false,                  // exclusive
-		false,                  // no-wait
-		nil,                    // arguments
+		namespace+"Apps", // name
+		true,             // durable
+		false,            // delete when unused
+		false,            // exclusive
+		false,            // no-wait
+		nil,              // arguments
 	)
 
 	return queue, err

@@ -2,7 +2,6 @@ package pics
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -15,7 +14,8 @@ import (
 
 const (
 	changesLimit = 500
-	checkSeconds = 10
+	checkSeconds = 5
+	bigChangeID  = 4067165 // Fallback when there are no changes in DB
 )
 
 var latestChangeSaved int
@@ -24,8 +24,6 @@ var latestChangeSaved int
 func Run() {
 
 	for {
-		fmt.Println("Checking for changes")
-
 		jsChange, err := getLatestChanges()
 		if err != nil {
 			logger.Error(err)
@@ -41,7 +39,33 @@ func Run() {
 			queue.PackageProducer(packageID, v)
 		}
 
-		// todo, make unique list of change IDs and call queue.ChangeProducer() on them
+		// Make a list of changes to add
+		changes := make(map[int]*datastore.Change, 0)
+
+		for k, v := range jsChange.Apps {
+			_, ok := changes[v]
+			if !ok {
+				changes[v] = &datastore.Change{ChangeID: v}
+			}
+
+			intx, _ := strconv.Atoi(k)
+			changes[v].Apps = append(changes[v].Apps, intx)
+		}
+
+		for k, v := range jsChange.Packages {
+			_, ok := changes[v]
+			if !ok {
+				changes[v] = &datastore.Change{ChangeID: v}
+			}
+
+			intx, _ := strconv.Atoi(k)
+			changes[v].Packages = append(changes[v].Packages, intx)
+		}
+
+		// Add changes to rabbit
+		for _, v := range changes {
+			queue.ChangeProducer(v)
+		}
 
 		time.Sleep(checkSeconds * time.Second)
 	}
@@ -60,7 +84,7 @@ func getLatestChanges() (jsChange JsChange, err error) {
 		if len(changes) > 0 {
 			latestChangeSaved = changes[0].ChangeID
 		} else {
-			latestChangeSaved = 4059093
+			latestChangeSaved = bigChangeID
 		}
 	}
 
@@ -95,99 +119,3 @@ type JsChange struct {
 	Apps               map[string]int `json:"apps"`
 	Packages           map[string]int `json:"packages"`
 }
-
-//func saveChangesFromJSON(jsChange JsChange) (changes []*datastore.Change, err error) {
-//
-//	// Make a list of changes to add
-//	dsChanges := make(map[int]*datastore.Change, 0)
-//
-//	for k, v := range jsChange.Apps {
-//		_, ok := dsChanges[v]
-//		if !ok {
-//			dsChanges[v] = &datastore.Change{ChangeID: v}
-//		}
-//
-//		intx, _ := strconv.Atoi(k)
-//		dsChanges[v].Apps = append(dsChanges[v].Apps, intx)
-//	}
-//
-//	for k, v := range jsChange.Packages {
-//		_, ok := dsChanges[v]
-//		if !ok {
-//			dsChanges[v] = &datastore.Change{ChangeID: v}
-//		}
-//
-//		intx, _ := strconv.Atoi(k)
-//		dsChanges[v].Packages = append(dsChanges[v].Packages, intx)
-//	}
-//
-//	// Stop if there are no apps/packages
-//	if len(dsChanges) < 1 {
-//		return
-//	}
-//
-//	// Make a slice from map
-//	var ChangeIDs []int
-//	for k := range dsChanges {
-//		ChangeIDs = append(ChangeIDs, k)
-//	}
-//
-//	// Datastore can only bulk insert 500, grab the oldest
-//	sort.Ints(ChangeIDs)
-//	count := int(math.Min(float64(len(ChangeIDs)), changesLimit))
-//	ChangeIDs = ChangeIDs[:count]
-//
-//	dsChangesSlice := make([]*datastore.Change, 0)
-//
-//	for _, v := range ChangeIDs {
-//		dsChangesSlice = append(dsChangesSlice, dsChanges[v])
-//	}
-//
-//	// Bulk add changes
-//	err = datastore.BulkAddChanges(dsChangesSlice)
-//	if err != nil {
-//
-//	}
-//
-//	// Get apps/packages IDs
-//	for _, v := range dsChangesSlice {
-//
-//		info, err := getInfoJSON(v)
-//		if err != nil {
-//			continue
-//		}
-//
-//		// Build up rows to bulk add apps
-//		dsApps := make([]*datastore.DsApp, 0)
-//
-//		for _, v := range info.Apps {
-//			dsApps = append(dsApps, createDsAppFromJsApp(v))
-//		}
-//
-//		websockets.Send(websockets.CHANGES, dsApps)
-//
-//		err = datastore.BulkAddApps(dsApps)
-//		if err != nil {
-//			logger.Error(err)
-//		}
-//
-//		// Build up rows to bulk add packages
-//		dsPackages := make([]*datastore.DsPackage, 0)
-//
-//		for _, vv := range info.Packages {
-//			dsPackage := createDsPackageFromJsPackage(vv)
-//			dsPackage.ChangeID = v.ChangeID
-//
-//			dsPackages = append(dsPackages, dsPackage)
-//		}
-//
-//		websockets.Send(websockets.CHANGES, dsPackages)
-//
-//		err = datastore.BulkAddPackages(dsPackages)
-//		if err != nil {
-//			logger.Error(err)
-//		}
-//	}
-//
-//	return nil, err
-//}

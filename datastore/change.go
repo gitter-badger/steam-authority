@@ -76,7 +76,7 @@ func GetChange(id string) (change *Change, err error) {
 	return change, nil
 }
 
-func BulkAddChanges(changes []*Change) (err error) {
+func AddChanges(changes []*Change) (err error) {
 
 	changesLen := len(changes)
 	if changesLen == 0 {
@@ -88,10 +88,10 @@ func BulkAddChanges(changes []*Change) (err error) {
 		return err
 	}
 
-	keys := make([]*datastore.Key, 0, changesLen)
+	keys := make([]*datastore.Key, 0)
 
 	for _, v := range changes {
-		keys = append(keys, v.GetKey(), nil)
+		keys = append(keys, v.GetKey())
 	}
 
 	fmt.Println("Saving " + strconv.Itoa(changesLen) + " changes")

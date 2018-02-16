@@ -25,6 +25,7 @@ func RunConsumers() {
 
 	//go playerConsumer()
 	go appConsumer()
+	go changeConsumer()
 
 	<-forever
 }
