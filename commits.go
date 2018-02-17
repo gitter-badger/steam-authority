@@ -38,7 +38,7 @@ func changelogHandler(w http.ResponseWriter, r *http.Request) {
 	template := changelogTemplate{}
 	template.Commits = commits
 
-	returnTemplate(w, "changelog", template)
+	returnTemplate(w, "commits", template)
 }
 
 type changelogTemplate struct {

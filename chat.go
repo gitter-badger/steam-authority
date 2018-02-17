@@ -32,7 +32,7 @@ func init() {
 	// Add websocket listener
 	discordSession.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if !m.Author.Bot {
-			websockets.Send(websockets.CHAT, chatPayload{
+			websockets.Send(websockets.CHAT, chatWebsocketPayload{
 				AuthorID:     m.Author.ID,
 				AuthorUser:   m.Author.Username,
 				AuthorAvatar: m.Author.Avatar,
@@ -98,7 +98,7 @@ type chatTemplate struct {
 	ChannelID string // Selected channel
 }
 
-type chatPayload struct {
+type chatWebsocketPayload struct {
 	AuthorID     string `json:"author_id"`
 	AuthorUser   string `json:"author_user"`
 	AuthorAvatar string `json:"author_avatar"`

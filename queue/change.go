@@ -91,20 +91,7 @@ func changeConsumer() {
 				break
 			case msg := <-messages:
 
-				var change datastore.Change
-				if err := json.Unmarshal(msg.Body, &change); err != nil {
-					logger.Error(err)
-					continue
-				}
-
-				logger.Info("Reading change " + strconv.Itoa(change.ChangeID) + " from rabbit")
-
-				// Convert to right format for datastore function
-				changes := []*datastore.Change{
-					&change,
-				}
-
-				err := datastore.AddChanges(changes)
+				err := datastore.Consume(msg)
 				if err != nil {
 					logger.Error(err)
 				} else {

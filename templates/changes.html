@@ -1,42 +1,38 @@
 {{define "changes"}} {{ template "header" }}
 
-<div class="container">
+<div class="container" id="changes-page">
 
-  <div class="jumbotron">
-    <h1 class="display-4">Changes</h1>
-    <p class="lead">Every time the Steam library gets updated, a change record is created. We use these to keep website information up to date.</p>
-  </div>
+    <div class="jumbotron">
+        <h1 class="display-4">Changes</h1>
+        <p class="lead">Every time the Steam library gets updated, a change record is created. We use these to keep website information up to date.</p>
+    </div>
 
-  {{ range $key, $value := .Changes }}
+    <div class="card">
+        <div class="card-header bg-light text-white">
 
-  <h5>
-    <a href="/changes/{{ .ChangeID }}">{{ .ChangeID }}</a>
-  </h5>
+            <h5 class="float-right" style="margin-bottom: 0;">
+                <span class="badge badge-secondary" id="live-badge-x">Live</span>
+            </h5>
 
-  {{ end }}
+        </div>
+        <div class="card-body">
+
+            <ul class="list-unstyled">
+
+            {{ range $key, $value := .Changes }}
+                <li class="media">
+                    <div class="media-body">
+                        <h5 class="mt-0 mb-1">Change {{ .ChangeID }}</h5>
+                        <p class="text-muted" data-livestamp="{{ unix .CreatedAt }}" style="margin-bottom: 0;">{{ unix .CreatedAt }}</p>
+                        <p class="text-muted" style="margin-bottom: 0;">{{ apps .Apps }}</p>
+                        <p class="text-muted">{{ packages .Packages }}</p>
+                    </div>
+                </li>
+            {{ end }}
+            </ul>
+        </div>
+    </div>
 
 </div>
 
-<script>
-  // Handle WebSockets
-  if (window.WebSocket === undefined) {
-    console.log('Your browser does not support WebSockets');
-  } else {
-    var socket = new WebSocket("ws://" + location.host + "/websocket");
-
-    socket.onopen = function (e) {
-      console.log('WebSocket opened');
-    };
-    socket.onclose = function (e) {
-      console.log('WebSocket closed');
-    };
-    socket.onmessage = function (e) {
-      console.log('WebSocket recieved');
-      console.log(e.data);
-    };
-    socket.onerror = function (e) {
-      console.log('WebSocket error');
-      console.log(e);
-    };
-  }
-</script> {{ template "footer" }} {{end}}
+{{ template "footer" }} {{end}}

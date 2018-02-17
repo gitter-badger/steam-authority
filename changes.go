@@ -14,7 +14,7 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 	template := changesTemplate{}
 
 	// Get changes
-	changes, err := datastore.GetLatestChanges(10)
+	changes, err := datastore.GetLatestChanges(100)
 	if err != nil {
 		logger.Error(err)
 	}

@@ -1,12 +1,15 @@
 package datastore
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
+	"github.com/steam-authority/steam-authority/websockets"
+	"github.com/streadway/amqp"
 	"google.golang.org/api/iterator"
 )
 
@@ -102,4 +105,42 @@ func AddChanges(changes []*Change) (err error) {
 	}
 
 	return nil
+}
+
+func Consume(message amqp.Delivery) (err error) {
+
+	var change Change
+	if err := json.Unmarshal(message.Body, &change); err != nil {
+		return err
+	}
+
+	logger.Info("Reading change " + strconv.Itoa(change.ChangeID) + " from rabbit")
+
+	// Convert to right format for datastore function
+	changes := []*Change{
+		&change,
+	}
+
+	err = AddChanges(changes)
+	if err != nil {
+		return err
+	}
+
+	// Send websocket
+	payload := changeWebsocketPayload{
+		ID:        change.ChangeID,
+		CreatedAt: change.CreatedAt.Unix(),
+		Apps:      change.Apps,
+		Packages:  change.Packages,
+	}
+	websockets.Send(websockets.CHANGES, payload)
+
+	return nil
+}
+
+type changeWebsocketPayload struct {
+	ID        int   `json:"id"`
+	CreatedAt int64 `json:"created_at"`
+	Apps      []int `json:"apps"`
+	Packages  []int `json:"packages"`
 }

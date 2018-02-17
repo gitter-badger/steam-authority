@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"path"
 	"runtime"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/dustin/go-humanize"
@@ -64,6 +66,23 @@ func getTemplateFuncMap() map[string]interface{} {
 		"title": func(a string) string { return strings.Title(a) },
 		"comma": func(a int) string { return humanize.Comma(int64(a)) },
 		"slug":  func(a string) string { return slug.Make(a) },
+		"apps": func(a []int) template.HTML {
+			var apps []string
+			for _, v := range a {
+				apps = append(apps, "<a href=\"/apps/"+strconv.Itoa(v)+"\">"+strconv.Itoa(v)+"</a>")
+			}
+			return template.HTML("Apps: " + strings.Join(apps, ", "))
+		},
+		"packages": func(a []int) template.HTML {
+			var packages []string
+			for _, v := range a {
+				packages = append(packages, "<a href=\"/packages/"+strconv.Itoa(v)+"\">"+strconv.Itoa(v)+"</a>")
+			}
+			return template.HTML("Packages: " + strings.Join(packages, ", "))
+		},
+		"unix": func(t time.Time) int64 {
+			return t.Unix()
+		},
 	}
 }
 

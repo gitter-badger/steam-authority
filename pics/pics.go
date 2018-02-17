@@ -14,7 +14,7 @@ import (
 
 const (
 	changesLimit = 500
-	checkSeconds = 5
+	checkSeconds = 10
 	bigChangeID  = 4067165 // Fallback when there are no changes in DB
 )
 
