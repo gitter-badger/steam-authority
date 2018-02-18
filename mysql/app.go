@@ -255,7 +255,9 @@ func (app *App) BeforeSave() {
 	// Get app details
 	err = app.FillFromAppDetails()
 	if err != nil {
-		logger.Error(err)
+		if err.Error() != "no app with id" {
+			logger.Error(err)
+		}
 	}
 
 	err = app.FillFromPICS()
@@ -349,9 +351,14 @@ func (app *App) FillFromPICS() (err error) {
 	}
 
 	// String to int
-	metacriticScoreInt, err := strconv.Atoi(js.Common.MetacriticScore)
-	if err != nil {
-		return err
+	var metacriticScoreInt int
+	if js.Common.MetacriticScore == "" {
+		metacriticScoreInt = 0
+	} else {
+		metacriticScoreInt, err = strconv.Atoi(js.Common.MetacriticScore)
+		if err != nil {
+			return err
+		}
 	}
 
 	//
@@ -377,7 +384,7 @@ func (app *App) FillFromAppDetails() (err error) {
 
 	// Get data
 	appDetails, err := steam.GetAppDetails(strconv.Itoa(app.ID))
-	if err != nil && err.Error() != "invalid app id" {
+	if err != nil {
 		return err
 	}
 
