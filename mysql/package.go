@@ -9,6 +9,7 @@ import (
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/steam"
+	"github.com/streadway/amqp"
 )
 
 type Package struct {
@@ -133,6 +134,19 @@ func (pack *Package) BeforeSave() {
 	if err != nil {
 		logger.Error(err)
 	}
+}
+
+func ConsumePackage(msg amqp.Delivery) (err error) {
+
+	id := string(msg.Body)
+	idx, _ := strconv.Atoi(id)
+
+	logger.Info("Reading package " + id + " from rabbit")
+
+	pack := NewPackage(idx)
+	err = pack.Save()
+
+	return err
 }
 
 func (pack *Package) FillFromPICS() (err error) {

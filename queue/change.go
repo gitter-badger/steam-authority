@@ -91,7 +91,7 @@ func changeConsumer() {
 				break
 			case msg := <-messages:
 
-				err := datastore.Consume(msg)
+				err := datastore.ConsumeChange(msg)
 				if err != nil {
 					logger.Error(err)
 				} else {

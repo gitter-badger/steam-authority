@@ -85,16 +85,8 @@ func packageConsumer() {
 				break
 			case msg := <-messages:
 
-				id := string(msg.Body)
-				logger.Info("Reading package " + id + " from rabbit")
-
-				idx, _ := strconv.Atoi(id)
-
-				pack := mysql.NewPackage(idx)
-				err = pack.Save()
-
+				err := mysql.ConsumePackage(msg)
 				if err != nil {
-					logger.Info("xx")
 					logger.Error(err)
 				} else {
 					msg.Ack(false)

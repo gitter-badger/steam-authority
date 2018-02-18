@@ -60,7 +60,7 @@ package queue
 //		}
 //
 //		fmt.Println("Getting player messages from rabbit")
-//		messages, err := chann.Consume(
+//		messages, err := chann.ConsumeChange(
 //			queue.Name, // queue
 //			"",         // consumer
 //			false,      // auto-ack

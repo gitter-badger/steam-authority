@@ -12,6 +12,7 @@ import (
 	"github.com/gosimple/slug"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/steam-authority/steam-authority/steam"
+	"github.com/streadway/amqp"
 )
 
 type App struct {
@@ -249,13 +250,20 @@ func (app *App) Save() (err error) {
 // GORM callback
 func (app *App) BeforeSave() {
 
+	var err error
+
 	// Get app details
-	err := app.FillFromAppDetails()
+	err = app.FillFromAppDetails()
 	if err != nil {
 		logger.Error(err)
 	}
 
-	//
+	err = app.FillFromPICS()
+	if err != nil {
+		logger.Error(err)
+	}
+
+	// Tidy
 	app.Type = strings.ToLower(app.Type)
 	app.ReleaseState = strings.ToLower(app.ReleaseState)
 
@@ -306,6 +314,17 @@ func (app *App) BeforeSave() {
 	if app.Packages == "" || app.Packages == "null" {
 		app.Packages = "[]"
 	}
+}
+
+func ConsumeApp(msg amqp.Delivery) (err error) {
+
+	id := string(msg.Body)
+	idx, _ := strconv.Atoi(id)
+
+	app := NewApp(idx)
+	err = app.Save()
+
+	return err
 }
 
 func (app *App) FillFromPICS() (err error) {

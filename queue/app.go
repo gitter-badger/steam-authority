@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
+	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/streadway/amqp"
 )
@@ -88,14 +89,17 @@ func appConsumer() {
 				id := string(msg.Body)
 				logger.Info("Reading app " + id + " from rabbit")
 
-				idx, _ := strconv.Atoi(id)
-
-				app := mysql.NewApp(idx)
-				err = app.Save()
-
+				dsErr := datastore.ConsumeApp(msg)
 				if err != nil {
 					logger.Error(err)
-				} else {
+				}
+
+				sqlErr := mysql.ConsumeApp(msg)
+				if err != nil {
+					logger.Error(err)
+				}
+
+				if dsErr == nil && sqlErr == nil {
 					msg.Ack(false)
 				}
 			}

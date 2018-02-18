@@ -14,7 +14,7 @@ func init() {
 
 	var err error
 	gormConnection, err = gorm.Open("mysql", os.Getenv("STEAM_SQL_DSN")+"?parseTime=true")
-	//gormConnection.LogMode(true)
+	gormConnection.LogMode(true)
 	if err != nil {
 		logger.Error(err)
 	}

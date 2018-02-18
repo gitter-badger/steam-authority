@@ -107,21 +107,17 @@ func AddChanges(changes []*Change) (err error) {
 	return nil
 }
 
-func Consume(message amqp.Delivery) (err error) {
+func ConsumeChange(msg amqp.Delivery) (err error) {
 
 	var change Change
-	if err := json.Unmarshal(message.Body, &change); err != nil {
+	if err := json.Unmarshal(msg.Body, &change); err != nil {
 		return err
 	}
 
 	logger.Info("Reading change " + strconv.Itoa(change.ChangeID) + " from rabbit")
 
-	// Convert to right format for datastore function
-	changes := []*Change{
-		&change,
-	}
-
-	err = AddChanges(changes)
+	// Save to DS
+	err = AddChanges([]*Change{&change})
 	if err != nil {
 		return err
 	}
