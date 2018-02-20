@@ -44,6 +44,7 @@ type App struct {
 	ChangeNumber      int        `gorm:"not null;column:change_number"`                 // PICS
 	Logo              string     `gorm:"not null;column:logo"`                          // PICS
 	Icon              string     `gorm:"not null;column:icon"`                          // PICS
+	ClientIcon        string     `gorm:"not null;column:client_icon"`                   // PICS
 }
 
 func (app App) GetPath() (ret string) {
@@ -348,6 +349,7 @@ func (app *App) FillFromPICS() (err error) {
 	app.ChangeNumber = js.ChangeNumber
 	app.Logo = js.Common.Logo
 	app.Icon = js.Common.Icon
+	app.ClientIcon = js.Common.ClientIcon
 
 	return nil
 }

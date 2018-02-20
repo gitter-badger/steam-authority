@@ -70,7 +70,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get messages
-	messagesResponse, err := discordSession.ChannelMessages(id, 10, "", "", "")
+	messagesResponse, err := discordSession.ChannelMessages(id, 50, "", "", "")
 	if err != nil {
 		logger.Error(err)
 	}
@@ -95,7 +95,7 @@ type chatTemplate struct {
 	GlobalTemplate
 	Channels  []*discordgo.Channel
 	Messages  []*discordgo.Message
-	ChannelID string
+	ChannelID string // Selected channel
 }
 
 type chatPayload struct {

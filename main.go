@@ -55,6 +55,10 @@ func main() {
 	r.Get("/players/{id:[0-9]+}", playerHandler)
 	r.Get("/players/{id:[0-9]+}/{slug}", playerHandler)
 
+	// Deals
+	r.Get("/deals", dealsHandler)
+	r.Get("/deals/{id}", dealsHandler)
+
 	// Changes
 	r.Get("/changes", changesHandler)
 	r.Get("/changes/{id}", changeHandler)
@@ -81,6 +85,7 @@ func main() {
 	r.Get("/websocket", websockets.Handler)
 	r.Get("/changelog", changelogHandler)
 	r.Get("/tags", tagsHandler)
+	r.Get("/genres", genresHandler)
 	r.Get("/news", newsHandler)
 
 	// Admin

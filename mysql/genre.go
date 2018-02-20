@@ -1,35 +1,31 @@
 package mysql
 
 import (
-	"strconv"
 	"time"
-
-	"github.com/Jleagle/go-helpers/logger"
 )
 
 type Genre struct {
-	ID        int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
+	Name      string     `gorm:"not null;column:name;primary_key"`
 	CreatedAt *time.Time `gorm:"not null;column:created_at"`
 	UpdatedAt *time.Time `gorm:"not null;column:updated_at"`
-	Name      string     `gorm:"not null;column:name"`
+	Games     int        `gorm:"not null;column:games"`
 }
 
 func (genre Genre) GetPath() string {
-	return "/apps?genre=" + strconv.Itoa(genre.ID)
+	return "/apps?genre=" + genre.Name
 }
 
-func GetAllGenres() (tags []Tag, err error) {
+func GetAllGenres() (genres []Genre, err error) {
 
 	db, err := getDB()
 	if err != nil {
-		logger.Error(err)
-		return tags, err
+		return genres, err
 	}
 
-	db.Limit(1000).Order("name DESC").Find(&tags)
+	db.Limit(1000).Order("name ASC").Find(&genres)
 	if db.Error != nil {
-		return tags, err
+		return genres, err
 	}
 
-	return tags, nil
+	return genres, nil
 }

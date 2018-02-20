@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"html/template"
 	"net/http"
 	"path"
@@ -30,11 +31,16 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 	}
 
 	// Write a respone
-	err = t.ExecuteTemplate(w, page, pageData)
+	buf := &bytes.Buffer{}
+	err = t.ExecuteTemplate(buf, page, pageData)
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 404, err.Error())
-		return err
+		returnErrorTemplate(w, 500, "Something has gone wrong, the error has been logged!")
+		return
+	} else {
+		// No error, send the content, HTTP 200 response status implied
+		buf.WriteTo(w)
+		return
 	}
 
 	return nil

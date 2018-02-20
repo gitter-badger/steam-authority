@@ -20,7 +20,7 @@
             <ul class="nav nav-tabs card-header-tabs" role="tablist">
             {{ range $key, $value := .Channels }}
                 <li class="nav-item">
-                    <a class="nav-link{{ if eq $.ChannelID .ID }} active{{ end }}" href="/chat/{{ .ID }}" role="tab">{{ .Name }}</a>
+                    <a class="nav-link{{ if eq $.ChannelID .ID }} active{{ end }}" href="/chat/{{ .ID }}" role="tab">{{ title .Name }}</a>
                 </li>
             {{ end }}
             </ul>
