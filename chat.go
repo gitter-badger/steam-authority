@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/bwmarrin/discordgo"
@@ -65,6 +66,10 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 	channels := make([]*discordgo.Channel, 0)
 	for _, v := range channelsResponse {
 		if v.Type == discordgo.ChannelTypeGuildText {
+
+			// Fix channel name
+			v.Name = strings.Title(strings.Replace(v.Name, "-", " ", 1))
+
 			channels = append(channels, v)
 		}
 	}

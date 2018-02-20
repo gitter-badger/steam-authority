@@ -1,20 +1,6 @@
 .table-ranks {
-
-    tr td[data-link] {
-        cursor: pointer;
-    }
-
-    td.img {
-        padding: 0;
-    }
-    td.img span {
-        display: inline-block;
-        margin: .3rem;
-    }
-
     img {
         @include rounded;
-        height: 36px;
     }
 
     img.avatar {

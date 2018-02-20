@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,7 +14,7 @@ import (
 func appsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get apps
-	apps, err := mysql.SearchApps(r.URL.Query())
+	apps, err := mysql.SearchApps(r.URL.Query(), 96, "")
 	if err != nil {
 		logger.Error(err)
 	}
@@ -52,9 +51,6 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//TEMP
-	//mysql.CreateOrUpdateApp(idx)
-
 	// Get app
 	app, err := mysql.GetApp(idx)
 	if err != nil {
@@ -79,8 +75,6 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 		primary = append(primary, "This listing is for a movie")
 	}
 	banners["primary"] = primary
-
-	fmt.Println(banners)
 
 	//if err != nil {
 	//	if err.Error() == "sql: no rows in result set" {

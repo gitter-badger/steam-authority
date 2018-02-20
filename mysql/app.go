@@ -3,6 +3,7 @@ package mysql
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -56,6 +57,21 @@ func (app App) GetPath() (ret string) {
 	}
 
 	return ret
+}
+
+func (app App) GetType() (ret string) {
+
+	switch os := runtime.GOOS; os {
+	case "darwin":
+		fmt.Println("OS X.")
+	case "linux":
+		fmt.Println("Linux.")
+	default:
+		// freebsd, openbsd,
+		// plan9, windows...
+		fmt.Printf("%s.", os)
+	}
+
 }
 
 // Used in frontend
@@ -168,6 +184,10 @@ func GetApp(id int) (app App, err error) {
 
 func GetApps(ids []int) (apps []App, err error) {
 
+	if len(ids) == 0 {
+		return apps, nil
+	}
+
 	db, err := getDB()
 	if err != nil {
 		return apps, err
@@ -181,14 +201,18 @@ func GetApps(ids []int) (apps []App, err error) {
 	return apps, nil
 }
 
-func SearchApps(query url.Values) (apps []App, err error) {
+func SearchApps(query url.Values, limit int, sort string) (apps []App, err error) {
 
 	db, err := getDB()
 	if err != nil {
 		return apps, err
 	}
 
-	db = db.Limit(96).Order("id DESC") // todo, order by popularity?
+	if sort == "" {
+		sort = "id DESC" // todo, order by popularity?
+	}
+
+	db = db.Limit(limit).Order(sort)
 
 	// Platforms
 	if _, ok := query["platforms"]; ok {
@@ -268,10 +292,6 @@ func (app *App) BeforeSave() {
 	// Tidy
 	app.Type = strings.ToLower(app.Type)
 	app.ReleaseState = strings.ToLower(app.ReleaseState)
-
-	if app.Name == "" {
-		app.Name = "App " + strconv.Itoa(app.ID)
-	}
 
 	if app.StoreTags == "" || app.StoreTags == "null" {
 		app.StoreTags = "[]"
@@ -444,8 +464,8 @@ func (app *App) FillFromAppDetails() (err error) {
 	// Genres
 	var genres []int8
 	for _, v := range appDetails.Data.Genres {
-		genre, _ := strconv.ParseInt(v.ID, 10, 8)
-		genres = append(genres, int8(genre))
+		//genre, _ := strconv.ParseInt(v.ID, 10, 8)
+		genres = append(genres, v.ID)
 	}
 
 	genresString, err := json.Marshal(genres)
@@ -470,9 +490,6 @@ func (app *App) FillFromAppDetails() (err error) {
 		return err
 	}
 
-	// Game ID
-	gameID, _ := strconv.Atoi(appDetails.Data.Fullgame.AppID)
-
 	//
 	app.Name = appDetails.Data.Name
 	app.Type = appDetails.Data.Type
@@ -492,7 +509,7 @@ func (app *App) FillFromAppDetails() (err error) {
 	app.Achievements = string(achievementsString)
 	app.Background = appDetails.Data.Background
 	app.Platforms = string(platformsString)
-	app.GameID = gameID
+	app.GameID = appDetails.Data.Fullgame.AppID
 	app.GameName = appDetails.Data.Fullgame.Name
 
 	return nil

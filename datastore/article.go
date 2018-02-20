@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -59,7 +58,7 @@ func BulkAddArticles(articles []*Article) (err error) {
 		keys = append(keys, v.GetKey())
 	}
 
-	fmt.Println("Saving " + strconv.Itoa(articlesLen) + " articles")
+	//fmt.Println("Saving " + strconv.Itoa(articlesLen) + " articles")
 
 	_, err = client.PutMulti(context, keys, articles)
 	if err != nil {
@@ -76,7 +75,7 @@ func GetArticles(appID int, limit int) (articles []Article, err error) {
 		return articles, err
 	}
 
-	q := datastore.NewQuery(ARTICLE).Order("app_id").Limit(limit) // Order by date, needs index
+	q := datastore.NewQuery(ARTICLE).Order("-app_id").Limit(limit) // Order by date, needs index
 
 	if appID != 0 {
 		q = q.Filter("app_id =", appID)

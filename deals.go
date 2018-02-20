@@ -9,6 +9,12 @@ import (
 	"github.com/steam-authority/steam-authority/mysql"
 )
 
+const (
+	FREE      = "free"
+	CHANGES   = "changes"
+	DISCOUNTS = "discounts"
+)
+
 func dealsHandler(w http.ResponseWriter, r *http.Request) {
 
 	tab := chi.URLParam(r, "id")
@@ -16,15 +22,17 @@ func dealsHandler(w http.ResponseWriter, r *http.Request) {
 		tab = "free"
 	}
 
-	search := url.Values{}
+	template := dealsTemplate{}
 
-	apps, err := mysql.SearchApps(search)
+	search := url.Values{}
+	search.Set("is_free", "1")
+	search.Set("name", "-")
+
+	apps, err := mysql.SearchApps(search, 1000, "name ASC")
 	if err != nil {
 		logger.Error(err)
 	}
 
-	// Template
-	template := dealsTemplate{}
 	template.Apps = apps
 	template.Tab = tab
 

@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -112,7 +111,8 @@ func BulkSaveRanks(ranks []*Rank) (err error) {
 		keys = append(keys, v.GetKey())
 	}
 
-	fmt.Println("Saving " + strconv.Itoa(RanksLen) + " ranks")
+	//fmt.Println("Saving " + strconv.Itoa(RanksLen) + " ranks")
+
 	_, err = client.PutMulti(context, keys, ranks)
 	if err != nil {
 		logger.Error(err)

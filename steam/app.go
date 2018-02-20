@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/kr/pretty"
@@ -14,8 +15,6 @@ https://partner.steamgames.com/doc/webapi/ISteamApps#GetCheatingReports
 https://partner.steamgames.com/doc/webapi/ISteamApps#GetPlayersBanned
 */
 
-// todo, list of apps that wont unmarshal: 2130, 2720, 4720, 4580, 4580
-// 33930, 221100 - cannot unmarshal string into Go struct field .required_age of type int
 func GetAppDetails(id string) (app AppDetailsBody, err error) {
 
 	options := url.Values{}
@@ -32,7 +31,25 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 	}
 
 	// Fix values that can change type, causing unmarshal errors
-	b := strings.Replace(string(bytes), "\"pc_requirements\":[],", "\"pc_requirements\":null,", 1)
+	var regex *regexp.Regexp
+	var b = string(bytes)
+
+	// Convert strings to ints
+	regex = regexp.MustCompile(`:"(\d+)"`)
+	b = regex.ReplaceAllString(b, `:$1`)
+
+	regex = regexp.MustCompile(`,"(\d+)"`)
+	b = regex.ReplaceAllString(b, `,$1`)
+
+	regex = regexp.MustCompile(`"(\d+)",`)
+	b = regex.ReplaceAllString(b, `$1,`)
+
+	// Make some its strings again
+	regex = regexp.MustCompile(`"date":(\d+)`)
+	b = regex.ReplaceAllString(b, `"date":"$1"`)
+
+	// Fix arrays that should be objects
+	b = strings.Replace(b, "\"pc_requirements\":[],", "\"pc_requirements\":null,", 1)
 	b = strings.Replace(b, "\"mac_requirements\":[],", "\"mac_requirements\":null,", 1)
 	b = strings.Replace(b, "\"linux_requirements\":[],", "\"linux_requirements\":null,", 1)
 	bytes = []byte(b)
@@ -67,7 +84,7 @@ type AppDetailsBody struct {
 		AboutTheGame        string `json:"about_the_game"`
 		ShortDescription    string `json:"short_description"`
 		Fullgame struct {
-			AppID string `json:"appid"`
+			AppID int    `json:"appid"`
 			Name  string `json:"name"`
 		} `json:"fullgame"`
 		SupportedLanguages string `json:"supported_languages"`
@@ -114,7 +131,7 @@ type AppDetailsBody struct {
 				PercentSavings           int    `json:"percent_savings"`
 				OptionText               string `json:"option_text"`
 				OptionDescription        string `json:"option_description"`
-				CanGetFreeLicense        string `json:"can_get_free_license"`
+				CanGetFreeLicense        int    `json:"can_get_free_license"`
 				IsFreeLicense            bool   `json:"is_free_license"`
 				PriceInCentsWithDiscount int    `json:"price_in_cents_with_discount"`
 			} `json:"subs"`
@@ -172,7 +189,7 @@ type AppDetailsAchievements struct {
 }
 
 type AppDetailsGenre struct {
-	ID          string `json:"id"`
+	ID          int8   `json:"id"`
 	Description string `json:"description"`
 }
 

@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -97,7 +96,7 @@ func AddChanges(changes []*Change) (err error) {
 		keys = append(keys, v.GetKey())
 	}
 
-	fmt.Println("Saving " + strconv.Itoa(changesLen) + " changes")
+	//fmt.Println("Saving " + strconv.Itoa(changesLen) + " changes")
 
 	_, err = client.PutMulti(context, keys, changes)
 	if err != nil {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/Jleagle/go-helpers/logger"
@@ -33,7 +32,7 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 	apps, err := mysql.GetApps(appIDs)
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 500, "Error getting articles")
+		returnErrorTemplate(w, 500, "Error getting apps")
 		return
 	}
 
@@ -42,8 +41,6 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 	for _, v := range apps {
 		appMap[v.ID] = v
 	}
-
-	fmt.Println(appMap[30].Name)
 
 	// Template
 	template := articlesTemplate{}
