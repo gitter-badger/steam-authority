@@ -29,10 +29,10 @@
 
         {{ if eq $.Tab "free" }}
 
-            <table class="table table-images">
+            <table class="table table-images table-sorter">
                 <thead>
                 <tr>
-                    <th scope="col">Icon</th>
+                    <th scope="col" class="{sorter: false}">Icon</th>
                     <th scope="col">Image</th>
                     <th scope="col">Type</th>
                 </tr>
@@ -57,12 +57,12 @@
         {{ end }}
 
         {{ if eq $.Tab "changes" }}
-
-            {{ end }}
+            changes
+        {{ end }}
 
         {{ if eq $.Tab "discounts" }}
-
-            {{ end }}
+            discounts
+        {{ end }}
 
         </div>
     </div>

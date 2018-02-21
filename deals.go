@@ -28,7 +28,8 @@ func dealsHandler(w http.ResponseWriter, r *http.Request) {
 	search.Set("is_free", "1")
 	search.Set("name", "-")
 
-	apps, err := mysql.SearchApps(search, 1000, "name ASC")
+	// Types not in this list will show first
+	apps, err := mysql.SearchApps(search, 1000, "FIELD(`type`,'game','dlc','demo','mod','video','movie','series','episode','application','tool','advertising'), name ASC")
 	if err != nil {
 		logger.Error(err)
 	}

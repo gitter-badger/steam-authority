@@ -28,7 +28,6 @@ func GetPICSInfo(apps []int, packages []int) (jsInfo JsInfo, err error) {
 	logger.Info("PICS: " + url)
 	response, err := http.Get(url)
 	if err != nil {
-		logger.Error(err)
 		return jsInfo, err
 	}
 	defer response.Body.Close()

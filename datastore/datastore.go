@@ -1,3 +1,5 @@
+// Docs: https://github.com/GoogleCloudPlatform/google-cloud-go/blob/master/datastore/example_test.go
+
 package datastore
 
 import (

@@ -4,3 +4,8 @@
 //         return $table.closest('.table-responsive');
 //     }
 // });
+
+$(document).ready(function () {
+        $('table.table-sorter').tablesorter();
+    }
+);

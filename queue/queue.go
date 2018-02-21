@@ -19,16 +19,11 @@ func init() {
 }
 
 func RunConsumers() {
-	fmt.Println("## Running consumers")
-
-	forever := make(chan bool)
 
 	//go playerConsumer()
 	go appConsumer()
 	go changeConsumer()
 	go packageConsumer()
-
-	<-forever
 }
 
 func connect() (err error) {

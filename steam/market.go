@@ -1,8 +1,9 @@
 package steam
 
 import (
-	"fmt"
 	"net/url"
+
+	"github.com/Jleagle/go-helpers/logger"
 )
 
 /**
@@ -23,6 +24,5 @@ func GetPopularItems() {
 		return
 	}
 
-	fmt.Println(string(bytes))
-
+	logger.Info(string(bytes))
 }

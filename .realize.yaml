@@ -18,11 +18,14 @@ settings:
 server:
   status: false
   open: false
-  port: 0
-  host: ""
+  port: 5001
+  host: "localhost"
 schema:
 - name: STEAM
   path: .
+  args:
+  - --pics
+  - --consumers
   commands:
     install:
       status: true
@@ -35,6 +38,7 @@ schema:
     - /
     extensions:
     - go
+    - yaml
     ignored_paths:
     - .git
     - vendor

@@ -141,7 +141,7 @@ func ConsumePackage(msg amqp.Delivery) (err error) {
 	id := string(msg.Body)
 	idx, _ := strconv.Atoi(id)
 
-	logger.Info("Reading package " + id + " from rabbit")
+	//logger.Info("Reading package " + id + " from rabbit")
 
 	pack := NewPackage(idx)
 	err = pack.Save()

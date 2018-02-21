@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/basicauth-go"
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
+	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/pics"
 	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/websockets"
@@ -19,20 +20,40 @@ func main() {
 
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("STEAM_GOOGLE_APPLICATION_CREDENTIALS"))
 
-	arguments := os.Args[1:]
+	// Flags
+	flagDebug := flag.Bool("debug", false, "Debug")
+	flagPics := flag.Bool("pics", false, "Pics")
+	flagConsumers := flag.Bool("consumers", false, "Consumers")
 
+	flag.Parse()
+
+	if *flagDebug {
+		mysql.SetDebug(true)
+	}
+
+	if *flagPics {
+		go pics.Run()
+	}
+
+	if *flagConsumers {
+		queue.RunConsumers()
+	}
+
+	// Scripts
+	arguments := os.Args[1:]
 	if len(arguments) > 0 {
 
 		switch arguments[0] {
-		case "consumers":
-			queue.RunConsumers()
-		case "pics":
-			pics.Run()
-		default:
-			fmt.Println("No such CLI command")
+		case "update-tags":
+			logger.Info("Tags")
+			os.Exit(0)
+		case "update-genres":
+			logger.Info("Genres")
+			os.Exit(0)
+		case "update-ranks":
+			logger.Info("Ranks")
+			os.Exit(0)
 		}
-
-		os.Exit(0)
 	}
 
 	logger.SetRollbarKey(os.Getenv("STEAM_ROLLBAR_PRIVATE"))
@@ -96,6 +117,9 @@ func main() {
 	fileServer(r, "/assets", http.Dir(filesDir))
 
 	http.ListenAndServe(":8085", r)
+
+	forever := make(chan bool)
+	<-forever
 }
 
 func adminRouter() http.Handler {

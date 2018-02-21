@@ -3,7 +3,6 @@ package mysql
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -59,19 +58,27 @@ func (app App) GetPath() (ret string) {
 	return ret
 }
 
+// advertising, demo, dlc, episode, game, mod, movie, series, tool, video
 func (app App) GetType() (ret string) {
 
-	switch os := runtime.GOOS; os {
-	case "darwin":
-		fmt.Println("OS X.")
-	case "linux":
-		fmt.Println("Linux.")
+	switch app.Type {
+	case "dlc":
+		return "DLC"
 	default:
-		// freebsd, openbsd,
-		// plan9, windows...
-		fmt.Printf("%s.", os)
+		return strings.Title(app.Type)
 	}
+}
 
+func (app App) GetCommunityLink() (string) {
+	return "https://steamcommunity.com/app/" + strconv.Itoa(app.ID) + "/?utm_source=SteamAuthority&utm_medium=SteamAuthority&utm_campaign=SteamAuthority"
+}
+
+func (app App) GetStoreLink() (string) {
+	return "https://store.steampowered.com/app/" + strconv.Itoa(app.ID) + "/?utm_source=SteamAuthority&utm_medium=SteamAuthority&utm_campaign=SteamAuthority"
+}
+
+func (app App) GetInstallLink() (string) {
+	return "steam://install/" + strconv.Itoa(app.ID)
 }
 
 // Used in frontend
@@ -212,7 +219,13 @@ func SearchApps(query url.Values, limit int, sort string) (apps []App, err error
 		sort = "id DESC" // todo, order by popularity?
 	}
 
-	db = db.Limit(limit).Order(sort)
+	db = db.Limit(limit)
+	db = db.Order(sort)
+
+	// Free
+	if _, ok := query["is_free"]; ok {
+		db = db.Where("is_free = ?", query.Get("is_free"))
+	}
 
 	// Platforms
 	if _, ok := query["platforms"]; ok {

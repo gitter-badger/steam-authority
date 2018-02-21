@@ -86,8 +86,8 @@ func appConsumer() {
 				break
 			case msg := <-messages:
 
-				id := string(msg.Body)
-				logger.Info("Reading app " + id + " from rabbit")
+				//id := string(msg.Body)
+				//logger.Info("Reading app " + id + " from rabbit")
 
 				dsErr := datastore.ConsumeApp(msg)
 				if err != nil {

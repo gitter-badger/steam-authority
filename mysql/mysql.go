@@ -8,21 +8,23 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-const (
-	DEBUG = false
-)
-
 var gormConnection *gorm.DB
+var debug = false
 
 func init() {
 
 	var err error
 	gormConnection, err = gorm.Open("mysql", os.Getenv("STEAM_SQL_DSN")+"?parseTime=true")
-	gormConnection.LogMode(DEBUG)
+	gormConnection.LogMode(debug)
 	if err != nil {
 
 		logger.Error(err)
 	}
+}
+
+func SetDebug(val bool) {
+	debug = val
+	return
 }
 
 func getDB() (conn *gorm.DB, err error) {

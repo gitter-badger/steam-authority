@@ -113,7 +113,7 @@ func ConsumeChange(msg amqp.Delivery) (err error) {
 		return err
 	}
 
-	logger.Info("Reading change " + strconv.Itoa(change.ChangeID) + " from rabbit")
+	//logger.Info("Reading change " + strconv.Itoa(change.ChangeID) + " from rabbit")
 
 	// Save to DS
 	err = AddChanges([]*Change{&change})
