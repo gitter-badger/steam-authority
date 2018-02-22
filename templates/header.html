@@ -54,6 +54,10 @@
                 </li>
             </ul>
             <ul class="navbar-nav">
+            {{/* todo, if logged out */}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/contact">Contact</a>
                 </li>
@@ -63,6 +67,10 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown">More</a>
                     <div class="dropdown-menu">
+                    {{/* todo, if logged in */}}
+                        <a class="dropdown-item" href="/settings">Settings</a>
+                        <a class="dropdown-item" href="/logout">Logout</a>
+                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/faqs">FAQs</a>
                         <a class="dropdown-item" href="/changelog">Changelog</a>
                         <a class="dropdown-item" href="/credits">Credits</a>

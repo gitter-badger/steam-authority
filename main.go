@@ -60,10 +60,38 @@ func main() {
 
 	r := chi.NewRouter()
 
+	// Admin
+	r.Mount("/admin", adminRouter())
+
 	// Apps
 	r.Get("/apps", appsHandler)
 	r.Get("/apps/{id}", appHandler)
 	r.Get("/apps/{id}/{slug}", appHandler)
+
+	// Changes
+	r.Get("/changes", changesHandler)
+	r.Get("/changes/{id}", changeHandler)
+
+	// Chat
+	r.Get("/chat", chatHandler)
+	r.Get("/chat/{id}", chatHandler)
+
+	// Contact
+	r.Get("/contact", contactHandler)
+	r.Post("/contact", postContactHandler)
+
+	// Deals
+	r.Get("/deals", dealsHandler)
+	r.Get("/deals/{id}", dealsHandler)
+
+	// Experience
+	r.Get("/experience", experienceHandler)
+	r.Get("/experience/{id}", experienceHandler)
+
+	// Login
+	r.Get("/login", loginHandler)
+	r.Get("/logout", logoutHandler)
+	r.Get("/login-callback", loginCallbackHandler)
 
 	// Packages
 	r.Get("/packages", packagesHandler)
@@ -76,48 +104,31 @@ func main() {
 	r.Get("/players/{id:[0-9]+}", playerHandler)
 	r.Get("/players/{id:[0-9]+}/{slug}", playerHandler)
 
-	// Deals
-	r.Get("/deals", dealsHandler)
-	r.Get("/deals/{id}", dealsHandler)
-
-	// Changes
-	r.Get("/changes", changesHandler)
-	r.Get("/changes/{id}", changeHandler)
-
-	// Experience
-	r.Get("/experience", experienceHandler)
-	r.Get("/experience/{id}", experienceHandler)
-
-	// Contact
-	r.Get("/contact", contactHandler)
-	r.Post("/contact", postContactHandler)
-
-	// Static pages
-	r.Get("/donate", donateHandler)
-	r.Get("/faqs", faqsHandler)
-	r.Get("/credits", creditsHandler)
-
-	// Chat
-	r.Get("/chat", chatHandler)
-	r.Get("/chat/{id}", chatHandler)
+	// Settings
+	r.Get("/settings", settingsHandler)
+	r.Post("/settings", saveSettingsHandler)
 
 	// Other
 	r.Get("/", homeHandler)
-	r.Get("/websocket", websockets.Handler)
 	r.Get("/changelog", changelogHandler)
-	r.Get("/tags", tagsHandler)
 	r.Get("/genres", genresHandler)
 	r.Get("/news", newsHandler)
+	r.Get("/tags", tagsHandler)
+	r.Get("/websocket", websockets.Handler)
 
-	// Admin
-	r.Mount("/admin", adminRouter())
+	// Static pages
+	r.Get("/credits", creditsHandler)
+	r.Get("/donate", donateHandler)
+	r.Get("/faqs", faqsHandler)
 
+	//
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "assets")
 	fileServer(r, "/assets", http.Dir(filesDir))
 
 	http.ListenAndServe(":8085", r)
 
+	// Block for goroutines
 	forever := make(chan bool)
 	<-forever
 }

@@ -1,0 +1,47 @@
+{{define "settings"}} {{ template "header" }}
+
+<div class="container" id="tags-page">
+
+    <div class="jumbotron">
+
+        <h1 class="display-4">Settings</h1>
+        <p class="lead">Player ID: {{ . }}</p>
+
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <form>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Email">
+                    <small id="emailHelp" class="form-text text-muted">We currently do not send any emails. May be used in the future.</small>
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                    <label class="form-check-label" for="exampleCheck1">Hide my profile from all areas</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                    <label class="form-check-label" for="exampleCheck1">Show browser alerts on page updates</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Save</button>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="card">
+        <h5 class="card-header">Donations</h5>
+        <div class="card-body">
+            <p>No donations.</p>
+            <p><a href="/donate">Donate Page</a>.</p>
+        </div>
+    </div>
+
+</div>
+
+{{ template "footer" }} {{end}}
