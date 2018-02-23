@@ -1,7 +1,6 @@
 package queue
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/streadway/amqp"
@@ -45,7 +44,7 @@ func connect() (err error) {
 	}
 	//defer ch.Close()
 
-	fmt.Println("connected")
+	//fmt.Println("connected")
 
 	return nil
 }

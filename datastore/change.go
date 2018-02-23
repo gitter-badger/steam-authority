@@ -7,7 +7,6 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
-	"github.com/steam-authority/steam-authority/websockets"
 	"github.com/streadway/amqp"
 	"google.golang.org/api/iterator"
 )
@@ -22,16 +21,6 @@ type Change struct {
 
 func (change Change) GetKey() (key *datastore.Key) {
 	return datastore.NameKey(CHANGE, strconv.Itoa(change.ChangeID), nil)
-}
-
-func (change *Change) Tidy() *Change {
-
-	change.UpdatedAt = time.Now()
-	if change.CreatedAt.IsZero() {
-		change.CreatedAt = time.Now()
-	}
-
-	return change
 }
 
 func GetLatestChanges(limit int) (changes []Change, err error) {
@@ -106,11 +95,20 @@ func AddChanges(changes []*Change) (err error) {
 	return nil
 }
 
-func ConsumeChange(msg amqp.Delivery) (err error) {
+func (change *Change) Tidy() *Change {
 
-	var change Change
+	change.UpdatedAt = time.Now()
+	if change.CreatedAt.IsZero() {
+		change.CreatedAt = time.Now()
+	}
+
+	return change
+}
+
+func ConsumeChange(msg amqp.Delivery) (change Change, err error) {
+
 	if err := json.Unmarshal(msg.Body, &change); err != nil {
-		return err
+		return change, err
 	}
 
 	//logger.Info("Reading change " + strconv.Itoa(change.ChangeID) + " from rabbit")
@@ -118,24 +116,8 @@ func ConsumeChange(msg amqp.Delivery) (err error) {
 	// Save to DS
 	err = AddChanges([]*Change{&change})
 	if err != nil {
-		return err
+		return change, err
 	}
 
-	// Send websocket
-	payload := changeWebsocketPayload{
-		ID:        change.ChangeID,
-		CreatedAt: change.CreatedAt.Unix(),
-		Apps:      change.Apps,
-		Packages:  change.Packages,
-	}
-	websockets.Send(websockets.CHANGES, payload)
-
-	return nil
-}
-
-type changeWebsocketPayload struct {
-	ID        int   `json:"id"`
-	CreatedAt int64 `json:"created_at"`
-	Apps      []int `json:"apps"`
-	Packages  []int `json:"packages"`
+	return change, nil
 }

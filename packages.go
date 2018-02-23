@@ -17,10 +17,15 @@ func packagesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := packagesTemplate{}
-
+	template.SetSession(r)
 	template.Packages = packages
 
 	returnTemplate(w, "packages", template)
+}
+
+type packagesTemplate struct {
+	GlobalTemplate
+	Packages []mysql.Package
 }
 
 func packageHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,21 +54,17 @@ func packageHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 	}
 
-	apps, err := mysql.GetApps(appIDs)
+	apps, err := mysql.GetApps(appIDs, []string{})
 	if err != nil {
 		logger.Error(err)
 	}
 
 	template := packageTemplate{}
+	template.SetSession(r)
 	template.Package = pack
 	template.Apps = apps
 
 	returnTemplate(w, "package", template)
-}
-
-type packagesTemplate struct {
-	GlobalTemplate
-	Packages []mysql.Package
 }
 
 type packageTemplate struct {

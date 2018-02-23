@@ -2,11 +2,12 @@ package queue
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/mysql"
+	"github.com/steam-authority/steam-authority/websockets"
 	"github.com/streadway/amqp"
 )
 
@@ -70,7 +71,7 @@ func changeConsumer() {
 			continue
 		}
 
-		fmt.Println("Getting change messages from rabbit")
+		//fmt.Println("Getting change messages from rabbit")
 		messages, err := channel.Consume(
 			queue.Name, // queue
 			"",         // consumer
@@ -91,13 +92,70 @@ func changeConsumer() {
 				break
 			case msg := <-messages:
 
-				err := datastore.ConsumeChange(msg)
+				change, err := datastore.ConsumeChange(msg)
 				if err != nil {
 					logger.Error(err)
 				} else {
 					msg.Ack(false)
 				}
+
+				// Send websocket
+				if websockets.HasConnections() {
+
+					// Get apps for change
+					var apps []changeAppWebsocketPayload
+					appsResp, err := mysql.GetApps(change.Apps, []string{"id", "name"})
+					if err != nil {
+						logger.Error(err)
+					}
+
+					for _, v := range appsResp {
+						apps = append(apps, changeAppWebsocketPayload{
+							ID:   v.ID,
+							Name: v.GetName(),
+						})
+					}
+
+					// Get packages for change
+					var packages []changePackageWebsocketPayload
+					packagesResp, err := mysql.GetPackages(change.Packages, []string{"id", "name"})
+					if err != nil {
+						logger.Error(err)
+					}
+
+					for _, v := range packagesResp {
+						packages = append(packages, changePackageWebsocketPayload{
+							ID:   v.ID,
+							Name: v.GetName(),
+						})
+					}
+
+					payload := changeWebsocketPayload{
+						ID:        change.ChangeID,
+						CreatedAt: change.CreatedAt.Unix(),
+						Apps:      apps,
+						Packages:  packages,
+					}
+					websockets.Send(websockets.CHANGES, payload)
+				}
 			}
 		}
 	}
+}
+
+type changeWebsocketPayload struct {
+	ID        int                             `json:"id"`
+	CreatedAt int64                           `json:"created_at"`
+	Apps      []changeAppWebsocketPayload     `json:"apps"`
+	Packages  []changePackageWebsocketPayload `json:"packages"`
+}
+
+type changeAppWebsocketPayload struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type changePackageWebsocketPayload struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }

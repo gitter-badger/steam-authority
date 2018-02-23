@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -13,6 +14,8 @@ import (
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/dustin/go-humanize"
 	"github.com/gosimple/slug"
+	"github.com/steam-authority/steam-authority/mysql"
+	"github.com/steam-authority/steam-authority/session"
 )
 
 func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (err error) {
@@ -66,17 +69,18 @@ func getTemplateFuncMap() map[string]interface{} {
 		"title": func(a string) string { return strings.Title(a) },
 		"comma": func(a int) string { return humanize.Comma(int64(a)) },
 		"slug":  func(a string) string { return slug.Make(a) },
-		"apps": func(a []int) template.HTML {
+		"apps": func(a []int, appsMap map[int]mysql.App) template.HTML {
 			var apps []string
 			for _, v := range a {
-				apps = append(apps, "<a href=\"/apps/"+strconv.Itoa(v)+"\">"+strconv.Itoa(v)+"</a>")
+				fmt.Println(appsMap[v].GetName())
+				apps = append(apps, "<a href=\"/apps/"+strconv.Itoa(v)+"\">"+appsMap[v].GetName()+"</a>")
 			}
 			return template.HTML("Apps: " + strings.Join(apps, ", "))
 		},
-		"packages": func(a []int) template.HTML {
+		"packages": func(a []int, packagesMap map[int]mysql.Package) template.HTML {
 			var packages []string
 			for _, v := range a {
-				packages = append(packages, "<a href=\"/packages/"+strconv.Itoa(v)+"\">"+strconv.Itoa(v)+"</a>")
+				packages = append(packages, "<a href=\"/packages/"+strconv.Itoa(v)+"\">"+packagesMap[v].GetName()+"</a>")
 			}
 			return template.HTML("Packages: " + strings.Join(packages, ", "))
 		},
@@ -94,5 +98,21 @@ type errorTemplate struct {
 
 // GlobalTemplate is added to every other template
 type GlobalTemplate struct {
-	Env string
+	Env    string
+	ID     int
+	Name   string
+	Avatar string
+}
+
+func (t *GlobalTemplate) SetSession(r *http.Request) {
+
+	id, _ := session.Read(r, session.ID)
+
+	t.ID, _ = strconv.Atoi(id)
+	t.Name, _ = session.Read(r, session.Name)
+	t.Avatar, _ = session.Read(r, session.Avatar)
+}
+
+func (t GlobalTemplate) LoggedIn() bool {
+	return t.ID > 0
 }

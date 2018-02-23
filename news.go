@@ -29,7 +29,7 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get app info
-	apps, err := mysql.GetApps(appIDs)
+	apps, err := mysql.GetApps(appIDs, []string{})
 	if err != nil {
 		logger.Error(err)
 		returnErrorTemplate(w, 500, "Error getting apps")
@@ -44,6 +44,7 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := articlesTemplate{}
+	template.SetSession(r)
 	template.Articles = filteredArticles
 	template.Apps = appMap
 
@@ -52,6 +53,7 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type articlesTemplate struct {
+	GlobalTemplate
 	Articles []datastore.Article
 	Apps     map[int]mysql.App
 }

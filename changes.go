@@ -2,53 +2,77 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
+	"github.com/kr/pretty"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
+	"github.com/steam-authority/steam-authority/queue"
 )
 
 func changesHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := changesTemplate{}
+	template.SetSession(r)
 
 	// Get changes
 	changes, err := datastore.GetLatestChanges(100)
 	if err != nil {
 		logger.Error(err)
 	}
+
+	queue.ChangeProducer(&datastore.Change{
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		ChangeID:  123,
+		Apps:      []int{922, 923},
+		Packages:  []int{8491, 31794},
+	})
+
+	// Get apps/packages
+	appIDs := make([]int, 0)
+	packageIDs := make([]int, 0)
+	for _, v := range changes {
+		appIDs = append(appIDs, v.Apps...)
+		packageIDs = append(packageIDs, v.Packages...)
+	}
+
+	// Get apps for all changes
+	appsMap := make(map[int]mysql.App)
+	apps, err := mysql.GetApps(appIDs, []string{"id", "name"})
+
+	for _, v := range apps {
+		appsMap[v.ID] = v
+	}
+
+	// Get packages for all changes
+	packagesMap := make(map[int]mysql.Package)
+	packages, err := mysql.GetPackages(packageIDs, []string{"id", "name"})
+
+	for _, v := range packages {
+		packagesMap[v.ID] = v
+	}
+
+	pretty.Println(appsMap)
+
+	// todo, sort packagesMap by id
+
+	// Template
 	template.Changes = changes
-
-	// // Get apps/packages
-	// apps := make([]int, 0, 500)
-	// packages := make([]int, 0, 500)
-	// for _, v := range changes {
-	// 	apps = append(apps, v.Apps...)
-	// 	packages = append(apps, v.Packages...)
-	// }
-
-	// dsApps, err := datastore.GetMultiAppsByKey(apps)
-	// if err != nil {
-	// 	logger.Error(err)
-	// }
-	// template.Apps = make(map[int]datastore.DsApp)
-	// for _, v := range dsApps {
-	// 	template.Apps[v.AppID] = v
-	// }
-
-	// dsPackages, err := datastore.GetMultiPackagesByKey(packages)
-	// if err != nil {
-	// 	logger.Error(err)
-	// }
-	// template.Packages = make(map[int]datastore.DsPackage)
-	// for _, v := range dsPackages {
-	// 	template.Packages[v.PackageID] = v
-	// }
-
-	// pretty.Print(template)
+	template.Apps = appsMap
+	template.Packages = packagesMap
 
 	returnTemplate(w, "changes", template)
+}
+
+// todo, Just pass through a new struct with all the correct info instead of changes and maps to get names
+type changesTemplate struct {
+	GlobalTemplate
+	Changes  []datastore.Change
+	Apps     map[int]mysql.App
+	Packages map[int]mysql.Package
 }
 
 func changeHandler(w http.ResponseWriter, r *http.Request) {
@@ -63,16 +87,10 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := changeTemplate{}
+	template.SetSession(r)
 	template.Change = change
 
 	returnTemplate(w, "change", template)
-}
-
-type changesTemplate struct {
-	GlobalTemplate
-	Changes  []datastore.Change
-	Apps     map[int]mysql.App
-	Packages map[int]mysql.Package
 }
 
 type changeTemplate struct {

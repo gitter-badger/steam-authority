@@ -18,6 +18,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := tagsTemplate{}
+	template.SetSession(r)
 	template.Tags = tags
 
 	returnTemplate(w, "tags", template)
@@ -25,5 +26,6 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type tagsTemplate struct {
+	GlobalTemplate
 	Tags []mysql.Tag
 }

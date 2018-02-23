@@ -53,9 +53,10 @@ func experienceHandler(w http.ResponseWriter, r *http.Request) {
 	rows = rows[0 : ROWS+1]
 
 	template := experienceTemplate{}
+	template.SetSession(r)
 	template.Chunks = chunk(rows, CHUNK)
-
 	template.Level = -1
+
 	id := chi.URLParam(r, "id")
 	if id != "" {
 		i, err := strconv.Atoi(id)

@@ -27,6 +27,7 @@ func appsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := appsTemplate{}
+	template.SetSession(r)
 	template.Apps = apps
 	template.Count = count
 
@@ -118,6 +119,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := appTemplate{}
+	template.SetSession(r)
 	template.App = app
 	template.Packages = packages
 	template.Articles = news

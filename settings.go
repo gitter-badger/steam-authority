@@ -3,16 +3,18 @@ package main
 import (
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/session"
+	"github.com/steam-authority/steam-authority/steam"
 	"github.com/yohcop/openid-go"
-	"fmt"
 	"net/http"
+	"os"
 	"path"
+	"strconv"
 )
 
 const (
-	OPENID   = "http://steamcommunity.com/openid"
-	CALLBACK = "http://localhost:8085/login-callback"
-	REALM    = "http://localhost:8085/"
+	ID     = "id"
+	NAME   = "name"
+	AVATAR = "avatar"
 )
 
 // todo
@@ -38,7 +40,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var url string
-	url, err = openid.RedirectURL(OPENID, CALLBACK, REALM)
+	url, err = openid.RedirectURL("http://steamcommunity.com/openid", os.Getenv("STEAM_DOMAIN")+"/login-callback", os.Getenv("STEAM_DOMAIN")+"/")
 	if err != nil {
 		returnErrorTemplate(w, 500, err.Error())
 		return
@@ -49,19 +51,29 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 func loginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
-	fullUrl := "http://localhost:8085" + r.URL.String()
-	id, err := openid.Verify(fullUrl, discoveryCache, nonceStore)
+	openID, err := openid.Verify(os.Getenv("STEAM_DOMAIN")+r.URL.String(), discoveryCache, nonceStore)
 	if err != nil {
 		returnErrorTemplate(w, 500, err.Error())
 		return
 	}
 
-	// Save session
-	err = session.Write(w, r, session.ID, path.Base(id))
+	id, err := strconv.Atoi(path.Base(openID))
 	if err != nil {
 		returnErrorTemplate(w, 500, err.Error())
 		return
 	}
+
+	resp, err := steam.GetPlayerSummaries([]int{id})
+	if err != nil {
+		returnErrorTemplate(w, 500, err.Error())
+		return
+	}
+
+	session.WriteMany(w, r, map[string]string{
+		ID:     strconv.Itoa(id),
+		NAME:   resp.Response.Players[0].PersonaName,
+		AVATAR: resp.Response.Players[0].AvatarMedium,
+	})
 
 	http.Redirect(w, r, "/settings", 302)
 	return
@@ -88,13 +100,11 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := settingsTemplate{}
-	template.Session, err = session.ReadAll(r)
+	template.SetSession(r)
 	if err != nil {
 		returnErrorTemplate(w, 500, err.Error())
 		return
 	}
-
-	fmt.Println(template.Session)
 
 	returnTemplate(w, "settings", template)
 
@@ -106,6 +116,5 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 type settingsTemplate struct {
 	GlobalTemplate
-	Session map[interface{}]interface{}
-	User    datastore.Player
+	User datastore.Player
 }

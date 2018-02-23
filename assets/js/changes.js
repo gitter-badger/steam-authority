@@ -7,35 +7,53 @@ if ($('#changes-page').length > 0) {
         var $badge = $('#live-badge');
 
         socket.onopen = function (e) {
-            console.log('WebSocket opened');
             $badge.addClass('badge-success').removeClass('badge-secondary badge-danger')
         };
         socket.onclose = function (e) {
-            console.log('WebSocket closed');
             $badge.addClass('badge-danger').removeClass('badge-secondary badge-success')
         };
         socket.onmessage = function (e) {
-            console.log('WebSocket recieved');
-            console.log(e.data);
-
             var data = jQuery.parseJSON(e.data);
 
             if (data.Page === 'changes') {
 
                 data = data.Data;
 
+                console.log(data);
+
                 $('ul.list-unstyled').prepend($(
                     '<li class="media">' +
                     '    <div class="media-body">' +
                     '        <h5 class="mt-0 mb-1">Change ' + data.id + '</h5>' +
-                    '        <p class="text-muted" data-livestamp="' + data.created_at + '" style="margin-bottom: 0;">' + data.created_at + '</p>' +
+                    '        <p class="text-muted" style="margin-bottom: 0;">\n' +
+                    '            <span data-livestamp="' + data.created_at + '">' + data.created_at + '</span>\n' +
+                    '            <a href="/changes/' + data.id + '"><i class="fa fa-paperclip" aria-hidden="true"></i></a>\n' +
+                    '        </p>' +
+                    '        <p class="text-muted" style="margin-bottom: 0;">Apps: ' + makeAppLinks(data.apps, 'apps') + '</p>' +
+                    '        <p class="text-muted">Packages: ' + makeAppLinks(data.packages, 'packages') + '</p>' +
                     '    </div>' +
                     '</li>'));
+
+                $('ul.list-unstyled .media').slice(100).remove();
             }
         };
         socket.onerror = function (e) {
-            console.log('WebSocket error');
             $badge.addClass('badge-danger').removeClass('badge-secondary badge-success')
         };
+
+        function makeAppLinks(apps, path) {
+
+            if (apps == null) {
+                return '';
+            }
+
+            var list = [];
+            $.each(apps, function (k, app) {
+                var x = $('<a href="/' + path + '/' + app.id + '">' + app.name + '</a>').prop('outerHTML');
+                list.push(x);
+            });
+
+            return list.join(', ')
+        }
     }
 }

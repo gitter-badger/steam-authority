@@ -155,7 +155,7 @@ func (app App) GetCategories() (categories []string, err error) {
 func (app App) GetName() (name string) {
 
 	if app.Name == "" {
-		app.Name = "App " + strconv.Itoa(int(app.ID))
+		app.Name = "App " + strconv.Itoa(app.ID)
 	}
 
 	return app.Name
@@ -189,15 +189,19 @@ func GetApp(id int) (app App, err error) {
 	return app, nil
 }
 
-func GetApps(ids []int) (apps []App, err error) {
+func GetApps(ids []int, columns []string) (apps []App, err error) {
 
-	if len(ids) == 0 {
+	if len(ids) < 1 {
 		return apps, nil
 	}
 
 	db, err := getDB()
 	if err != nil {
 		return apps, err
+	}
+
+	if len(columns) > 0 {
+		db = db.Select(columns)
 	}
 
 	db.Where("id IN (?)", ids).Find(&apps)
@@ -372,7 +376,7 @@ func (app *App) FillFromPICS() (err error) {
 	}
 
 	var js steam.JsApp
-	if val, ok := resp.Apps[app.ID]; ok {
+	if val, ok := resp.Apps[strconv.Itoa(app.ID)]; ok {
 		js = val
 	} else {
 		return errors.New("no app key in json")

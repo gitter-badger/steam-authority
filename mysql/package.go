@@ -28,6 +28,45 @@ func (pack Package) GetPath() string {
 	return "/packages/" + strconv.Itoa(int(pack.ID)) + "/" + slug.Make(pack.Name)
 }
 
+func (pack Package) GetName() (name string) {
+
+	if pack.Name == "" {
+		pack.Name = "Package " + strconv.Itoa(pack.ID)
+	}
+
+	return pack.Name
+}
+
+func (pack Package) GetBillingType() (string) {
+
+	switch pack.BillingType {
+	case 11:
+		return "Repurchaseable"
+	default:
+		return "Unknown"
+	}
+}
+
+func (pack Package) GetLicenseType() (string) {
+
+	switch pack.LicenseType {
+	case 0:
+		return "No License"
+	default:
+		return "Unknown"
+	}
+}
+
+func (pack Package) GetStatus() (string) {
+
+	switch pack.LicenseType {
+	case 0:
+		return "Available"
+	default:
+		return "Unknown"
+	}
+}
+
 func (pack Package) GetApps() (apps []int, err error) {
 
 	bytes := []byte(pack.Apps)
@@ -59,11 +98,19 @@ func GetPackage(id int) (pack Package, err error) {
 	return pack, nil
 }
 
-func GetPackages(ids []int) (packages []Package, err error) {
+func GetPackages(ids []int, columns []string) (packages []Package, err error) {
+
+	if len(ids) < 1 {
+		return packages, nil
+	}
 
 	db, err := getDB()
 	if err != nil {
 		return packages, err
+	}
+
+	if len(columns) > 0 {
+		db = db.Select(columns)
 	}
 
 	db.Where("id IN (?)", ids).Find(&packages)
@@ -158,7 +205,7 @@ func (pack *Package) FillFromPICS() (err error) {
 	}
 
 	var pics steam.JsPackage
-	if val, ok := resp.Packages[pack.ID]; ok {
+	if val, ok := resp.Packages[strconv.Itoa(pack.ID)]; ok {
 		pics = val
 	} else {
 		return errors.New("no package key in json")

@@ -25,6 +25,10 @@ func init() {
 	connections = make(map[int]*websocket.Conn)
 }
 
+func HasConnections() (bool) {
+	return len(connections) > 0
+}
+
 func Send(page string, data interface{}) {
 
 	payload := websocketPayload{}

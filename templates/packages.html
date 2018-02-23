@@ -1,4 +1,4 @@
-{{define "packages"}} {{ template "header" }} {{ range $key, $value := .Packages }}
+{{define "packages"}} {{ template "header" . }} {{ range $key, $value := .Packages }}
 
 <div class="container">
 

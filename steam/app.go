@@ -3,7 +3,9 @@ package steam
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 
@@ -44,8 +46,8 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 	regex = regexp.MustCompile(`"(\d+)",`) // Before comma
 	b = regex.ReplaceAllString(b, `$1,`)
 
-	//regex = regexp.MustCompile(`\["(\d+)"\]`) // No commas
-	//b = regex.ReplaceAllString(b, `[$1]`)
+	regex = regexp.MustCompile(`"packages":\["(\d+)"\]`) // Package array with single int
+	b = regex.ReplaceAllString(b, `"packages":[$1]`)
 
 	// Make some its strings again
 	regex = regexp.MustCompile(`"date":(\d+)`)
@@ -55,9 +57,9 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 	b = regex.ReplaceAllString(b, `"name":"$1"`)
 
 	// Fix arrays that should be objects
-	b = strings.Replace(b, "\"pc_requirements\":[],", "\"pc_requirements\":null,", 1)
-	b = strings.Replace(b, "\"mac_requirements\":[],", "\"mac_requirements\":null,", 1)
-	b = strings.Replace(b, "\"linux_requirements\":[],", "\"linux_requirements\":null,", 1)
+	b = strings.Replace(b, "\"pc_requirements\":[]", "\"pc_requirements\":null", 1)
+	b = strings.Replace(b, "\"mac_requirements\":[]", "\"mac_requirements\":null", 1)
+	b = strings.Replace(b, "\"linux_requirements\":[]", "\"linux_requirements\":null", 1)
 	bytes = []byte(b)
 
 	// Unmarshal JSON
@@ -66,8 +68,8 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			//pretty.Print(string(bytes))
 
-			//fmt.Println(b)
-			//os.Exit(1)
+			fmt.Println(b)
+			os.Exit(1)
 
 		}
 		return app, err

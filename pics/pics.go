@@ -42,10 +42,15 @@ func Run() {
 		// Make a list of changes to add
 		changes := make(map[int]*datastore.Change, 0)
 
+		// todo, these should get the change from DS first to keep the CreatedAt correct
 		for k, v := range jsChange.Apps {
 			_, ok := changes[v]
 			if !ok {
-				changes[v] = &datastore.Change{ChangeID: v}
+				changes[v] = &datastore.Change{
+					ChangeID:  v,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}
 			}
 
 			intx, _ := strconv.Atoi(k)
@@ -55,7 +60,11 @@ func Run() {
 		for k, v := range jsChange.Packages {
 			_, ok := changes[v]
 			if !ok {
-				changes[v] = &datastore.Change{ChangeID: v}
+				changes[v] = &datastore.Change{
+					ChangeID:  v,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}
 			}
 
 			intx, _ := strconv.Atoi(k)
@@ -90,7 +99,7 @@ func getLatestChanges() (jsChange JsChange, err error) {
 
 	// Grab the JSON from node
 	url := "http://localhost:8086/changes/" + strconv.Itoa(latestChangeSaved)
-	logger.Info("PICS: " + url)
+	//logger.Info("PICS: " + url)
 	response, err := http.Get(url)
 	if err != nil {
 		return jsChange, err

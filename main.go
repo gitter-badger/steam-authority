@@ -19,6 +19,11 @@ import (
 func main() {
 
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("STEAM_GOOGLE_APPLICATION_CREDENTIALS"))
+	if os.Getenv("ENV") == "local" {
+		os.Setenv("STEAM_DOMAIN", os.Getenv("STEAM_LOCAL_DOMAIN"))
+	} else {
+		os.Setenv("STEAM_DOMAIN", "https://steamauthority.net")
+	}
 
 	// Flags
 	flagDebug := flag.Bool("debug", false, "Debug")

@@ -18,6 +18,7 @@ func genresHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := genresTemplate{}
+	template.SetSession(r)
 	template.Genres = genres
 
 	returnTemplate(w, "genres", template)
@@ -25,5 +26,6 @@ func genresHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type genresTemplate struct {
+	GlobalTemplate
 	Genres []mysql.Genre
 }

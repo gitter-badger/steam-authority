@@ -22,8 +22,6 @@ func dealsHandler(w http.ResponseWriter, r *http.Request) {
 		tab = "free"
 	}
 
-	template := dealsTemplate{}
-
 	search := url.Values{}
 	search.Set("is_free", "1")
 	search.Set("name", "-")
@@ -34,6 +32,8 @@ func dealsHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 	}
 
+	template := dealsTemplate{}
+	template.SetSession(r)
 	template.Apps = apps
 	template.Tab = tab
 
@@ -42,6 +42,7 @@ func dealsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type dealsTemplate struct {
+	GlobalTemplate
 	Apps []mysql.App
 	Tab  string
 }

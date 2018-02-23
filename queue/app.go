@@ -1,7 +1,6 @@
 package queue
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
@@ -65,7 +64,7 @@ func appConsumer() {
 			continue
 		}
 
-		fmt.Println("Getting app messages from rabbit")
+		//fmt.Println("Getting app messages from rabbit")
 		messages, err := channel.Consume(
 			queue.Name, // queue
 			"",         // consumer

@@ -10,7 +10,15 @@ import (
 )
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
-	returnTemplate(w, "contact", nil)
+
+	template:= contactTemplate{}
+	template.SetSession(r)
+
+	returnTemplate(w, "contact", template)
+}
+
+type contactTemplate struct {
+	GlobalTemplate
 }
 
 func postContactHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,4 +1,4 @@
-{{define "changes"}} {{ template "header" }}
+{{define "changes"}} {{ template "header" . }}
 
 <div class="container" id="changes-page">
 
@@ -11,7 +11,7 @@
         <div class="card-header bg-light text-white">
 
             <h5 class="float-right" style="margin-bottom: 0;">
-                <span class="badge badge-secondary" id="live-badge-x">Live</span>
+                <span class="badge badge-secondary" id="live-badge">Live</span>
             </h5>
 
         </div>
@@ -23,9 +23,12 @@
                 <li class="media">
                     <div class="media-body">
                         <h5 class="mt-0 mb-1">Change {{ .ChangeID }}</h5>
-                        <p class="text-muted" data-livestamp="{{ unix .CreatedAt }}" style="margin-bottom: 0;">{{ unix .CreatedAt }}</p>
-                        <p class="text-muted" style="margin-bottom: 0;">{{ apps .Apps }}</p>
-                        <p class="text-muted">{{ packages .Packages }}</p>
+                        <p class="text-muted" style="margin-bottom: 0;">
+                            <span data-livestamp="{{ unix .CreatedAt }}">{{ unix .CreatedAt }}</span>
+                            <a href="/changes/{{ .ChangeID }}"><i class="fa fa-paperclip" aria-hidden="true"></i></a>
+                        </p>
+                        <p class="text-muted" style="margin-bottom: 0;">{{ apps .Apps $.Apps }}</p>
+                        <p class="text-muted">{{ packages .Packages $.Packages }}</p>
                     </div>
                 </li>
             {{ end }}

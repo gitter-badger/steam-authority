@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	ID           = "id"
+	ID     = "id"
+	Name   = "name"
+	Avatar = "avatar"
 )
 
 func getSession(r *http.Request) (*sessions.Session, error) {

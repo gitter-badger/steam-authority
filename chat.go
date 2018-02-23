@@ -89,6 +89,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := chatTemplate{}
+	template.SetSession(r)
 	template.Channels = channels
 	template.Messages = messages
 	template.ChannelID = id

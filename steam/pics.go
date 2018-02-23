@@ -2,12 +2,12 @@ package steam
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/Jleagle/go-helpers/logger"
 	"github.com/kr/pretty"
 )
 
@@ -25,7 +25,7 @@ func GetPICSInfo(apps []int, packages []int) (jsInfo JsInfo, err error) {
 
 	// Grab the JSON from node
 	url := "http://localhost:8086/info?apps=" + strings.Join(stringApps, ",") + "&packages=" + strings.Join(stringPackages, ",") + "&prettyprint=0"
-	logger.Info("PICS: " + url)
+	//logger.Info("PICS: " + url)
 	response, err := http.Get(url)
 	if err != nil {
 		return jsInfo, err
@@ -33,29 +33,36 @@ func GetPICSInfo(apps []int, packages []int) (jsInfo JsInfo, err error) {
 	defer response.Body.Close()
 
 	// Convert to bytes
-	contents, err := ioutil.ReadAll(response.Body)
+	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		logger.Error(err)
+		return jsInfo, err
 	}
+
+	// Fix arrays that should be objects
+	var b = string(bytes)
+	b = strings.Replace(b, "\"appitems\":[]", "\"appitems\":null", 1)
+	bytes = []byte(b)
 
 	// Unmarshal JSON
 	info := JsInfo{}
-	if err := json.Unmarshal(contents, &info); err != nil {
+	if err := json.Unmarshal(bytes, &info); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
-			pretty.Print(string(contents))
+			fmt.Println("x")
+			pretty.Print(string(bytes))
+			fmt.Println("y")
 		}
-		logger.Error(err)
+		return jsInfo, err
 	}
 
 	return info, nil
 }
 
 type JsInfo struct {
-	Success         int8              `json:"success"`
-	Apps            map[int]JsApp     `json:"apps"`
-	Packages        map[int]JsPackage `json:"packages"`
-	UnknownApps     []int             `json:"unknown_apps"`
-	UnknownPackages []int             `json:"unknown_packages"`
+	Success         int8                 `json:"success"`
+	Apps            map[string]JsApp     `json:"apps"`
+	Packages        map[string]JsPackage `json:"packages"`
+	UnknownApps     []int                `json:"unknown_apps"`
+	UnknownPackages []int                `json:"unknown_packages"`
 }
 
 type JsApp struct {
@@ -161,9 +168,9 @@ type JsPackage struct {
 	LicenseType int8 `json:"licensetype"`
 	Status      int8 `json:"status"`
 	// Extended    JsPackageExtended `json:"extended"` // Sometimes shows as empty array, breaking unmarshal
-	AppIDs   []int `json:"appids"`
-	DepotIDs []int `json:"depotids"`
-	AppItems []int `json:"appitems"` // todo, no data to test with
+	AppIDs   []int            `json:"appids"`
+	DepotIDs []int            `json:"depotids"`
+	AppItems map[string][]int `json:"appitems"`
 }
 
 // JsPackageExtended ...
