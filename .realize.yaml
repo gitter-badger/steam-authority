@@ -24,8 +24,8 @@ schema:
 - name: STEAM
   path: .
   args:
-  - --pics
-  - --consumers
+#  - --pics
+#  - --consumers
   commands:
     install:
       status: true

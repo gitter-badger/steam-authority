@@ -285,6 +285,7 @@ func (app *App) Save() (err error) {
 }
 
 // GORM callback
+// If any callback returns an error, GORM will stop future operations and rollback current transaction.
 func (app *App) BeforeSave() {
 
 	var err error

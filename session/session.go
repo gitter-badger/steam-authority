@@ -8,14 +8,7 @@ import (
 )
 
 const (
-	LastPage     = "last-page"
-	AuthState    = "auth.state"
-	UserCountry  = "user.country"
-	UserID       = "user.id"
-	TokenToken   = "token.token"
-	TokenType    = "token.type"
-	TokenRefresh = "token.refresh"
-	TokenExpiry  = "token.expiry"
+	ID           = "id"
 )
 
 func getSession(r *http.Request) (*sessions.Session, error) {
@@ -124,6 +117,6 @@ func SetFlash(w http.ResponseWriter, r *http.Request, flash string) (err error) 
 }
 
 func IsLoggedIn(r *http.Request) (val bool, err error) {
-	read, err := Read(r, TokenToken)
+	read, err := Read(r, ID)
 	return read != "", err
 }

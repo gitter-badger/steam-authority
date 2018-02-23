@@ -6,6 +6,7 @@ import (
 	"github.com/yohcop/openid-go"
 	"fmt"
 	"net/http"
+	"path"
 )
 
 const (
@@ -46,14 +47,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, 303)
 	return
 }
-func logoutHandler(w http.ResponseWriter, r *http.Request) {
-
-	session.Clear(w, r)
-
-	http.Redirect(w, r, "/", 303)
-	return
-}
-
 func loginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	fullUrl := "http://localhost:8085" + r.URL.String()
@@ -64,13 +57,20 @@ func loginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Save session
-	err = session.Write(w, r, "player_id", id)
+	err = session.Write(w, r, session.ID, path.Base(id))
 	if err != nil {
 		returnErrorTemplate(w, 500, err.Error())
 		return
 	}
 
 	http.Redirect(w, r, "/settings", 302)
+	return
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+
+	session.Clear(w, r)
+	http.Redirect(w, r, "/", 303)
 	return
 }
 
