@@ -42,14 +42,15 @@ func playersHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 404, err.Error())
+		returnErrorTemplate(w, r, 404, err.Error())
 		return
 	}
 
 	template := playersTemplate{}
+	template.SetSession(r)
 	template.Ranks = ranks
 
-	returnTemplate(w, "players", template)
+	returnTemplate(w, r, "players", template)
 }
 
 type playersTemplate struct {
@@ -65,7 +66,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 	idx, err := strconv.Atoi(id)
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 404, err.Error())
+		returnErrorTemplate(w, r, 404, err.Error())
 		return
 	}
 
@@ -79,7 +80,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 			summary, err := steam.GetPlayerSummaries([]int{idx})
 			if err != nil {
 				logger.Error(err)
-				returnErrorTemplate(w, 404, err.Error())
+				returnErrorTemplate(w, r, 404, err.Error())
 				return
 			}
 			player.FillFromSummary(summary)
@@ -88,7 +89,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 			friends, err := steam.GetFriendList(id)
 			if err != nil {
 				logger.Error(err)
-				returnErrorTemplate(w, 404, err.Error())
+				returnErrorTemplate(w, r, 404, err.Error())
 				return
 			}
 			player.FillFromFriends(friends)
@@ -107,7 +108,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			logger.Error(err)
-			returnErrorTemplate(w, 404, err.Error())
+			returnErrorTemplate(w, r, 404, err.Error())
 			return
 		}
 	}
@@ -127,10 +128,17 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := playerTemplate{}
+	template.SetSession(r)
 	template.Player = player
 	template.Friends = friends
 
-	returnTemplate(w, "player", template)
+	returnTemplate(w, r, "player", template)
+}
+
+type playerTemplate struct {
+	GlobalTemplate
+	Player  datastore.Player
+	Friends []datastore.Player
 }
 
 func playerIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -142,15 +150,9 @@ func playerIDHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := steam.GetID(post)
 	if err != nil {
 		logger.Info(err.Error() + ": " + post)
-		returnErrorTemplate(w, 404, "Can't find user: "+post)
+		returnErrorTemplate(w, r, 404, "Can't find user: "+post)
 		return
 	}
 
 	http.Redirect(w, r, "/players/"+id, 302)
-}
-
-type playerTemplate struct {
-	GlobalTemplate
-	Player  datastore.Player
-	Friends []datastore.Player
 }

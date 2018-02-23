@@ -31,7 +31,7 @@ func changelogHandler(w http.ResponseWriter, r *http.Request) {
 	commits, _, err := client.Repositories.ListCommits(ctx, "steam-authority", "steam-authority", &options)
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
@@ -39,7 +39,7 @@ func changelogHandler(w http.ResponseWriter, r *http.Request) {
 	template.SetSession(r)
 	template.Commits = commits
 
-	returnTemplate(w, "commits", template)
+	returnTemplate(w, r, "commits", template)
 }
 
 type changelogTemplate struct {

@@ -64,7 +64,7 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 	template.Apps = appsMap
 	template.Packages = packagesMap
 
-	returnTemplate(w, "changes", template)
+	returnTemplate(w, r, "changes", template)
 }
 
 // todo, Just pass through a new struct with all the correct info instead of changes and maps to get names
@@ -81,7 +81,7 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Error(err)
 		if err.Error() == "datastore: no such entity" {
-			returnErrorTemplate(w, 404, "We can't find this change in our database, there may not be one with this ID.")
+			returnErrorTemplate(w, r, 404, "We can't find this change in our database, there may not be one with this ID.")
 			return
 		}
 	}
@@ -90,7 +90,7 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 	template.SetSession(r)
 	template.Change = change
 
-	returnTemplate(w, "change", template)
+	returnTemplate(w, r, "change", template)
 }
 
 type changeTemplate struct {

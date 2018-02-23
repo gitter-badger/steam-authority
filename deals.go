@@ -37,7 +37,7 @@ func dealsHandler(w http.ResponseWriter, r *http.Request) {
 	template.Apps = apps
 	template.Tab = tab
 
-	returnTemplate(w, "deals", template)
+	returnTemplate(w, r, "deals", template)
 	return
 }
 

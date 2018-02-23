@@ -31,7 +31,7 @@ func appsHandler(w http.ResponseWriter, r *http.Request) {
 	template.Apps = apps
 	template.Count = count
 
-	returnTemplate(w, "apps", template)
+	returnTemplate(w, r, "apps", template)
 }
 
 type appsTemplate struct {
@@ -48,7 +48,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	idx, err := strconv.Atoi(id)
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 404, err.Error())
+		returnErrorTemplate(w, r, 404, err.Error())
 		return
 	}
 
@@ -57,10 +57,10 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err.Error() == "no app with id" {
 			logger.Error(err)
-			returnErrorTemplate(w, 404, err.Error())
+			returnErrorTemplate(w, r, 404, err.Error())
 		} else {
 			logger.Error(err)
-			returnErrorTemplate(w, 500, err.Error())
+			returnErrorTemplate(w, r, 500, err.Error())
 		}
 		return
 	}
@@ -125,7 +125,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	template.Articles = news
 	template.Banners = banners
 
-	returnTemplate(w, "app", template)
+	returnTemplate(w, r, "app", template)
 }
 
 type appTemplate struct {

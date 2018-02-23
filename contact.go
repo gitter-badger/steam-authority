@@ -14,7 +14,7 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 	template:= contactTemplate{}
 	template.SetSession(r)
 
-	returnTemplate(w, "contact", template)
+	returnTemplate(w, r, "contact", template)
 }
 
 type contactTemplate struct {
@@ -29,15 +29,15 @@ func postContactHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Validation
 	if r.PostForm.Get("name") == "" {
-		returnErrorTemplate(w, 500, "Please fill in the whole form.")
+		returnErrorTemplate(w, r, 500, "Please fill in the whole form.")
 		return
 	}
 	if r.PostForm.Get("email") == "" {
-		returnErrorTemplate(w, 500, "Please fill in the whole form.")
+		returnErrorTemplate(w, r, 500, "Please fill in the whole form.")
 		return
 	}
 	if r.PostForm.Get("message") == "" {
-		returnErrorTemplate(w, 500, "Please fill in the whole form.")
+		returnErrorTemplate(w, r, 500, "Please fill in the whole form.")
 		return
 	}
 
@@ -49,7 +49,7 @@ func postContactHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err := client.Send(message)
 	if err != nil {
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	} else {
 		http.Redirect(w, r, "/contact?success", 302)

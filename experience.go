@@ -66,7 +66,7 @@ func experienceHandler(w http.ResponseWriter, r *http.Request) {
 		template.Level = i
 	}
 
-	returnTemplate(w, "experience", template)
+	returnTemplate(w, r, "experience", template)
 }
 
 func chunk(rows []experienceRow, chunkSize int) (chunked [][]experienceRow) {

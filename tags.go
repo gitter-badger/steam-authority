@@ -12,7 +12,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 	tags, err := mysql.GetAllTags()
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 500, "Error getting tags")
+		returnErrorTemplate(w, r, 500, "Error getting tags")
 		return
 	}
 
@@ -21,7 +21,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 	template.SetSession(r)
 	template.Tags = tags
 
-	returnTemplate(w, "tags", template)
+	returnTemplate(w, r, "tags", template)
 	return
 }
 

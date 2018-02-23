@@ -54,10 +54,15 @@
                 </li>
             </ul>
             <ul class="navbar-nav">
-            {{/* todo, if logged out */}}
+            {{ if .LoggedIn }}
+                <li class="nav-item">
+                    <a class="nav-link" href="/players/{{.ID}}">{{.Name}}</a>
+                </li>
+            {{else}}
                 <li class="nav-item">
                     <a class="nav-link" href="/login">Login</a>
                 </li>
+            {{end}}
                 <li class="nav-item">
                     <a class="nav-link" href="/contact">Contact</a>
                 </li>

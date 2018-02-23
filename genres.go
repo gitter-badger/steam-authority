@@ -12,7 +12,7 @@ func genresHandler(w http.ResponseWriter, r *http.Request) {
 	genres, err := mysql.GetAllGenres()
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 500, "Error getting genres")
+		returnErrorTemplate(w, r, 500, "Error getting genres")
 		return
 	}
 
@@ -21,7 +21,7 @@ func genresHandler(w http.ResponseWriter, r *http.Request) {
 	template.SetSession(r)
 	template.Genres = genres
 
-	returnTemplate(w, "genres", template)
+	returnTemplate(w, r, "genres", template)
 	return
 }
 

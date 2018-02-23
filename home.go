@@ -10,7 +10,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	return
 
 	template := homeTemplate{}
-	returnTemplate(w, "home", template)
+	returnTemplate(w, r, "home", template)
 }
 
 type homeTemplate struct {

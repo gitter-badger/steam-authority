@@ -13,7 +13,7 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 	articles, err := datastore.GetArticles(0, 100)
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 500, "Error getting articles")
+		returnErrorTemplate(w, r, 500, "Error getting articles")
 		return
 	}
 
@@ -32,7 +32,7 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 	apps, err := mysql.GetApps(appIDs, []string{})
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 500, "Error getting apps")
+		returnErrorTemplate(w, r, 500, "Error getting apps")
 		return
 	}
 
@@ -48,7 +48,7 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 	template.Articles = filteredArticles
 	template.Apps = appMap
 
-	returnTemplate(w, "news", template)
+	returnTemplate(w, r, "news", template)
 	return
 }
 

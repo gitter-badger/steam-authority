@@ -18,7 +18,7 @@ import (
 	"github.com/steam-authority/steam-authority/session"
 )
 
-func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (err error) {
+func returnTemplate(w http.ResponseWriter, r *http.Request, page string, pageData interface{}) (err error) {
 
 	// Get current app path
 	_, file, _, ok := runtime.Caller(0)
@@ -31,7 +31,7 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 	t, err := template.New("t").Funcs(getTemplateFuncMap()).ParseFiles(folder+"/templates/header.html", folder+"/templates/footer.html", folder+"/templates/"+page+".html")
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 404, err.Error())
+		returnErrorTemplate(w, r, 404, err.Error())
 		return err
 	}
 
@@ -40,7 +40,7 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 	err = t.ExecuteTemplate(buf, page, pageData)
 	if err != nil {
 		logger.Error(err)
-		returnErrorTemplate(w, 500, "Something has gone wrong, the error has been logged!")
+		returnErrorTemplate(w, r, 500, "Something has gone wrong, the error has been logged!")
 		return
 	} else {
 		// No error, send the content, HTTP 200 response status implied
@@ -51,16 +51,16 @@ func returnTemplate(w http.ResponseWriter, page string, pageData interface{}) (e
 	return nil
 }
 
-func returnErrorTemplate(w http.ResponseWriter, code int, message string) {
+func returnErrorTemplate(w http.ResponseWriter, r *http.Request, code int, message string) {
 
 	w.WriteHeader(code)
 
-	tmpl := errorTemplate{
-		Code:    code,
-		Message: message,
-	}
+	tmpl := errorTemplate{}
+	tmpl.SetSession(r)
+	tmpl.Code = code
+	tmpl.Message = message
 
-	returnTemplate(w, "error", tmpl)
+	returnTemplate(w, r, "error", tmpl)
 }
 
 func getTemplateFuncMap() map[string]interface{} {

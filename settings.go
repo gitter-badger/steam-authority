@@ -30,7 +30,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	loggedIn, err := session.IsLoggedIn(r)
 	if err != nil {
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
@@ -42,7 +42,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	var url string
 	url, err = openid.RedirectURL("http://steamcommunity.com/openid", os.Getenv("STEAM_DOMAIN")+"/login-callback", os.Getenv("STEAM_DOMAIN")+"/")
 	if err != nil {
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
@@ -53,19 +53,19 @@ func loginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	openID, err := openid.Verify(os.Getenv("STEAM_DOMAIN")+r.URL.String(), discoveryCache, nonceStore)
 	if err != nil {
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
 	id, err := strconv.Atoi(path.Base(openID))
 	if err != nil {
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
 	resp, err := steam.GetPlayerSummaries([]int{id})
 	if err != nil {
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
@@ -90,7 +90,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 
 	loggedIn, err := session.IsLoggedIn(r)
 	if err != nil {
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
@@ -102,11 +102,11 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 	template := settingsTemplate{}
 	template.SetSession(r)
 	if err != nil {
-		returnErrorTemplate(w, 500, err.Error())
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
-	returnTemplate(w, "settings", template)
+	returnTemplate(w, r, "settings", template)
 
 }
 

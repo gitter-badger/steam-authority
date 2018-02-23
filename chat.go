@@ -94,7 +94,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 	template.Messages = messages
 	template.ChannelID = id
 
-	returnTemplate(w, "chat", template)
+	returnTemplate(w, r, "chat", template)
 }
 
 type chatTemplate struct {

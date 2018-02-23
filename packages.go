@@ -20,7 +20,7 @@ func packagesHandler(w http.ResponseWriter, r *http.Request) {
 	template.SetSession(r)
 	template.Packages = packages
 
-	returnTemplate(w, "packages", template)
+	returnTemplate(w, r, "packages", template)
 }
 
 type packagesTemplate struct {
@@ -39,13 +39,13 @@ func packageHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 
 		if err.Error() == "sql: no rows in result set" {
-			returnErrorTemplate(w, 404, "We can't find this package in our database, there may not be one with this ID.")
+			returnErrorTemplate(w, r, 404, "We can't find this package in our database, there may not be one with this ID.")
 			return
 		}
 
 		logger.Error(err)
 
-		returnErrorTemplate(w, 404, err.Error())
+		returnErrorTemplate(w, r, 404, err.Error())
 		return
 	}
 
@@ -64,7 +64,7 @@ func packageHandler(w http.ResponseWriter, r *http.Request) {
 	template.Package = pack
 	template.Apps = apps
 
-	returnTemplate(w, "package", template)
+	returnTemplate(w, r, "package", template)
 }
 
 type packageTemplate struct {
