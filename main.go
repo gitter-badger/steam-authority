@@ -18,6 +18,8 @@ import (
 
 func main() {
 
+	logger.SetRollbarKey(os.Getenv("STEAM_ROLLBAR_PRIVATE"))
+
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("STEAM_GOOGLE_APPLICATION_CREDENTIALS"))
 	if os.Getenv("ENV") == "local" {
 		os.Setenv("STEAM_DOMAIN", os.Getenv("STEAM_LOCAL_DOMAIN"))
@@ -61,72 +63,58 @@ func main() {
 		}
 	}
 
-	logger.SetRollbarKey(os.Getenv("STEAM_ROLLBAR_PRIVATE"))
-
+	// Routes
 	r := chi.NewRouter()
 
-	// Admin
 	r.Mount("/admin", adminRouter())
 
-	// Apps
 	r.Get("/apps", appsHandler)
 	r.Get("/apps/{id}", appHandler)
 	r.Get("/apps/{id}/{slug}", appHandler)
 
-	// Changes
 	r.Get("/changes", changesHandler)
 	r.Get("/changes/{id}", changeHandler)
 
-	// Chat
 	r.Get("/chat", chatHandler)
 	r.Get("/chat/{id}", chatHandler)
 
-	// Contact
 	r.Get("/contact", contactHandler)
 	r.Post("/contact", postContactHandler)
 
-	// Deals
 	r.Get("/deals", dealsHandler)
 	r.Get("/deals/{id}", dealsHandler)
 
-	// Experience
 	r.Get("/experience", experienceHandler)
 	r.Get("/experience/{id}", experienceHandler)
 
-	// Login
 	r.Get("/login", loginHandler)
 	r.Get("/logout", logoutHandler)
 	r.Get("/login-callback", loginCallbackHandler)
 
-	// Packages
 	r.Get("/packages", packagesHandler)
 	r.Get("/packages/{id}", packageHandler)
 
-	// Players
 	r.Post("/players", playerIDHandler)
 	r.Get("/players", playersHandler)
 	r.Get("/players/{id:[a-z]+}", playersHandler)
 	r.Get("/players/{id:[0-9]+}", playerHandler)
 	r.Get("/players/{id:[0-9]+}/{slug}", playerHandler)
 
-	// Settings
 	r.Get("/settings", settingsHandler)
 	r.Post("/settings", saveSettingsHandler)
 
 	// Other
 	r.Get("/", homeHandler)
 	r.Get("/changelog", changelogHandler)
+	r.Get("/credits", creditsHandler)
+	r.Get("/donate", donateHandler)
+	r.Get("/faqs", faqsHandler)
 	r.Get("/genres", genresHandler)
 	r.Get("/news", newsHandler)
 	r.Get("/tags", tagsHandler)
 	r.Get("/websocket", websockets.Handler)
 
-	// Static pages
-	r.Get("/credits", creditsHandler)
-	r.Get("/donate", donateHandler)
-	r.Get("/faqs", faqsHandler)
-
-	//
+	// File server
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "assets")
 	fileServer(r, "/assets", http.Dir(filesDir))
