@@ -1,4 +1,14 @@
-#player-page .jumbotron img {
-    height: 3.5rem;
-    vertical-align: text-bottom;
+#player-page {
+    .jumbotron {
+         img {
+             @include rounded;
+             float: left;
+             height: 169px;
+             margin: -2rem;
+         }
+
+         h1, p.lead{
+         margin-left:160px;
+         }
+     }
 }

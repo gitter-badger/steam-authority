@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Jleagle/go-helpers/logger"
 	"github.com/gosimple/slug"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/steam-authority/steam-authority/steam"
@@ -163,28 +162,15 @@ func (app App) GetName() (name string) {
 
 func GetApp(id int) (app App, err error) {
 
-	// Connect
 	db, err := getDB()
 	if err != nil {
 		return app, err
 	}
 
-	// Get app
-	db.FirstOrInit(&app, App{ID: id})
+	db.First(&app, App{ID: id})
 	if db.Error != nil {
 		return app, db.Error
 	}
-
-	// If new or expired app
-	if app.UpdatedAt.Unix() < time.Now().AddDate(0, 0, -1).Unix() {
-
-		err = app.Save()
-		if err != nil {
-			return app, err
-		}
-	}
-
-	// Don't bother checking steam to see if it exists, we should know about all apps.
 
 	return app, nil
 }
@@ -205,7 +191,7 @@ func GetApps(ids []int, columns []string) (apps []App, err error) {
 	}
 
 	db.Where("id IN (?)", ids).Find(&apps)
-	if db.GetErrors() != nil {
+	if db.Error != nil {
 		return apps, err
 	}
 
@@ -242,6 +228,9 @@ func SearchApps(query url.Values, limit int, sort string) (apps []App, err error
 		db = db.Where("JSON_CONTAINS(tags, ?)", "[\""+query.Get("tags")+"\"]")
 	}
 
+	// Genres
+	// select * from apps WHERE JSON_SEARCH(genres, 'one', 'Action') IS NOT NULL;
+
 	// Query
 	db = db.Find(&apps)
 	if db.Error != nil {
@@ -266,51 +255,51 @@ func CountApps() (count int, err error) {
 	return count, nil
 }
 
-func NewApp(id int) (app App) {
+func ConsumeApp(msg amqp.Delivery) (err error) {
 
-	app.ID = id
-	return app
-}
+	id := string(msg.Body)
+	idx, _ := strconv.Atoi(id)
 
-func (app *App) Save() (err error) {
-
-	// Save
 	db, err := getDB()
 	if err != nil {
 		return err
 	}
 
+	app := new(App)
+
+	db.Where(App{ID: idx}).FirstOrInit(app)
+
+	app.fill()
+
 	db.Save(&app)
 	if db.Error != nil {
-		return err
+		return db.Error
 	}
 
-	return nil
+	return err
 }
 
-// GORM callback
-// If any callback returns an error, GORM will stop future operations and rollback current transaction.
-func (app *App) BeforeSave() {
-
-	var err error
+func (app *App) fill() (err error) {
 
 	// Get app details
-	err = app.FillFromAppDetails()
+	err = app.fillFromAppDetails()
 	if err != nil {
 		if err.Error() != "no app with id" {
-			logger.Error(err)
+			return err
 		}
 	}
 
-	err = app.FillFromPICS()
+	// PICS
+	err = app.fillFromPICS()
 	if err != nil {
-		logger.Error(err)
+		return err
 	}
 
 	// Tidy
 	app.Type = strings.ToLower(app.Type)
 	app.ReleaseState = strings.ToLower(app.ReleaseState)
 
+	// Default JSON values
 	if app.StoreTags == "" || app.StoreTags == "null" {
 		app.StoreTags = "[]"
 	}
@@ -354,20 +343,11 @@ func (app *App) BeforeSave() {
 	if app.Packages == "" || app.Packages == "null" {
 		app.Packages = "[]"
 	}
+
+	return nil
 }
 
-func ConsumeApp(msg amqp.Delivery) (err error) {
-
-	id := string(msg.Body)
-	idx, _ := strconv.Atoi(id)
-
-	app := NewApp(idx)
-	err = app.Save()
-
-	return err
-}
-
-func (app *App) FillFromPICS() (err error) {
+func (app *App) fillFromPICS() (err error) {
 
 	// Call PICS
 	resp, err := steam.GetPICSInfo([]int{app.ID}, []int{})
@@ -418,7 +398,7 @@ func (app *App) FillFromPICS() (err error) {
 	return nil
 }
 
-func (app *App) FillFromAppDetails() (err error) {
+func (app *App) fillFromAppDetails() (err error) {
 
 	// Get data
 	appDetails, err := steam.GetAppDetails(strconv.Itoa(app.ID))
@@ -480,13 +460,13 @@ func (app *App) FillFromAppDetails() (err error) {
 	}
 
 	// Genres
-	var genres []int8
-	for _, v := range appDetails.Data.Genres {
-		//genre, _ := strconv.ParseInt(v.ID, 10, 8)
-		genres = append(genres, v.ID)
-	}
+	//var genres []int8
+	//for _, v := range appDetails.Data.Genres {
+	//	genre, _ := strconv.ParseInt(v.ID, 10, 8)
+	//genres = append(genres, v.ID)
+	//}
 
-	genresString, err := json.Marshal(genres)
+	genresString, err := json.Marshal(appDetails.Data.Genres)
 	if err != nil {
 		return err
 	}

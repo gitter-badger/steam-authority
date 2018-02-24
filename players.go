@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi"
 	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/steam"
 )
 
@@ -70,47 +71,13 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	player, err := datastore.GetPlayer(id)
+	queue.PlayerProducer(idx)
+
+	player, err := datastore.GetPlayer(idx, true)
 	if err != nil {
-		if err.Error() == "datastore: no such entity" || err.Error() == "expired" {
-
-			player.PlayerID = idx
-
-			//Get summary
-			summary, err := steam.GetPlayerSummaries([]int{idx})
-			if err != nil {
-				logger.Error(err)
-				returnErrorTemplate(w, r, 404, err.Error())
-				return
-			}
-			player.FillFromSummary(summary)
-
-			//Get friends
-			friends, err := steam.GetFriendList(id)
-			if err != nil {
-				logger.Error(err)
-				returnErrorTemplate(w, r, 404, err.Error())
-				return
-			}
-			player.FillFromFriends(friends)
-
-			//for _, v := range friends {
-			//	vv, _ := strconv.Atoi(v.Steamid)
-			//	queue.PlayerProducer(vv)
-			//}
-
-			// todo, get player bans, groups
-			// todo, clear latest players cache
-			player.Tidy()
-			_, err = datastore.SaveKind(player.GetKey(), &player)
-			if err != nil {
-				logger.Error(err)
-			}
-		} else {
-			logger.Error(err)
-			returnErrorTemplate(w, r, 404, err.Error())
-			return
-		}
+		logger.Error(err)
+		returnErrorTemplate(w, r, 404, err.Error())
+		return
 	}
 
 	// Redirect to correct slug
@@ -120,10 +87,24 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get friends
-	friends, err := datastore.GetPlayersByIDs(player.Friends)
+	// Make friend ID slice
+	var friendsSlice []int
+	for _, v := range player.Friends {
+		s, _ := strconv.Atoi(v.SteamID)
+		friendsSlice = append(friendsSlice, s)
+	}
+
+	// Get friends for template
+	friends, err := datastore.GetPlayersByIDs(friendsSlice)
 	if err != nil {
 		logger.Error(err)
+	}
+
+	// Add friends to rabbit
+	if player.AddFriends {
+		for _, v := range friendsSlice {
+			queue.PlayerProducer(v)
+		}
 	}
 
 	// Template

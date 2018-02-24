@@ -3,7 +3,9 @@
 <div class="container" id="player-page">
 
     <div class="jumbotron">
-        <h1 class="display-4"><img src="{{ .Player.Avatar }}" alt="{{ .Player.PersonaName }}"> {{ .Player.PersonaName }}
+        <img src="{{ .Player.Avatar }}" alt="{{ .Player.PersonaName }}">
+        <h1 class="display-4">
+        {{ .Player.PersonaName }}
             <span class="badge badge-secondary">{{ .Player.Level }}</span>
         </h1>
         <p class="lead">x</p>

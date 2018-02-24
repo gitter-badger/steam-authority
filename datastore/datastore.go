@@ -10,23 +10,10 @@ import (
 )
 
 const (
-	// CHANGE datastore kind
-	CHANGE = "Change"
-
-	// APP datastore kind
-	//APP = "App"
-
-	// PACKAGE datastore kind
-	//PACKAGE = "Package"
-
-	// ARTICLE is a news article for an app
+	CHANGE  = "Change"
 	ARTICLE = "Article"
-
-	// PLAYER datastore kind
-	PLAYER = "Player"
-
-	// RANK datastore kind
-	RANK = "Rank"
+	PLAYER  = "Player"
+	RANK    = "Rank"
 )
 
 func getDSClient() (client *datastore.Client, ctx context.Context, err error) {

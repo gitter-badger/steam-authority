@@ -2,14 +2,11 @@ package main
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
-	"github.com/kr/pretty"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
-	"github.com/steam-authority/steam-authority/queue"
 )
 
 func changesHandler(w http.ResponseWriter, r *http.Request) {
@@ -23,13 +20,13 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 	}
 
-	queue.ChangeProducer(&datastore.Change{
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		ChangeID:  123,
-		Apps:      []int{922, 923},
-		Packages:  []int{8491, 31794},
-	})
+	//queue.ChangeProducer(&datastore.Change{
+	//	CreatedAt: time.Now(),
+	//	UpdatedAt: time.Now(),
+	//	ChangeID:  123,
+	//	Apps:      []int{922, 923},
+	//	Packages:  []int{8491, 31794},
+	//})
 
 	// Get apps/packages
 	appIDs := make([]int, 0)
@@ -55,7 +52,7 @@ func changesHandler(w http.ResponseWriter, r *http.Request) {
 		packagesMap[v.ID] = v
 	}
 
-	pretty.Println(appsMap)
+	//pretty.Println(appsMap)
 
 	// todo, sort packagesMap by id
 

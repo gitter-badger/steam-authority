@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -72,7 +71,6 @@ func getTemplateFuncMap() map[string]interface{} {
 		"apps": func(a []int, appsMap map[int]mysql.App) template.HTML {
 			var apps []string
 			for _, v := range a {
-				fmt.Println(appsMap[v].GetName())
 				apps = append(apps, "<a href=\"/apps/"+strconv.Itoa(v)+"\">"+appsMap[v].GetName()+"</a>")
 			}
 			return template.HTML("Apps: " + strings.Join(apps, ", "))

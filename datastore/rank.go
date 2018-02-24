@@ -12,29 +12,29 @@ import (
 var ranksLimit = 500
 
 type Rank struct {
-	CreatedAt   time.Time `datastore:"created_at"`
-	UpdatedAt   time.Time `datastore:"updated_at"`
-	PlayerID    int       `datastore:"player_id"`
-	ValintyURL  string    `datastore:"vality_url"`
-	Avatar      string    `datastore:"avatar"`
-	PersonaName string    `datastore:"persona_name"`
+	CreatedAt   time.Time `datastore:"created_at,noindex"`
+	UpdatedAt   time.Time `datastore:"updated_at,noindex"`
+	PlayerID    int       `datastore:"player_id,noindex"`
+	ValintyURL  string    `datastore:"vality_url,noindex"`
+	Avatar      string    `datastore:"avatar,noindex"`
+	PersonaName string    `datastore:"persona_name,noindex"`
 	CountryCode string    `datastore:"country_code"`
 
 	// Ranks
 	Level           int `datastore:"level"`
 	LevelRank       int `datastore:"level_rank"`
-	Games           int `datastore:"games"`
+	GamesCount      int `datastore:"games"`
 	GamesRank       int `datastore:"games_rank"`
-	Badges          int `datastore:"badges"`
+	BadgesCount     int `datastore:"badges"`
 	BadgesRank      int `datastore:"badges_rank"`
 	PlayTime        int `datastore:"play_time"`
 	PlayTimeRank    int `datastore:"play_time_rank"`
 	TimeCreated     int `datastore:"time_created"`
 	TimeCreatedRank int `datastore:"time_created_rank"`
-	Friends         int `datastore:"friends"`
+	FriendsCount    int `datastore:"friends"`
 	FriendsRank     int `datastore:"friends_rank"`
 
-	Rank int `datastore:"-"` // Just for the frontend
+	Rank int `datastore:"-"` // Internal
 }
 
 func (rank Rank) GetKey() (key *datastore.Key) {
@@ -59,11 +59,11 @@ func (rank *Rank) FillFromPlayer(player Player) *Rank {
 	rank.PersonaName = player.PersonaName
 	rank.CountryCode = player.CountryCode
 	rank.Level = player.Level
-	rank.Games = player.Games
-	rank.Badges = player.Badges
+	rank.GamesCount = player.Games
+	rank.BadgesCount = player.Badges
 	rank.PlayTime = player.PlayTime
 	rank.TimeCreated = player.TimeCreated
-	rank.Friends = len(player.Friends)
+	rank.FriendsCount = len(player.Friends)
 
 	return rank
 }

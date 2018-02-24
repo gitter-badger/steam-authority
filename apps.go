@@ -9,6 +9,7 @@ import (
 	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
+	"github.com/steam-authority/steam-authority/queue"
 )
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +52,8 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 		returnErrorTemplate(w, r, 404, err.Error())
 		return
 	}
+
+	queue.AppProducer(idx, 0)
 
 	// Get app
 	app, err := mysql.GetApp(idx)

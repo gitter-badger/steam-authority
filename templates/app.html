@@ -50,6 +50,7 @@
                 {{end}}
 
                     <p>Store Tags: {{ .App.StoreTags }}</p>
+                    <p>genres: {{ .App.GetGenres }}</p>
                     <p>Homepage: {{ .App.Homepage }}</p>
                     <p>Change Number:
                         <a href="/changes/{{ .App.ChangeNumber }}">{{ .App.ChangeNumber }}</a>

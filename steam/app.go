@@ -3,9 +3,7 @@ package steam
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/url"
-	"os"
 	"regexp"
 	"strings"
 
@@ -66,11 +64,8 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 	resp := make(map[string]AppDetailsBody)
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
-			//pretty.Print(string(bytes))
-
-			fmt.Println(b)
-			os.Exit(1)
-
+			pretty.Print(string(bytes))
+			pretty.Print(err.Error())
 		}
 		return app, err
 	}

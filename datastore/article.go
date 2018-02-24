@@ -11,19 +11,19 @@ import (
 )
 
 type Article struct {
-	CreatedAt  time.Time `datastore:"created_at"`
-	UpdatedAt  time.Time `datastore:"updated_at"`
-	ArticleID  int       `datastore:"article_id"`
+	CreatedAt  time.Time `datastore:"created_at,noindex"`
+	UpdatedAt  time.Time `datastore:"updated_at,noindex"`
+	ArticleID  int       `datastore:"article_id,noindex"`
 	AppID      int       `datastore:"app_id"`
-	Title      string    `datastore:"title"`
-	URL        string    `datastore:"url"`
-	IsExternal bool      `datastore:"is_external"`
-	Author     string    `datastore:"author"`
+	Title      string    `datastore:"title,noindex"`
+	URL        string    `datastore:"url,noindex"`
+	IsExternal bool      `datastore:"is_external,noindex"`
+	Author     string    `datastore:"author,noindex"`
 	Contents   string    `datastore:"contents,noindex"`
 	Date       time.Time `datastore:"date"`
-	FeedLabel  string    `datastore:"feed_label"`
-	FeedName   string    `datastore:"feed_name"`
-	FeedType   int8      `datastore:"feed_type"`
+	FeedLabel  string    `datastore:"feed_label,noindex"`
+	FeedName   string    `datastore:"feed_name,noindex"`
+	FeedType   int8      `datastore:"feed_type,noindex"`
 }
 
 func (article Article) GetKey() (key *datastore.Key) {

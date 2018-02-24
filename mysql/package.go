@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Jleagle/go-helpers/logger"
 	"github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/steam"
 	"github.com/streadway/amqp"
@@ -86,14 +85,8 @@ func GetPackage(id int) (pack Package, err error) {
 
 	db.First(&pack, id)
 	if db.Error != nil {
-		return pack, err
+		return pack, db.Error
 	}
-
-	if pack.UpdatedAt.Unix() < time.Now().AddDate(0, 0, -1).Unix() {
-
-	}
-
-	// Don't bother checking steam to see if it exists, we should know about all packs.
 
 	return pack, nil
 }
@@ -115,7 +108,7 @@ func GetPackages(ids []int, columns []string) (packages []Package, err error) {
 
 	db.Where("id IN (?)", ids).Find(&packages)
 	if db.Error != nil {
-		return packages, err
+		return packages, db.Error
 	}
 
 	return packages, nil
@@ -130,7 +123,7 @@ func GetLatestPackages() (packages []Package, err error) {
 
 	db.Limit(20).Order("created_at DESC").Find(&packages)
 	if db.Error != nil {
-		return packages, err
+		return packages, db.Error
 	}
 
 	return packages, nil
@@ -145,42 +138,10 @@ func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
 
 	db = db.Where("JSON_CONTAINS(apps, '[\"?\"]')", appID).Limit(96).Order("id DESC").Find(&packages)
 	if db.Error != nil {
-		return packages, err
+		return packages, db.Error
 	}
 
 	return packages, nil
-}
-
-func NewPackage(id int) (pack Package) {
-
-	pack.ID = id
-	return pack
-}
-
-func (pack *Package) Save() (err error) {
-
-	// Save
-	db, err := getDB()
-	if err != nil {
-		return err
-	}
-
-	db.Save(&pack)
-	if db.Error != nil {
-		return err
-	}
-
-	return nil
-}
-
-// GORM callback
-func (pack *Package) BeforeSave() {
-
-	// Get app details
-	err := pack.FillFromPICS()
-	if err != nil {
-		logger.Error(err)
-	}
 }
 
 func ConsumePackage(msg amqp.Delivery) (err error) {
@@ -188,15 +149,38 @@ func ConsumePackage(msg amqp.Delivery) (err error) {
 	id := string(msg.Body)
 	idx, _ := strconv.Atoi(id)
 
-	//logger.Info("Reading package " + id + " from rabbit")
+	db, err := getDB()
+	if err != nil {
+		return err
+	}
 
-	pack := NewPackage(idx)
-	err = pack.Save()
+	pack := new(Package)
+
+	db.Where(Package{ID: idx}).FirstOrInit(pack)
+
+	pack.fill()
+
+	db.Save(&pack)
+	if db.Error != nil {
+		return db.Error
+	}
 
 	return err
 }
 
-func (pack *Package) FillFromPICS() (err error) {
+// GORM callback
+func (pack *Package) fill() (err error) {
+
+	// Get app details
+	err = pack.fillFromPICS()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pack *Package) fillFromPICS() (err error) {
 
 	// Call PICS
 	resp, err := steam.GetPICSInfo([]int{}, []int{pack.ID})

@@ -3,6 +3,7 @@ package steam
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -16,10 +17,10 @@ https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerBans
 https://partner.steamgames.com/doc/webapi/ISteamUser#GetAppPriceInfo
 */
 
-func GetFriendList(id string) (friends []GetFriendListFriend, err error) {
+func GetFriendList(id int) (friends []GetFriendListFriend, err error) {
 
 	options := url.Values{}
-	options.Set("steamid", id)
+	options.Set("steamid", strconv.Itoa(id))
 	options.Set("relationship", "friend")
 
 	bytes, err := get("ISteamUser/GetFriendList/v1/", options)
@@ -50,7 +51,7 @@ type GetFriendListBody struct {
 }
 
 type GetFriendListFriend struct {
-	Steamid      string `json:"steamid"`
+	SteamID      string `json:"steamid"`
 	Relationship string `json:"relationship"`
 	FriendSince  int    `json:"friend_since"`
 }
@@ -70,6 +71,7 @@ func ResolveVanityURL(id string) (resp ResolveVanityURLBody, err error) {
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			pretty.Print(string(bytes))
+			fmt.Println(err.Error())
 		}
 		return resp, err
 	}
@@ -115,6 +117,7 @@ func GetPlayerSummaries(ids []int) (resp PlayerSummariesBody, err error) {
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			pretty.Print(string(bytes))
+			fmt.Println(err.Error())
 		}
 		return resp, err
 	}

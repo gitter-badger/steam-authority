@@ -19,7 +19,7 @@ func init() {
 
 func RunConsumers() {
 
-	//go playerConsumer()
+	go playerConsumer()
 	go appConsumer()
 	go changeConsumer()
 	go packageConsumer()

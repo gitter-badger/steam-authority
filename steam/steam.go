@@ -25,7 +25,7 @@ func get(path string, query url.Values, useKey ...bool) (bytes []byte, err error
 	}
 
 	// Debug
-	//logger.Info("STEAM: " + path + "?" + strings.Replace(query.Encode(), os.Getenv("STEAM_API_KEY"), "_", 1))
+	//logger.Info("STEAM: " + path + "?" + query.Encode())
 
 	// Grab the JSON from node
 	response, err := http.Get(path + "?" + query.Encode())

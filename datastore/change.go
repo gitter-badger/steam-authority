@@ -12,11 +12,11 @@ import (
 )
 
 type Change struct {
-	CreatedAt time.Time `datastore:"created_at"`
-	UpdatedAt time.Time `datastore:"updated_at"`
+	CreatedAt time.Time `datastore:"created_at,noindex"`
+	UpdatedAt time.Time `datastore:"updated_at,noindex"`
 	ChangeID  int       `datastore:"change_id"`
-	Apps      []int     `datastore:"apps"`
-	Packages  []int     `datastore:"packages"`
+	Apps      []int     `datastore:"apps,noindex"`
+	Packages  []int     `datastore:"packages,noindex"`
 }
 
 func (change Change) GetKey() (key *datastore.Key) {
