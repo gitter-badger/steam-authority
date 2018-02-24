@@ -9,6 +9,6 @@ do
   protoc \
   --proto_path=protos \
   --go_out=../generated/ \
-  $f
+  ${f}
 
 done

@@ -10,6 +10,7 @@ import (
 
 	"github.com/gosimple/slug"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/kr/pretty"
 	"github.com/steam-authority/steam-authority/steam"
 	"github.com/streadway/amqp"
 )
@@ -269,7 +270,10 @@ func ConsumeApp(msg amqp.Delivery) (err error) {
 
 	db.Where(App{ID: idx}).FirstOrInit(app)
 
-	app.fill()
+	err = app.fill()
+	if err != nil {
+		return err
+	}
 
 	db.Save(&app)
 	if db.Error != nil {
@@ -284,9 +288,7 @@ func (app *App) fill() (err error) {
 	// Get app details
 	err = app.fillFromAppDetails()
 	if err != nil {
-		if err.Error() != "no app with id" {
-			return err
-		}
+		return err
 	}
 
 	// PICS
@@ -359,6 +361,8 @@ func (app *App) fillFromPICS() (err error) {
 	if val, ok := resp.Apps[strconv.Itoa(app.ID)]; ok {
 		js = val
 	} else {
+		pretty.Print(resp)
+		pretty.Print(err.Error())
 		return errors.New("no app key in json")
 	}
 

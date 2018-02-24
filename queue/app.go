@@ -94,8 +94,9 @@ func appConsumer() {
 				}
 
 				sqlErr := mysql.ConsumeApp(msg)
-				if err != nil {
+				if err != nil && err.Error() != "no app with id" {
 					logger.Error(err)
+					err = nil
 				}
 
 				if dsErr == nil && sqlErr == nil {

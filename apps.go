@@ -58,8 +58,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	// Get app
 	app, err := mysql.GetApp(idx)
 	if err != nil {
-		if err.Error() == "no app with id" {
-			logger.Error(err)
+		if err.Error() == "sql: no rows in result set" {
 			returnErrorTemplate(w, r, 404, err.Error())
 		} else {
 			logger.Error(err)

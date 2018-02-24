@@ -58,10 +58,10 @@ func GetChange(id string) (change *Change, err error) {
 
 	key := datastore.NameKey(CHANGE, id, nil)
 
-	change = &Change{}
+	change = new(Change)
 	err = client.Get(context, key, change)
 	if err != nil {
-		logger.Error(err)
+		return change, err
 	}
 
 	return change, nil

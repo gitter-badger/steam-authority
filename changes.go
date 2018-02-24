@@ -76,9 +76,12 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 
 	change, err := datastore.GetChange(chi.URLParam(r, "id"))
 	if err != nil {
-		logger.Error(err)
 		if err.Error() == "datastore: no such entity" {
 			returnErrorTemplate(w, r, 404, "We can't find this change in our database, there may not be one with this ID.")
+			return
+		} else {
+			logger.Error(err)
+			returnErrorTemplate(w, r, 500, err.Error())
 			return
 		}
 	}
