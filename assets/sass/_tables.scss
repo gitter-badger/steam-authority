@@ -1,13 +1,9 @@
 .table-images {
-
     td.img {
-
         padding: 0;
-
         img {
             height: 36px;
         }
-
         span {
             display: inline-block;
             margin: .3rem;
@@ -16,9 +12,7 @@
 }
 
 table.table-sorter {
-
-    thead tr{
-
+    thead tr {
         .header {
             background-image: url(/assets/img/tablesorter/bg.gif);
             background-repeat: no-repeat;
@@ -26,12 +20,10 @@ table.table-sorter {
             cursor: pointer;
             padding-left: 20px;
         }
-
         .headerSortUp {
             background-image: url(/assets/img/tablesorter/asc.gif);
             text-decoration: underline;
         }
-
         .headerSortDown {
             background-image: url(/assets/img/tablesorter/desc.gif);
             text-decoration: underline;

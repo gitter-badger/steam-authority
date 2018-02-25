@@ -1,14 +1,14 @@
 #player-page {
     .jumbotron {
-         img {
-             @include rounded;
-             float: left;
-             height: 169px;
-             margin: -2rem;
-         }
-
-         h1, p.lead{
-         margin-left:160px;
-         }
-     }
+        img {
+            @include rounded;
+            float: left;
+            height: 169px;
+            margin: -2rem;
+        }
+        h1,
+        p.lead {
+            margin-left: 160px;
+        }
+    }
 }

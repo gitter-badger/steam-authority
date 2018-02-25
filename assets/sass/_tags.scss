@@ -1,20 +1,17 @@
 #tags-page {
-
     .list-group {
-
-        svg, i {
+        svg,
+        i {
             float: left;
             width: 30px;
             height: 30px;
             margin: 10px 10px 0 -2px;
         }
-
         h6 {
             @include text-truncate;
             height: 19px;
         }
     }
-
     span[data-sort] {
         text-decoration: underline;
         cursor: pointer;

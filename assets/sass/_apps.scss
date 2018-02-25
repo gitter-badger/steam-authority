@@ -1,16 +1,13 @@
 .app-results {
-
     a {
         /*color: #212529;*/
         text-decoration: none;
     }
-
     span {
         @include text-truncate;
         display: block;
         height: 24px;
     }
-
     img {
         @include rounded;
         width: 100%;

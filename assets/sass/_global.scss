@@ -19,14 +19,14 @@ body {
     @include rounded;
     padding: 2rem;
     margin-top: 2rem;
-
     .lead {
         margin: 0;
     }
 }
 
-.small-print{
+.small-print {
     margin: 50px 0;
+    display: block;
 }
 
 [data-link] {
