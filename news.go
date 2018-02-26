@@ -29,7 +29,7 @@ func newsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get app info
-	apps, err := mysql.GetApps(appIDs, []string{})
+	apps, err := mysql.GetApps(appIDs, []string{"id", "name", "icon"})
 	if err != nil {
 		logger.Error(err)
 		returnErrorTemplate(w, r, 500, "Error getting apps")

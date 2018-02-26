@@ -206,12 +206,18 @@ func SearchApps(query url.Values, limit int, sort string) (apps []App, err error
 		return apps, err
 	}
 
-	if sort == "" {
-		sort = "id DESC" // todo, order by popularity?
+	if limit > 0 {
+		db = db.Limit(limit)
 	}
 
-	db = db.Limit(limit)
-	db = db.Order(sort)
+	if sort != "" {
+		db = db.Order(sort)
+	}
+
+	// JSON Depth
+	if _, ok := query["json_depth"]; ok {
+		db = db.Where("JSON_DEPTH(genres) = ?", query.Get("json_depth"))
+	}
 
 	// Free
 	if _, ok := query["is_free"]; ok {

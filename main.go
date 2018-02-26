@@ -131,8 +131,8 @@ func adminRouter() http.Handler {
 	r.Use(basicauth.New("Steam", map[string][]string{
 		os.Getenv("STEAM_AUTH_USER"): {os.Getenv("STEAM_AUTH_PASS")},
 	}))
-	r.Get("/rerank", adminReRankHandler)
-	r.Get("/fill-apps", adminUpdateAllAppsHandler)
+	r.Get("/", adminHandler)
+	r.Get("/{option}", adminHandler)
 	return r
 }
 

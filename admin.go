@@ -2,15 +2,103 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
+	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/steam"
 )
 
-func adminReRankHandler(w http.ResponseWriter, r *http.Request) {
+func adminHandler(w http.ResponseWriter, r *http.Request) {
+
+	option := chi.URLParam(r, "option")
+
+	switch option {
+	case "apps": // Add all apps to queue
+		go adminApps(w, r)
+	case "deploy":
+		go adminDeploy(w, r)
+	case "donations":
+		go adminDonations(w, r)
+	case "genres":
+		go adminGenres(w, r)
+	case "ranks":
+		go adminRanks(w, r)
+	case "tags":
+		go adminTags(w, r)
+	}
+
+	if option != "" {
+		http.Redirect(w, r, "/admin?"+option, 302)
+		return
+	}
+
+	// Template
+	template := adminTemplate{}
+	template.SetSession(r)
+
+	returnTemplate(w, r, "admin", template)
+	return
+}
+
+type adminTemplate struct {
+	GlobalTemplate
+}
+
+func adminApps(w http.ResponseWriter, r *http.Request) {
+
+	// Get apps
+	apps, err := steam.GetAppList()
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	for _, v := range apps {
+		queue.AppProducer(v.AppID, 0)
+	}
+
+	logger.Info(strconv.Itoa(len(apps)) + " apps added to rabbit")
+}
+
+func adminDeploy(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func adminDonations(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func adminGenres(w http.ResponseWriter, r *http.Request) {
+
+	filter := url.Values{}
+	filter.Set("json_depth", "3")
+
+	apps, err := mysql.SearchApps(filter, 0, "")
+	if err != nil {
+		logger.Error(err)
+	}
+
+	var genres []steam.AppDetailsGenre
+	var counts map[int]int
+
+	for _, v := range apps {
+		genres, err = v.GetGenres()
+		if err != nil {
+			logger.Error(err)
+		}
+	}
+}
+
+func adminTags(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func adminRanks(w http.ResponseWriter, r *http.Request) {
 
 	var playersToRank = 500
 
@@ -61,20 +149,4 @@ func adminReRankHandler(w http.ResponseWriter, r *http.Request) {
 	datastore.BulkDeleteRanks(oldKeys)
 
 	w.Write([]byte("OK"))
-}
-
-func adminUpdateAllAppsHandler(w http.ResponseWriter, r *http.Request) {
-
-	// Get apps
-	apps, err := steam.GetAppList()
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-
-	for _, v := range apps {
-		queue.AppProducer(v.AppID, 0)
-	}
-
-	logger.Info(strconv.Itoa(len(apps)) + " apps added to rabbit")
 }
