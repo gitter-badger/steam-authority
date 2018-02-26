@@ -2,7 +2,6 @@ package queue
 
 import (
 	"encoding/json"
-	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
@@ -32,7 +31,7 @@ func getChangeQueue() (queue amqp.Queue, err error) {
 
 func ChangeProducer(change *datastore.Change) (err error) {
 
-	logger.Info("Adding change " + strconv.Itoa(change.ChangeID) + " to rabbit")
+	//logger.Info("Adding change " + strconv.Itoa(change.ChangeID) + " to rabbit")
 
 	queue, err := getChangeQueue()
 	if err != nil {

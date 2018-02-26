@@ -30,7 +30,7 @@ func getAppQueue() (queue amqp.Queue, err error) {
 
 func AppProducer(id int, change int) (err error) {
 
-	logger.Info("Adding app " + strconv.Itoa(id) + " to rabbit")
+	//logger.Info("Adding app " + strconv.Itoa(id) + " to rabbit")
 
 	queue, err := getAppQueue()
 	if err != nil {
@@ -89,14 +89,14 @@ func appConsumer() {
 				//logger.Info("Reading app " + id + " from rabbit")
 
 				dsErr := datastore.ConsumeApp(msg)
-				if err != nil {
-					logger.Error(err)
+				if dsErr != nil {
+					logger.Error(dsErr)
 				}
 
 				sqlErr := mysql.ConsumeApp(msg)
-				if err != nil && err.Error() != "no app with id" {
-					logger.Error(err)
-					err = nil
+				if sqlErr != nil {
+					logger.Error(sqlErr)
+					sqlErr = nil
 				}
 
 				if dsErr == nil && sqlErr == nil {

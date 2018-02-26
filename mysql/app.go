@@ -46,6 +46,23 @@ type App struct {
 	Logo              string     `gorm:"not null;column:logo"`                          // PICS
 	Icon              string     `gorm:"not null;column:icon"`                          // PICS
 	ClientIcon        string     `gorm:"not null;column:client_icon"`                   // PICS
+	Ghost             bool       `gorm:"not null;column:is_ghost;type:tinyint(1)"`      //
+}
+
+func getDefaultAppJSON() App {
+	return App{
+		StoreTags:    "[]",
+		Developers:   "[]",
+		Publishers:   "[]",
+		Categories:   "[]",
+		Genres:       "[]",
+		Screenshots:  "[]",
+		Movies:       "[]",
+		Achievements: "{}",
+		Platforms:    "[]",
+		DLC:          "[]",
+		Packages:     "[]",
+	}
 }
 
 func (app App) GetPath() (ret string) {
@@ -58,12 +75,13 @@ func (app App) GetPath() (ret string) {
 	return ret
 }
 
-// advertising, demo, dlc, episode, game, mod, movie, series, tool, video
 func (app App) GetType() (ret string) {
 
 	switch app.Type {
 	case "dlc":
 		return "DLC"
+	case "":
+		return "Unknown"
 	default:
 		return strings.Title(app.Type)
 	}
@@ -168,9 +186,13 @@ func GetApp(id int) (app App, err error) {
 		return app, err
 	}
 
-	db.First(&app, App{ID: id})
+	db.First(&app, id)
 	if db.Error != nil {
 		return app, db.Error
+	}
+
+	if app.ID == 0 {
+		return app, errors.New("no id")
 	}
 
 	return app, nil
@@ -274,14 +296,14 @@ func ConsumeApp(msg amqp.Delivery) (err error) {
 
 	app := new(App)
 
-	db.Where(App{ID: idx}).FirstOrInit(app)
+	db.Attrs(getDefaultAppJSON()).FirstOrCreate(app, App{ID: idx})
 
 	err = app.fill()
 	if err != nil {
 		return err
 	}
 
-	db.Save(&app)
+	db.Save(app)
 	if db.Error != nil {
 		return db.Error
 	}
@@ -413,6 +435,13 @@ func (app *App) fillFromAppDetails() (err error) {
 	// Get data
 	appDetails, err := steam.GetAppDetails(strconv.Itoa(app.ID))
 	if err != nil {
+
+		// Not all apps can be found
+		if err.Error() == "no app with id in steam" {
+			app.Ghost = true
+			return nil
+		}
+
 		return err
 	}
 

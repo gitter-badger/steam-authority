@@ -29,7 +29,7 @@ func getPackageQueue() (queue amqp.Queue, err error) {
 
 func PackageProducer(id int, change int) (err error) {
 
-	logger.Info("Adding package " + strconv.Itoa(id) + " to rabbit")
+	//logger.Info("Adding package " + strconv.Itoa(id) + " to rabbit")
 
 	queue, err := getPackageQueue()
 	if err != nil {

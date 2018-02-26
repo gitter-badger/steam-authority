@@ -2,7 +2,6 @@ package steam
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -41,15 +40,15 @@ func GetPICSInfo(apps []int, packages []int) (jsInfo JsInfo, err error) {
 	// Fix arrays that should be objects
 	var b = string(bytes)
 	b = strings.Replace(b, "\"appitems\":[]", "\"appitems\":null", 1)
+	b = strings.Replace(b, "\"extended\":[]", "\"extended\":null", 1)
 	bytes = []byte(b)
 
 	// Unmarshal JSON
 	info := JsInfo{}
 	if err := json.Unmarshal(bytes, &info); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
-			fmt.Println("x")
 			pretty.Print(string(bytes))
-			fmt.Println("y")
+			pretty.Print(err.Error())
 		}
 		return jsInfo, err
 	}
@@ -163,20 +162,12 @@ type JsAppSystemRequirements struct {
 
 // JsPackage ...
 type JsPackage struct {
-	PackageID   int  `json:"packageid"`
-	BillingType int8 `json:"billingtype"`
-	LicenseType int8 `json:"licensetype"`
-	Status      int8 `json:"status"`
-	// Extended    JsPackageExtended `json:"extended"` // Sometimes shows as empty array, breaking unmarshal
-	AppIDs   []int            `json:"appids"`
-	DepotIDs []int            `json:"depotids"`
-	AppItems map[string][]int `json:"appitems"`
-}
-
-// JsPackageExtended ...
-type JsPackageExtended struct {
-	AlwaysCountsAsOwned               int8   `json:"alwayscountsasowned"`
-	DevComp                           int8   `json:"devcomp"`
-	ReleaseStateOverride              string `json:"releasestateoverride"`
-	AllowCrossRegionTradingAndGifting string `json:"allowcrossregiontradingandgifting"`
+	PackageID   int                    `json:"packageid"`
+	BillingType int8                   `json:"billingtype"`
+	LicenseType int8                   `json:"licensetype"`
+	Status      int8                   `json:"status"`
+	Extended    map[string]interface{} `json:"extended"`
+	AppIDs      []int                  `json:"appids"`
+	DepotIDs    []int                  `json:"depotids"`
+	AppItems    map[string][]int       `json:"appitems"`
 }

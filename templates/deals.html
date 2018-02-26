@@ -29,30 +29,32 @@
 
         {{ if eq $.Tab "free" }}
 
-            <table class="table table-images table-sorter">
-                <thead>
-                <tr>
-                    <th scope="col" class="{sorter: false}">Icon</th>
-                    <th scope="col">Image</th>
-                    <th scope="col">Type</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{ range $key, $value := .Apps }}
-                <tr data-link="{{ .GetPath }}">
-                    <td class="img">
-                    {{ if eq .Icon "" }}
-                        <img src="/assets/img/no-app-icon.png" alt="{{ .GetName }}">
-                    {{ else }}
-                        <img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{{ .ID }}/{{ .Icon }}.jpg" alt="{{ .GetName }}">
+            <div class="table-responsive">
+                <table class="table table-images table-sorter">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="{sorter: false}">Icon</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Type</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{ range $key, $value := .Apps }}
+                    <tr data-link="{{ .GetPath }}">
+                        <td class="img">
+                        {{ if eq .Icon "" }}
+                            <img src="/assets/img/no-app-icon.png" alt="{{ .GetName }}">
+                        {{ else }}
+                            <img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{{ .ID }}/{{ .Icon }}.jpg" alt="{{ .GetName }}">
+                        {{ end }}
+                        </td>
+                        <td>{{ .GetName }}</td>
+                        <td>{{ .GetType }}</td>
+                    </tr>
                     {{ end }}
-                    </td>
-                    <td>{{ .GetName }}</td>
-                    <td>{{ .GetType }}</td>
-                </tr>
-                {{ end }}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
 
         {{ end }}
 

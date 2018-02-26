@@ -7,6 +7,7 @@ import (
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
+	"github.com/kr/pretty"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/queue"
@@ -83,15 +84,34 @@ func adminGenres(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 	}
 
-	var genres []steam.AppDetailsGenre
-	var counts map[int]int
+	counts := make(map[int]*adminGenreCount)
 
-	for _, v := range apps {
-		genres, err = v.GetGenres()
+	for _, app := range apps {
+		genres, err := app.GetGenres()
 		if err != nil {
 			logger.Error(err)
+			continue
+		}
+
+		for _, genre := range genres {
+			//logger.Info(genre.Description)
+
+			if _, ok := counts[genre.ID]; ok {
+				counts[genre.ID].Count++
+			} else {
+				counts[genre.ID] = &adminGenreCount{
+					Count: 1,
+					Genre: genre,
+				}
+			}
 		}
 	}
+	pretty.Print(counts)
+}
+
+type adminGenreCount struct {
+	Count int
+	Genre steam.AppDetailsGenre
 }
 
 func adminTags(w http.ResponseWriter, r *http.Request) {

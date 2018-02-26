@@ -50,34 +50,36 @@
                 {{end}}
 
                     <p>Store Tags: {{ .App.StoreTags }}</p>
-                    <p>genres: {{ .App.GetGenres }}</p>
+                    <p>Genres: {{ .App.GetGenres }}</p>
                     <p>Homepage: {{ .App.Homepage }}</p>
                     <p>Change Number:
                         <a href="/changes/{{ .App.ChangeNumber }}">{{ .App.ChangeNumber }}</a>
                     </p>
 
                     <h5>Included in these packages</h5>
-                    <table class="table table-hover table-sm">
-                        <thead>
-                        <th scope="col">Package ID</th>
-                        <th scope="col">Billing</th>
-                        <th scope="col">License</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Apps</th>
-                        </thead>
-                    {{ range $key, $value := .Packages }}
-                        <tr>
-                            <td>
-                                <a href="/packages/{{.ID}}">{{.ID}}</a>
-                            </td>
-                            <td>{{ .BillingType }}</td>
-                            <td>{{ .LicenseType }}</td>
-                            <td>{{ .Status }}</td>
-                            <td>{{ len .Apps }}</td>
-                            <!-- <td>{{.ChangeID}}</td> -->
-                        </tr>
-                    {{ end }}
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                            <th scope="col">Package ID</th>
+                            <th scope="col">Billing</th>
+                            <th scope="col">License</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Apps</th>
+                            </thead>
+                        {{ range $key, $value := .Packages }}
+                            <tr>
+                                <td>
+                                    <a href="/packages/{{.ID}}">{{.ID}}</a>
+                                </td>
+                                <td>{{ .BillingType }}</td>
+                                <td>{{ .LicenseType }}</td>
+                                <td>{{ .Status }}</td>
+                                <td>{{ len .Apps }}</td>
+                                <!-- <td>{{.ChangeID}}</td> -->
+                            </tr>
+                        {{ end }}
+                        </table>
+                    </div>
 
                 </div>
                 <div class="tab-pane" id="media" role="tabpanel">

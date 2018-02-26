@@ -29,7 +29,7 @@ func getPlayerQueue() (queue amqp.Queue, err error) {
 
 func PlayerProducer(id int) (err error) {
 
-	logger.Info("Adding player " + strconv.Itoa(id) + " to rabbit")
+	//logger.Info("Adding player " + strconv.Itoa(id) + " to rabbit")
 
 	queue, err := getPlayerQueue()
 	if err != nil {

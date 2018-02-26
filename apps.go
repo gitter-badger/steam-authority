@@ -9,7 +9,6 @@ import (
 	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
-	"github.com/steam-authority/steam-authority/queue"
 )
 
 func appsHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,22 +47,23 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 
 	idx, err := strconv.Atoi(id)
 	if err != nil {
-		logger.Error(err)
-		returnErrorTemplate(w, r, 404, err.Error())
+		returnErrorTemplate(w, r, 500, "Invalid App ID")
 		return
 	}
 
-	queue.AppProducer(idx, 0)
+	//queue.AppProducer(idx, 0)
 
 	// Get app
 	app, err := mysql.GetApp(idx)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
+
+		if err.Error() == "no id" {
 			returnErrorTemplate(w, r, 404, err.Error())
-		} else {
-			logger.Error(err)
-			returnErrorTemplate(w, r, 500, err.Error())
+			return
 		}
+
+		logger.Error(err)
+		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
@@ -77,31 +77,10 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	if app.Type == "movie" {
 		primary = append(primary, "This listing is for a movie")
 	}
-	banners["primary"] = primary
 
-	//if err != nil {
-	//	if err.Error() == "sql: no rows in result set" {
-	//
-	//		// Create the app
-	//		app, err = mysql.CreateApp(idx)
-	//		if err != nil {
-	//			logger.Error(err)
-	//			returnErrorTemplate(w, 404, err.Error())
-	//			return
-	//		}
-	//
-	//		// Get app articles
-	//		_, err = datastore.GetArticlesFromSteam(idx)
-	//		if err != nil {
-	//			logger.Error(err)
-	//		}
-	//
-	//	} else {
-	//		logger.Error(err)
-	//		returnErrorTemplate(w, 500, err.Error())
-	//		return
-	//	}
-	//}
+	if len(primary) > 0 {
+		banners["primary"] = primary
+	}
 
 	// Get news
 	news, err := datastore.GetArticles(idx, 1000)

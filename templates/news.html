@@ -28,7 +28,7 @@
                 {{ if eq (index $.Apps .AppID).Icon "" }}
                     <img class="mr-3" src="/assets/img/no-app-icon.png" alt="{{ (index $.Apps .AppID).Name }}">
                 {{ else }}
-                    <img class="mr-3" src="{{ (index $.Apps .AppID).Icon }}" alt="{{ (index $.Apps .AppID).Name }}">
+                    <img class="mr-3" src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{{ .AppID }}/{{ (index $.Apps .AppID).Icon }}.jpg" alt="{{ (index $.Apps .AppID).Name }}">
                 {{ end }}
 
                     <div class="media-body">

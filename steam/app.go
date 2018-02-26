@@ -71,7 +71,7 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 	}
 
 	if resp[id].Success == false {
-		return app, errors.New("no app with id")
+		return app, errors.New("no app with id in steam")
 	}
 
 	return resp[id], nil
@@ -196,7 +196,7 @@ type AppDetailsAchievements struct {
 }
 
 type AppDetailsGenre struct {
-	ID          int8   `json:"id"`
+	ID          int    `json:"id"`
 	Description string `json:"description"`
 }
 
