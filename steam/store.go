@@ -54,6 +54,9 @@ func GetAppDetails(id string) (app AppDetailsBody, err error) {
 	regex = regexp.MustCompile(`"name":(\d+)`)
 	b = regex.ReplaceAllString(b, `"name":"$1"`)
 
+	regex = regexp.MustCompile(`"description":(\d+)`)
+	b = regex.ReplaceAllString(b, `"description":"$1"`)
+
 	// Fix arrays that should be objects
 	b = strings.Replace(b, "\"pc_requirements\":[]", "\"pc_requirements\":null", 1)
 	b = strings.Replace(b, "\"mac_requirements\":[]", "\"mac_requirements\":null", 1)
