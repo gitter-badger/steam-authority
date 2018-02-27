@@ -48,7 +48,7 @@ func playersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := playersTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Ranks = ranks
 
 	returnTemplate(w, r, "players", template)
@@ -109,7 +109,7 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := playerTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Player = player
 	template.Friends = friends
 

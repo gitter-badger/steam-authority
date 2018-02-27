@@ -5,7 +5,7 @@ import "net/http"
 func creditsHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := staticTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 
 	returnTemplate(w, r, "credits", template)
 }
@@ -13,7 +13,7 @@ func creditsHandler(w http.ResponseWriter, r *http.Request) {
 func donateHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := staticTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 
 	returnTemplate(w, r, "donate", template)
 }
@@ -21,7 +21,7 @@ func donateHandler(w http.ResponseWriter, r *http.Request) {
 func faqsHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := staticTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 
 	returnTemplate(w, r, "faqs", template)
 }

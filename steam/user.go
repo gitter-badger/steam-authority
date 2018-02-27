@@ -3,11 +3,11 @@ package steam
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 
+	"github.com/Jleagle/go-helpers/logger"
 	"github.com/kr/pretty"
 )
 
@@ -71,7 +71,7 @@ func ResolveVanityURL(id string) (resp ResolveVanityURLBody, err error) {
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			pretty.Print(string(bytes))
-			fmt.Println(err.Error())
+			logger.Error(err)
 		}
 		return resp, err
 	}
@@ -117,7 +117,7 @@ func GetPlayerSummaries(ids []int) (resp PlayerSummariesBody, err error) {
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			pretty.Print(string(bytes))
-			fmt.Println(err.Error())
+			logger.Error(err)
 		}
 		return resp, err
 	}

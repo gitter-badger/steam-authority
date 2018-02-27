@@ -1,10 +1,10 @@
 body {
     overflow-y: scroll;
     margin-top: 76px;
+    background-color: $dark;
 }
 
 .navbar-brand {
-    @include rounded;
     background-color: #5cb85c;
     display: inline-block;
     height: 36px;
@@ -16,7 +16,6 @@ body {
 }
 
 .jumbotron {
-    @include rounded;
     padding: 2rem;
     margin-top: 2rem;
     .lead {
@@ -31,4 +30,33 @@ body {
 
 [data-link] {
     cursor: pointer;
+}
+
+.oldschool {
+	margin: 0 auto;
+	background-color: #4c5844;
+	color: #a0aa95;
+	padding: 10px;
+	border: 1px solid;
+	border-color: #889180 #272f20 #272f20 #889180;
+
+    h1 {
+        margin: 0;
+        font-size: 14px;
+        background: url(/assets/img/close.png) right center no-repeat;
+    }
+
+    div {
+        margin: 10px;
+        background-color: #3e4637;
+        padding: 10px;
+        border: 2px solid;
+        border-color: #272f20 #889180 #889180 #272f20;
+    }
+}
+
+.card-header-tabs{
+    a{
+        color: $dark;
+    }
 }

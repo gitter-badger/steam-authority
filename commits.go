@@ -36,7 +36,7 @@ func changelogHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := changelogTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Commits = commits
 
 	returnTemplate(w, r, "commits", template)

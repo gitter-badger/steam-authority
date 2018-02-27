@@ -55,11 +55,17 @@ func returnErrorTemplate(w http.ResponseWriter, r *http.Request, code int, messa
 	w.WriteHeader(code)
 
 	tmpl := errorTemplate{}
-	tmpl.SetSession(r)
+	tmpl.Fill(r)
 	tmpl.Code = code
 	tmpl.Message = message
 
 	returnTemplate(w, r, "error", tmpl)
+}
+
+type errorTemplate struct {
+	GlobalTemplate
+	Code    int
+	Message string
 }
 
 func getTemplateFuncMap() map[string]interface{} {
@@ -82,16 +88,9 @@ func getTemplateFuncMap() map[string]interface{} {
 			}
 			return template.HTML("Packages: " + strings.Join(packages, ", "))
 		},
-		"unix": func(t time.Time) int64 {
-			return t.Unix()
-		},
+		"unix":       func(t time.Time) int64 { return t.Unix() },
+		"startsWith": func(a string, b string) bool { return strings.HasPrefix(a, b) },
 	}
-}
-
-type errorTemplate struct {
-	GlobalTemplate
-	Code    int
-	Message string
 }
 
 // GlobalTemplate is added to every other template
@@ -100,15 +99,20 @@ type GlobalTemplate struct {
 	ID     int
 	Name   string
 	Avatar string
+	Path   string // URL
 }
 
-func (t *GlobalTemplate) SetSession(r *http.Request) {
+func (t *GlobalTemplate) Fill(r *http.Request) {
 
+	// From session
 	id, _ := session.Read(r, session.ID)
 
 	t.ID, _ = strconv.Atoi(id)
 	t.Name, _ = session.Read(r, session.Name)
 	t.Avatar, _ = session.Read(r, session.Avatar)
+
+	// From request
+	t.Path = r.URL.Path
 }
 
 func (t GlobalTemplate) LoggedIn() bool {

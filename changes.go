@@ -12,7 +12,7 @@ import (
 func changesHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := changesTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 
 	// Get changes
 	changes, err := datastore.GetLatestChanges(100)
@@ -87,7 +87,7 @@ func changeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := changeTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Change = change
 
 	returnTemplate(w, r, "change", template)

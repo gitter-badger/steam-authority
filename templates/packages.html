@@ -9,25 +9,31 @@
 
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-hover table-sm">
-            <thead>
-            <th scope="col">Name</th>
-            <th scope="col">Billing Type</th>
-            <th scope="col">License Type</th>
-            <th scope="col">Status</th>
-            <th scope="col">Apps</th>
-            </thead>
-        {{ range $key, $value := .Packages }}
-            <tr data-link="/packages/{{ .ID }}">
-                <td>{{.GetName}}</td>
-                <td>{{.GetBillingType}}</td>
-                <td>{{.GetLicenseType}}</td>
-                <td>{{.GetStatus}}</td>
-                <td>{{len .GetApps}}</td>
-            </tr>
-        {{ end }}
-        </table>
+    <div class="card">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead>
+                    <th scope="col">Name</th>
+                    <th scope="col">Billing Type</th>
+                    <th scope="col">License Type</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Apps</th>
+                    </thead>
+                {{ range $key, $value := .Packages }}
+                    <tr data-link="/packages/{{ .ID }}">
+                        <td>{{.GetName}}</td>
+                        <td>{{.GetBillingType}}</td>
+                        <td>{{.GetLicenseType}}</td>
+                        <td>{{.GetStatus}}</td>
+                        <td>{{len .GetApps}}</td>
+                    </tr>
+                {{ end }}
+                </table>
+            </div>
+
+        </div>
     </div>
 
 </div>

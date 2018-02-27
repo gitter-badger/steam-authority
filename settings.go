@@ -100,7 +100,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := settingsTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	if err != nil {
 		returnErrorTemplate(w, r, 500, err.Error())
 		return

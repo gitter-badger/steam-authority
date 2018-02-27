@@ -28,23 +28,30 @@
 
     </div>
 
-    <div class="row tags-list">
-    {{ range $key, $value := .Tags }}
-        <div class="col-sm-4 mb-2" id="tag_{{ .ID }}">
+    <div class="card">
+        <div class="card-body">
 
-            <div class="list-group">
-                <a href="{{ .GetPath }}" class="list-group-item list-group-item-action list-group-item-secondary">
-                    <i class="fas fa-tag"></i>
-                    <h6 class="mb-1 tag-name">{{ .Name }}</h6>
-                    <small>
-                        <span class="tag-games">{{ .Games }}</span> Games
-                    </small>
-                </a>
+            <div class="row tags-list">
+            {{ range $key, $value := .Tags }}
+                <div class="col-sm-4 mb-2" id="tag_{{ .ID }}">
+
+                    <div class="list-group">
+                        <a href="{{ .GetPath }}" class="list-group-item list-group-item-action list-group-item-secondary">
+                            <i class="fas fa-tag"></i>
+                            <h6 class="mb-1 tag-name">{{ .Name }}</h6>
+                            <small>
+                                <span class="tag-games">{{ .Games }}</span> Games
+                            </small>
+                        </a>
+                    </div>
+
+                </div>
+            {{ end }}
             </div>
 
         </div>
-    {{ end }}
     </div>
+
 
 </div>
 

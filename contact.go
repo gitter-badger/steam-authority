@@ -12,7 +12,7 @@ import (
 func contactHandler(w http.ResponseWriter, r *http.Request) {
 
 	template:= contactTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 
 	returnTemplate(w, r, "contact", template)
 }

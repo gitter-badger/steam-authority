@@ -53,7 +53,7 @@ func experienceHandler(w http.ResponseWriter, r *http.Request) {
 	rows = rows[0 : ROWS+1]
 
 	template := experienceTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Chunks = chunk(rows, CHUNK)
 	template.Level = -1
 

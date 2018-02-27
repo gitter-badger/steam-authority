@@ -28,22 +28,28 @@
 
     </div>
 
-    <div class="row genres-list">
-    {{ range $key, $value := .Genres }}
-        <div class="col-sm-4 mb-2" id="genre_{{ .ID }}">
+    <div class="card">
+        <div class="card-body">
 
-            <div class="list-group">
-                <a href="{{ .GetPath }}" class="list-group-item list-group-item-action list-group-item-secondary">
-                    <i class="fas fa-star"></i>
-                    <h6 class="mb-1 genre-name">{{ .Name }}</h6>
-                    <small>
-                        <span class="genre-games">{{ .Apps }}</span> Games
-                    </small>
-                </a>
+            <div class="row genres-list">
+            {{ range $key, $value := .Genres }}
+                <div class="col-sm-4 mb-2" id="genre_{{ .ID }}">
+
+                    <div class="list-group">
+                        <a href="{{ .GetPath }}" class="list-group-item list-group-item-action list-group-item-secondary">
+                            <i class="fas fa-star"></i>
+                            <h6 class="mb-1 genre-name">{{ .Name }}</h6>
+                            <small>
+                                <span class="genre-games">{{ .Apps }}</span> Games
+                            </small>
+                        </a>
+                    </div>
+
+                </div>
+            {{ end }}
             </div>
 
         </div>
-    {{ end }}
     </div>
 
 </div>

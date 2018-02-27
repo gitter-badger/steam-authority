@@ -39,7 +39,7 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := adminTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 
 	returnTemplate(w, r, "admin", template)
 	return

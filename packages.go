@@ -11,13 +11,13 @@ import (
 
 func packagesHandler(w http.ResponseWriter, r *http.Request) {
 
-	packages, err := mysql.GetLatestPackages()
+	packages, err := mysql.GetLatestPackages(100)
 	if err != nil {
 		logger.Error(err)
 	}
 
 	template := packagesTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Packages = packages
 
 	returnTemplate(w, r, "packages", template)
@@ -72,7 +72,7 @@ func packageHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := packageTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Package = pack
 	template.Apps = apps
 	template.Keys = packageKeys

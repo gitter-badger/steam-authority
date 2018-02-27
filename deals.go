@@ -33,7 +33,7 @@ func dealsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := dealsTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Apps = apps
 	template.Tab = tab
 

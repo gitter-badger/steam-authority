@@ -18,7 +18,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := tagsTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Tags = tags
 
 	returnTemplate(w, r, "tags", template)

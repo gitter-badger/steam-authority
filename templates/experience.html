@@ -7,27 +7,33 @@
         <p class="lead">Check how much XP you need to go up a level.</p>
     </div>
 
-    <div class="table-responsive">
-    {{ range $key, $value := .Chunks }}
-        <table class="table table-striped table-bordered table-hover table-sm">
-            <thead>
-            <tr>
-                <th scope="col" width="25%">Level</th>
-                <th scope="col" width="25%">Start XP</th>
-                <th scope="col" width="25%">End XP</th>
-                <th scope="col" width="25%">For Next Level</th>
-            </tr>
-            </thead>
-        {{ range $keyx, $valuex := $value }}
-            <tr data-level="{{ .Level }}">
-                <td width="25%">{{ comma .Level }}</td>
-                <td width="25%">{{ comma .Start }}</td>
-                <td width="25%">{{ comma .End }}</td>
-                <td width="25%">{{ comma .Diff }}</td>
-            </tr>
-        {{ end }}
-        </table>
-    {{ end }}
+    <div class="card">
+        <div class="card-body">
+
+            <div class="table-responsive">
+            {{ range $key, $value := .Chunks }}
+                <table class="table table-striped table-bordered table-hover table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col" width="25%">Level</th>
+                        <th scope="col" width="25%">Start XP</th>
+                        <th scope="col" width="25%">End XP</th>
+                        <th scope="col" width="25%">For Next Level</th>
+                    </tr>
+                    </thead>
+                {{ range $keyx, $valuex := $value }}
+                    <tr data-level="{{ .Level }}">
+                        <td width="25%">{{ comma .Level }}</td>
+                        <td width="25%">{{ comma .Start }}</td>
+                        <td width="25%">{{ comma .End }}</td>
+                        <td width="25%">{{ comma .Diff }}</td>
+                    </tr>
+                {{ end }}
+                </table>
+            {{ end }}
+            </div>
+
+        </div>
     </div>
 
 </div>

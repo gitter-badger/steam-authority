@@ -18,7 +18,7 @@ func genresHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := genresTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Genres = genres
 
 	returnTemplate(w, r, "genres", template)

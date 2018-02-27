@@ -180,14 +180,14 @@ func GetPackages(ids []int, columns []string) (packages []Package, err error) {
 	return packages, nil
 }
 
-func GetLatestPackages() (packages []Package, err error) {
+func GetLatestPackages(limit int) (packages []Package, err error) {
 
 	db, err := getDB()
 	if err != nil {
 		return packages, err
 	}
 
-	db.Limit(50).Order("created_at DESC").Find(&packages)
+	db.Limit(limit).Order("created_at DESC").Find(&packages)
 	if db.Error != nil {
 		return packages, db.Error
 	}

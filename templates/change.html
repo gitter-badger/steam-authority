@@ -1,25 +1,35 @@
 {{define "change"}} {{ template "header" . }}
+
 <div class="container">
 
-  <h1>Change {{ .Change.ChangeID }}</h1>
+    <div class="jumbotron">
+        <h1 class="display-4">Change {{ .Change.GetName }}</h1>
+        <p class="lead"></p>
+    </div>
 
-  <h2>Apps</h2>
+    <div class="card">
+        <div class="card-header">
 
-  {{ range $key, $value := .Change.Apps }}
+            <h2>Apps</h2>
+        {{ range $key, $value := .Change.Apps }}
+            <div>
+                <a href="/apps/{{ $value }}">App {{ $value }}</a>
+            </div>
+        {{ end }}
 
-  <div>
-    {{ $value }}
-  </div>
+            <h2>Packages</h2>
 
-  {{ end }}
+        {{ range $key, $value := .Change.Packages }}
 
-  <h2>Packages</h2>
+            <div>
+                <a href="/players/{{ $value }}">App {{ $value }}</a>
+            </div>
 
-  {{ range $key, $value := .Change.Packages }}
+        {{ end }}
 
-  <div>
-    {{ $value }}
-  </div>
+        </div>
+    </div>
 
 </div>
-{{ end }} {{ template "footer" }} {{end}}
+
+{{ template "footer" }} {{end}}

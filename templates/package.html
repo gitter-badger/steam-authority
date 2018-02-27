@@ -5,71 +5,77 @@
     <div class="jumbotron">
 
         <h1 class="display-4">{{.Package.GetName}}</h1>
-        
+
     </div>
 
-{{ range $k, $v := .Banners }}
-    <div class="alert alert-{{ $k }}" role="alert">
-    {{ range $kk, $vv := $v }}
-        <div>{{ $vv }}</div>
-    {{ end }}
-    </div>
-{{ end }}
+    <div class="card">
+        <div class="card-body">
 
-    <h5>Properties</h5>
-    <div class="table-responsive">
-        <table class="table table-hover table-sm">
-            <tr>
-                <td width="30%">Billing Type</td>
-                <td>{{ .Package.GetBillingType }}</td>
-            </tr>
-            <tr>
-                <td>License Type</td>
-                <td>{{ .Package.GetLicenseType }}</td>
-            </tr>
-            <tr>
-                <td>Status</td>
-                <td>{{ .Package.GetStatus }}</td>
-            </tr>
-            <tr>
-                <td>Change ID</td>
-                <td>{{ .Package.ChangeID }}</td>
-            </tr>
-        {{ range $key, $value := .Package.GetExtended }}
-            <tr>
-                <td style="white-space:nowrap">{{ index $.Keys $key }}</td>
-                <td>{{$value}}</td>
-            </tr>
+        {{ range $k, $v := .Banners }}
+            <div class="alert alert-{{ $k }}" role="alert">
+            {{ range $kk, $vv := $v }}
+                <div>{{ $vv }}</div>
+            {{ end }}
+            </div>
         {{ end }}
-        </table>
-    </div>
 
-    <h5>Apps ({{len .Package.GetApps}})</h5>
-    <div class="table-responsive">
-        <table class="table table-hover table-sm table-images">
-            <thead>
-            <th scope="col" width="1%"></th>
-            <th scope="col" width="25%">Name</th>
-            <th scope="col">Type</th>
-            <th scope="col">Platforms</th>
-            <th scope="col">DLC</th>
-            </thead>
-        {{ range $key, $value := .Apps }}
-            <tr>
-                <td class="img">
-                {{ if eq .Icon "" }}
-                    <img class="mr-3" src="/assets/img/no-app-icon.png" alt="{{ .Name }}">
-                {{ else }}
-                    <img class="mr-3" src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{{ .ID }}/{{ .Icon }}.jpg" alt="{{ .Name }}">
+            <h5>Properties</h5>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <tr>
+                        <td width="30%">Billing Type</td>
+                        <td>{{ .Package.GetBillingType }}</td>
+                    </tr>
+                    <tr>
+                        <td>License Type</td>
+                        <td>{{ .Package.GetLicenseType }}</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td>{{ .Package.GetStatus }}</td>
+                    </tr>
+                    <tr>
+                        <td>Change ID</td>
+                        <td>{{ .Package.ChangeID }}</td>
+                    </tr>
+                {{ range $key, $value := .Package.GetExtended }}
+                    <tr>
+                        <td style="white-space:nowrap">{{ index $.Keys $key }}</td>
+                        <td>{{$value}}</td>
+                    </tr>
                 {{ end }}
-                </td>
-                <td style="white-space:nowrap"><a href="/apps/{{.ID}}">{{.GetName}}</a></td>
-                <td>{{ .GetType }}</td>
-                <td>{{ .GetPlatforms }}</td>
-                <td>{{ len .GetDLC }}</td>
-            </tr>
-        {{ end }}
-        </table>
+                </table>
+            </div>
+
+            <h5>Apps ({{len .Package.GetApps}})</h5>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm table-images">
+                    <thead>
+                    <th scope="col" width="1%"></th>
+                    <th scope="col" width="25%">Name</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Platforms</th>
+                    <th scope="col">DLC</th>
+                    </thead>
+                {{ range $key, $value := .Apps }}
+                    <tr>
+                        <td class="img">
+                        {{ if eq .Icon "" }}
+                            <img class="mr-3" src="/assets/img/no-app-icon.png" alt="{{ .Name }}">
+                        {{ else }}
+                            <img class="mr-3" src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{{ .ID }}/{{ .Icon }}.jpg" alt="{{ .Name }}">
+                        {{ end }}
+                        </td>
+                        <td style="white-space:nowrap"><a href="/apps/{{.ID}}">{{.GetName}}</a></td>
+                        <td>{{ .GetType }}</td>
+                        <td>{{ .GetPlatforms }}</td>
+                        <td>{{ len .GetDLC }}</td>
+                    </tr>
+                {{ end }}
+                </table>
+            </div>
+
+        </div>
     </div>
 
 </div>

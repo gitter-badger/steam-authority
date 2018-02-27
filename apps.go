@@ -27,7 +27,7 @@ func appsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := appsTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.Apps = apps
 	template.Count = count
 
@@ -58,7 +58,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 
 		if err.Error() == "no id" {
-			returnErrorTemplate(w, r, 404, err.Error())
+			returnErrorTemplate(w, r, 404, "We can't find this app in our database, there may not be one with this ID.")
 			return
 		}
 
@@ -100,7 +100,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Template
 	template := appTemplate{}
-	template.SetSession(r)
+	template.Fill(r)
 	template.App = app
 	template.Packages = packages
 	template.Articles = news

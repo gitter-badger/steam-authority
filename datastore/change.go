@@ -23,6 +23,11 @@ func (change Change) GetKey() (key *datastore.Key) {
 	return datastore.NameKey(CHANGE, strconv.Itoa(change.ChangeID), nil)
 }
 
+func (change Change) GetName() (name string) {
+
+	return "Change " + strconv.Itoa(change.ChangeID)
+}
+
 func GetLatestChanges(limit int) (changes []Change, err error) {
 
 	client, context, err := getDSClient()
