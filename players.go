@@ -47,16 +47,33 @@ func playersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Count players
+	playersCount, err := datastore.CountPlayers()
+	if err != nil {
+		logger.Error(err)
+	}
+
+	// Count ranks
+	ranksCount, err := datastore.CountRankedPlayers()
+	if err != nil {
+		logger.Error(err)
+	}
+
 	template := playersTemplate{}
 	template.Fill(r)
 	template.Ranks = ranks
+	template.PlayersCount = playersCount // todo, SHow these on front end
+	template.RanksCount = ranksCount
 
 	returnTemplate(w, r, "players", template)
+	return
 }
 
 type playersTemplate struct {
 	GlobalTemplate
-	Ranks []datastore.Rank
+	Ranks        []datastore.Rank
+	PlayersCount int
+	RanksCount   int
 }
 
 func playerHandler(w http.ResponseWriter, r *http.Request) {

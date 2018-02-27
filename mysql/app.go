@@ -170,6 +170,16 @@ func (app App) GetCategories() (categories []string, err error) {
 	return categories, nil
 }
 
+func (app App) GetTags() (tags []int, err error) {
+
+	bytes := []byte(app.StoreTags)
+	if err := json.Unmarshal(bytes, &tags); err != nil {
+		return tags, err
+	}
+
+	return tags, nil
+}
+
 func (app App) GetName() (name string) {
 
 	if app.Name == "" {
@@ -394,8 +404,14 @@ func (app *App) fillFromPICS() (err error) {
 		return errors.New("no app key in json")
 	}
 
-	// Tags
-	tags, err := json.Marshal(js.Common.StoreTags)
+	// Tags, convert map to slice
+	var tagsSlice []int
+	for _, v := range js.Common.StoreTags {
+		vv, _ := strconv.Atoi(v)
+		tagsSlice = append(tagsSlice, vv)
+	}
+
+	tags, err := json.Marshal(tagsSlice)
 	if err != nil {
 		return err
 	}

@@ -27,7 +27,7 @@ func returnTemplate(w http.ResponseWriter, r *http.Request, page string, pageDat
 	folder := path.Dir(file)
 
 	// Load templates needed
-	t, err := template.New("t").Funcs(getTemplateFuncMap()).ParseFiles(folder+"/templates/header.html", folder+"/templates/footer.html", folder+"/templates/"+page+".html")
+	t, err := template.New("t").Funcs(getTemplateFuncMap()).ParseFiles(folder+"/templates/_header.html", folder+"/templates/_footer.html", folder+"/templates/"+page+".html")
 	if err != nil {
 		logger.Error(err)
 		returnErrorTemplate(w, r, 404, err.Error())

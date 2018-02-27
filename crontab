@@ -1,0 +1,9 @@
+# steamauthority.net
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 5 * * * ~/go/src/github.com/steam-authority/steam-authority/cmd/action-ranks.sh
+0 4 * * * ~/go/src/github.com/steam-authority/steam-authority/cmd/action-tags.sh
+0 3 * * * ~/go/src/github.com/steam-authority/steam-authority/cmd/action-genres.sh
+0 2 * * * ~/go/src/github.com/steam-authority/steam-authority/cmd/action-donations.sh

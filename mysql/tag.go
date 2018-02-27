@@ -10,7 +10,7 @@ type Tag struct {
 	CreatedAt *time.Time `gorm:"not null;column:created_at"`
 	UpdatedAt *time.Time `gorm:"not null;column:updated_at"`
 	Name      string     `gorm:"not null;column:name"`
-	Games     int        `gorm:"not null;column:games"`
+	Apps      int        `gorm:"not null;column:apps"`
 	Votes     int        `gorm:"not null;column:votes"`
 }
 
@@ -31,4 +31,20 @@ func GetAllTags() (tags []Tag, err error) {
 	}
 
 	return tags, nil
+}
+
+func SaveOrUpdateTag(id int, apps int) (err error) {
+
+	db, err := getDB()
+	if err != nil {
+		return err
+	}
+
+	tag := new(Tag)
+	db.Assign(Tag{Apps: apps}).FirstOrCreate(tag, Tag{ID: id})
+	if db.Error != nil {
+		return db.Error
+	}
+
+	return nil
 }

@@ -2,12 +2,21 @@
 
 cd ../
 
+# Get the latest version
 git fetch origin
 git reset --hard origin/master
 
+# Build
 dep ensure
 go build
 
+# Copy over crontab
+cp ../contab /etc/cron.d/steamauthority
+
+# Restart PICS
+./pics.sh
+
+# Tell Rollbar
 curl https://api.rollbar.com/api/1/deploy/ \
   -F access_token=${STEAM_ROLLBAR_PRIVATE} \
   -F environment=${ENV} \
@@ -15,4 +24,5 @@ curl https://api.rollbar.com/api/1/deploy/ \
   -F local_username=Jleagle \
   --silent > /dev/null
 
+# Restart web server
 /etc/init.d/steam restart

@@ -73,6 +73,7 @@ func adminDonations(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// todo, handle genres that no longer have any games.
 func adminGenres(w http.ResponseWriter, r *http.Request) {
 
 	filter := url.Values{}
@@ -121,8 +122,45 @@ type adminGenreCount struct {
 	Genre steam.AppDetailsGenre
 }
 
+// todo, handle tags that no longer have any games.
 func adminTags(w http.ResponseWriter, r *http.Request) {
 
+	filter := url.Values{}
+	filter.Set("json_depth", "2")
+
+	apps, err := mysql.SearchApps(filter, 0, "")
+	if err != nil {
+		logger.Error(err)
+	}
+
+	counts := make(map[int]int)
+
+	for _, app := range apps {
+		tags, err := app.GetTags()
+		if err != nil {
+			logger.Error(err)
+			continue
+		}
+
+		for _, tag := range tags {
+			//logger.Info(genre.Description)
+
+			if _, ok := counts[tag]; ok {
+				counts[tag]++
+			} else {
+				counts[tag] = 1
+			}
+		}
+	}
+
+	for k, v := range counts {
+		err := mysql.SaveOrUpdateTag(k, v)
+		if err != nil {
+			logger.Error(err)
+		}
+	}
+
+	logger.Info("Tags updated")
 }
 
 func adminRanks(w http.ResponseWriter, r *http.Request) {
