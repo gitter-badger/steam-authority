@@ -215,7 +215,7 @@ func GetApps(ids []int, columns []string) (apps []App, err error) {
 
 	db.Where("id IN (?)", ids).Find(&apps)
 	if db.Error != nil {
-		return apps, err
+		return apps, db.Error
 	}
 
 	return apps, nil
@@ -263,7 +263,7 @@ func SearchApps(query url.Values, limit int, sort string) (apps []App, err error
 	// Query
 	db = db.Find(&apps)
 	if db.Error != nil {
-		return apps, err
+		return apps, db.Error
 	}
 
 	return apps, err
@@ -278,7 +278,7 @@ func CountApps() (count int, err error) {
 
 	db.Model(&App{}).Count(&count)
 	if db.Error != nil {
-		return count, err
+		return count, db.Error
 	}
 
 	return count, nil

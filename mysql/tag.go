@@ -27,7 +27,7 @@ func GetAllTags() (tags []Tag, err error) {
 
 	db = db.Limit(1000).Order("name ASC").Find(&tags)
 	if db.Error != nil {
-		return tags, err
+		return tags, db.Error
 	}
 
 	return tags, nil

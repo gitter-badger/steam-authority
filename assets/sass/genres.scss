@@ -1,0 +1,7 @@
+#genres-page {
+    @include tag;
+    span[data-sort] {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}

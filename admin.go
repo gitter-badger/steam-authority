@@ -7,7 +7,6 @@ import (
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
-	"github.com/kr/pretty"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/queue"
@@ -106,7 +105,15 @@ func adminGenres(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	pretty.Print(counts)
+
+	for _, v := range counts {
+		err := mysql.SaveOrUpdateGenre(v.Genre.ID, v.Genre.Description, v.Count)
+		if err != nil {
+			logger.Error(err)
+		}
+	}
+
+	logger.Info("Genres updated")
 }
 
 type adminGenreCount struct {

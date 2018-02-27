@@ -4,3 +4,10 @@ $("[data-link]").click(function () {
         window.location.href = $(this).attr('data-link');
     }
 });
+
+function clearField(evt, input) {
+    var code = evt.charCode || evt.keyCode;
+    if (code === 27) {
+        input.value = '';
+    }
+}
