@@ -1,4 +1,4 @@
-{{define "experience"}} {{ template "header" . }}
+{{define "experience"}} {{ template "_header" . }}
 
 <div class="container" id="xp-page">
 
@@ -41,4 +41,4 @@
 {{ if gt .Level 0}}
 <script>
     var scrollTo = '[data-level={{ .Level }}]'
-</script> {{end}} {{ template "footer" }} {{end}}
+</script> {{end}} {{ template "_footer" }} {{end}}

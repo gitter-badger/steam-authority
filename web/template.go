@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"html/template"
 	"net/http"
-	"path"
-	"runtime"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -20,11 +19,10 @@ import (
 func returnTemplate(w http.ResponseWriter, r *http.Request, page string, pageData interface{}) (err error) {
 
 	// Get current app path
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
+	folder, _ := os.Getwd()
+	if err != nil {
 		logger.Info("Failed to get path")
 	}
-	folder := path.Dir(file)
 
 	// Load templates needed
 	t, err := template.New("t").Funcs(getTemplateFuncMap()).ParseFiles(folder+"/templates/_header.html", folder+"/templates/_footer.html", folder+"/templates/"+page+".html")
