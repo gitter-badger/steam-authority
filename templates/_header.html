@@ -13,7 +13,7 @@
     <title>Steam</title>
 
     <script async defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
-    
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-125104-31"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -64,6 +64,11 @@
                 </li>
             </ul>
             <ul class="navbar-nav">
+            {{ if .IsAdmin }}
+                <li class="nav-item {{if startsWith .Path "/admin" }}active{{end}}">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
+            {{end}}
             {{ if .LoggedIn }}
                 <li class="nav-item">
                     <a class="nav-link" href="/players/{{.ID}}">{{.Name}}</a>

@@ -93,11 +93,13 @@ func getTemplateFuncMap() map[string]interface{} {
 
 // GlobalTemplate is added to every other template
 type GlobalTemplate struct {
-	Env    string
-	ID     int
-	Name   string
-	Avatar string
-	Path   string // URL
+	Env      string
+	ID       int
+	Name     string
+	Avatar   string
+	Path     string // URL
+	IsAdmin  bool
+	LoggedIn bool
 }
 
 func (t *GlobalTemplate) Fill(r *http.Request) {
@@ -109,10 +111,9 @@ func (t *GlobalTemplate) Fill(r *http.Request) {
 	t.Name, _ = session.Read(r, session.Name)
 	t.Avatar, _ = session.Read(r, session.Avatar)
 
+	t.LoggedIn = t.ID > 0
+
 	// From request
 	t.Path = r.URL.Path
-}
-
-func (t GlobalTemplate) LoggedIn() bool {
-	return t.ID > 0
+	t.IsAdmin = r.Header.Get("Authorization") != ""
 }
