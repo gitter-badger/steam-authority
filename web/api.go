@@ -1,4 +1,4 @@
-package main
+package web
 
 //func APIHandler(w http.ResponseWriter, r *http.Request) {
 //

@@ -1,8 +1,8 @@
-package main
+package web
 
 import "net/http"
 
-func creditsHandler(w http.ResponseWriter, r *http.Request) {
+func CreditsHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := staticTemplate{}
 	template.Fill(r)
@@ -10,7 +10,7 @@ func creditsHandler(w http.ResponseWriter, r *http.Request) {
 	returnTemplate(w, r, "credits", template)
 }
 
-func donateHandler(w http.ResponseWriter, r *http.Request) {
+func DonateHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := staticTemplate{}
 	template.Fill(r)
@@ -18,7 +18,7 @@ func donateHandler(w http.ResponseWriter, r *http.Request) {
 	returnTemplate(w, r, "donate", template)
 }
 
-func faqsHandler(w http.ResponseWriter, r *http.Request) {
+func FAQsHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := staticTemplate{}
 	template.Fill(r)

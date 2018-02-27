@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-func contactHandler(w http.ResponseWriter, r *http.Request) {
+func ContactHandler(w http.ResponseWriter, r *http.Request) {
 
 	template:= contactTemplate{}
 	template.Fill(r)
@@ -21,7 +21,7 @@ type contactTemplate struct {
 	GlobalTemplate
 }
 
-func postContactHandler(w http.ResponseWriter, r *http.Request) {
+func PostContactHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := r.ParseForm(); err != nil {
 		logger.Error(err)

@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -13,7 +13,7 @@ import (
 	"github.com/steam-authority/steam-authority/steam"
 )
 
-func adminHandler(w http.ResponseWriter, r *http.Request) {
+func AdminHandler(w http.ResponseWriter, r *http.Request) {
 
 	option := chi.URLParam(r, "option")
 

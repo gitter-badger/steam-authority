@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"github.com/steam-authority/steam-authority/datastore"
@@ -26,7 +26,7 @@ const (
 var nonceStore = openid.NewSimpleNonceStore()
 var discoveryCache = openid.NewSimpleDiscoveryCache()
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	loggedIn, err := session.IsLoggedIn(r)
 	if err != nil {
@@ -49,7 +49,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, 303)
 	return
 }
-func loginCallbackHandler(w http.ResponseWriter, r *http.Request) {
+func LoginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	openID, err := openid.Verify(os.Getenv("STEAM_DOMAIN")+r.URL.String(), discoveryCache, nonceStore)
 	if err != nil {
@@ -79,14 +79,14 @@ func loginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func logoutHandler(w http.ResponseWriter, r *http.Request) {
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	session.Clear(w, r)
 	http.Redirect(w, r, "/", 303)
 	return
 }
 
-func settingsHandler(w http.ResponseWriter, r *http.Request) {
+func SettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 	loggedIn, err := session.IsLoggedIn(r)
 	if err != nil {
@@ -110,7 +110,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
+func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 

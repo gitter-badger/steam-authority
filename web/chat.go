@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -49,7 +49,7 @@ func init() {
 	}
 }
 
-func chatHandler(w http.ResponseWriter, r *http.Request) {
+func ChatHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get ID from URL
 	id := chi.URLParam(r, "id")

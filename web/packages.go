@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/steam-authority/steam-authority/mysql"
 )
 
-func packagesHandler(w http.ResponseWriter, r *http.Request) {
+func PackagesHandler(w http.ResponseWriter, r *http.Request) {
 
 	packages, err := mysql.GetLatestPackages(100)
 	if err != nil {
@@ -28,7 +28,7 @@ type packagesTemplate struct {
 	Packages []mysql.Package
 }
 
-func packageHandler(w http.ResponseWriter, r *http.Request) {
+func PackageHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {

@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/steam-authority/steam-authority/mysql"
 )
 
-func changesHandler(w http.ResponseWriter, r *http.Request) {
+func ChangesHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := changesTemplate{}
 	template.Fill(r)
@@ -72,7 +72,7 @@ type changesTemplate struct {
 	Packages map[int]mysql.Package
 }
 
-func changeHandler(w http.ResponseWriter, r *http.Request) {
+func ChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 	change, err := datastore.GetChange(chi.URLParam(r, "id"))
 	if err != nil {

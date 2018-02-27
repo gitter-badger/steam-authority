@@ -1,10 +1,10 @@
-package main
+package web
 
 import (
 	"net/http"
 )
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/players", 302)
 	return

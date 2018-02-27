@@ -13,6 +13,7 @@ import (
 	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/pics"
 	"github.com/steam-authority/steam-authority/queue"
+	"github.com/steam-authority/steam-authority/web"
 	"github.com/steam-authority/steam-authority/websockets"
 )
 
@@ -68,50 +69,50 @@ func main() {
 
 	r.Mount("/admin", adminRouter())
 
-	r.Get("/apps", appsHandler)
-	r.Get("/apps/{id}", appHandler)
-	r.Get("/apps/{id}/{slug}", appHandler)
+	r.Get("/apps", web.AppsHandler)
+	r.Get("/apps/{id}", web.AppHandler)
+	r.Get("/apps/{id}/{slug}", web.AppHandler)
 
-	r.Get("/changes", changesHandler)
-	r.Get("/changes/{id}", changeHandler)
+	r.Get("/changes", web.ChangesHandler)
+	r.Get("/changes/{id}", web.ChangeHandler)
 
-	r.Get("/chat", chatHandler)
-	r.Get("/chat/{id}", chatHandler)
+	r.Get("/chat", web.ChatHandler)
+	r.Get("/chat/{id}", web.ChatHandler)
 
-	r.Get("/contact", contactHandler)
-	r.Post("/contact", postContactHandler)
+	r.Get("/contact", web.ContactHandler)
+	r.Post("/contact", web.PostContactHandler)
 
-	r.Get("/deals", dealsHandler)
-	r.Get("/deals/{id}", dealsHandler)
+	r.Get("/deals", web.DealsHandler)
+	r.Get("/deals/{id}", web.DealsHandler)
 
-	r.Get("/experience", experienceHandler)
-	r.Get("/experience/{id}", experienceHandler)
+	r.Get("/experience", web.ExperienceHandler)
+	r.Get("/experience/{id}", web.ExperienceHandler)
 
-	r.Get("/login", loginHandler)
-	r.Get("/logout", logoutHandler)
-	r.Get("/login-callback", loginCallbackHandler)
+	r.Get("/login", web.LoginHandler)
+	r.Get("/logout", web.LogoutHandler)
+	r.Get("/login-callback", web.LoginCallbackHandler)
 
-	r.Get("/packages", packagesHandler)
-	r.Get("/packages/{id}", packageHandler)
+	r.Get("/packages", web.PackagesHandler)
+	r.Get("/packages/{id}", web.PackageHandler)
 
-	r.Post("/players", playerIDHandler)
-	r.Get("/players", playersHandler)
-	r.Get("/players/{id:[a-z]+}", playersHandler)
-	r.Get("/players/{id:[0-9]+}", playerHandler)
-	r.Get("/players/{id:[0-9]+}/{slug}", playerHandler)
+	r.Post("/players", web.PlayerIDHandler)
+	r.Get("/players", web.PlayersHandler)
+	r.Get("/players/{id:[a-z]+}", web.PlayersHandler)
+	r.Get("/players/{id:[0-9]+}", web.PlayerHandler)
+	r.Get("/players/{id:[0-9]+}/{slug}", web.PlayerHandler)
 
-	r.Get("/settings", settingsHandler)
-	r.Post("/settings", saveSettingsHandler)
+	r.Get("/settings", web.SettingsHandler)
+	r.Post("/settings", web.SaveSettingsHandler)
 
 	// Other
-	r.Get("/", homeHandler)
-	r.Get("/commits", commitsHandler)
-	r.Get("/credits", creditsHandler)
-	r.Get("/donate", donateHandler)
-	r.Get("/faqs", faqsHandler)
-	r.Get("/genres", genresHandler)
-	r.Get("/news", newsHandler)
-	r.Get("/tags", tagsHandler)
+	r.Get("/", web.HomeHandler)
+	r.Get("/changelog", web.ChangelogHandler)
+	r.Get("/credits", web.CreditsHandler)
+	r.Get("/donate", web.DonateHandler)
+	r.Get("/faqs", web.FAQsHandler)
+	r.Get("/genres", web.GenresHandler)
+	r.Get("/news", web.NewsHandler)
+	r.Get("/tags", web.TagsHandler)
 	r.Get("/websocket", websockets.Handler)
 
 	// File server
@@ -131,8 +132,8 @@ func adminRouter() http.Handler {
 	r.Use(basicauth.New("Steam", map[string][]string{
 		os.Getenv("STEAM_AUTH_USER"): {os.Getenv("STEAM_AUTH_PASS")},
 	}))
-	r.Get("/", adminHandler)
-	r.Get("/{option}", adminHandler)
+	r.Get("/", web.AdminHandler)
+	r.Get("/{option}", web.AdminHandler)
 	return r
 }
 

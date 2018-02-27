@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -12,7 +12,7 @@ import (
 	"github.com/steam-authority/steam-authority/steam"
 )
 
-func playersHandler(w http.ResponseWriter, r *http.Request) {
+func PlayersHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Normalise the order
 	var ranks []datastore.Rank
@@ -76,7 +76,7 @@ type playersTemplate struct {
 	RanksCount   int
 }
 
-func playerHandler(w http.ResponseWriter, r *http.Request) {
+func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 	slug := chi.URLParam(r, "slug")
@@ -139,7 +139,7 @@ type playerTemplate struct {
 	Friends []datastore.Player
 }
 
-func playerIDHandler(w http.ResponseWriter, r *http.Request) {
+func PlayerIDHandler(w http.ResponseWriter, r *http.Request) {
 
 	post := r.PostFormValue("id")
 

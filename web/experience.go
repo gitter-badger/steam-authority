@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"math"
@@ -17,7 +17,7 @@ const (
 	CHUNK = 100
 )
 
-func experienceHandler(w http.ResponseWriter, r *http.Request) {
+func ExperienceHandler(w http.ResponseWriter, r *http.Request) {
 
 	var rows []experienceRow
 	xp := 0

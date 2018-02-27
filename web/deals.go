@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ const (
 	DISCOUNTS = "discounts"
 )
 
-func dealsHandler(w http.ResponseWriter, r *http.Request) {
+func DealsHandler(w http.ResponseWriter, r *http.Request) {
 
 	tab := chi.URLParam(r, "id")
 	if tab == "" {

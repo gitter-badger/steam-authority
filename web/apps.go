@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ import (
 	"github.com/steam-authority/steam-authority/mysql"
 )
 
-func appsHandler(w http.ResponseWriter, r *http.Request) {
+func AppsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get apps
 	apps, err := mysql.SearchApps(r.URL.Query(), 96, "id DESC")
@@ -40,7 +40,7 @@ type appsTemplate struct {
 	Count int
 }
 
-func appHandler(w http.ResponseWriter, r *http.Request) {
+func AppHandler(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 	slug := chi.URLParam(r, "slug")

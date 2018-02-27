@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/steam-authority/steam-authority/mysql"
 )
 
-func genresHandler(w http.ResponseWriter, r *http.Request) {
+func GenresHandler(w http.ResponseWriter, r *http.Request) {
 
 	genres, err := mysql.GetAllGenres()
 	if err != nil {

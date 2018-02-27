@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/steam-authority/steam-authority/mysql"
 )
 
-func tagsHandler(w http.ResponseWriter, r *http.Request) {
+func TagsHandler(w http.ResponseWriter, r *http.Request) {
 
 	tags, err := mysql.GetAllTags()
 	if err != nil {

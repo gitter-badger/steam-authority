@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"github.com/steam-authority/steam-authority/mysql"
 )
 
-func newsHandler(w http.ResponseWriter, r *http.Request) {
+func NewsHandler(w http.ResponseWriter, r *http.Request) {
 
 	articles, err := datastore.GetArticles(0, 100)
 	if err != nil {
