@@ -10,7 +10,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func changelogHandler(w http.ResponseWriter, r *http.Request) {
+func commitsHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
@@ -35,14 +35,14 @@ func changelogHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	template := changelogTemplate{}
+	template := commitsTemplate{}
 	template.Fill(r)
 	template.Commits = commits
 
 	returnTemplate(w, r, "commits", template)
 }
 
-type changelogTemplate struct {
+type commitsTemplate struct {
 	GlobalTemplate
 	Commits []*github.RepositoryCommit
 }
