@@ -3,7 +3,8 @@
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-0 5 * * * ~/go/src/github.com/steam-authority/steam-authority/cmd/action-ranks.sh
-0 4 * * * ~/go/src/github.com/steam-authority/steam-authority/cmd/action-tags.sh
-0 3 * * * ~/go/src/github.com/steam-authority/steam-authority/cmd/action-genres.sh
-0 2 * * * ~/go/src/github.com/steam-authority/steam-authority/cmd/action-donations.sh
+0 5 * * * root ~/go/src/github.com/steam-authority/steam-authority/cmd/action-ranks.sh
+0 6 * * * root ~/go/src/github.com/steam-authority/steam-authority/cmd/action-tags.sh
+0 7 * * * root ~/go/src/github.com/steam-authority/steam-authority/cmd/action-genres.sh
+0 8 * * * root ~/go/src/github.com/steam-authority/steam-authority/cmd/action-donations.sh
+0 9 * * * root /etc/init.d/steam restart
