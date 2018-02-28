@@ -87,6 +87,15 @@ func (app App) GetType() (ret string) {
 	}
 }
 
+func (app App) GetIcon() (ret string) {
+
+	if app.Icon == "" {
+		return "/assets/img/no-app-icon.png"
+	} else {
+		return "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/" + strconv.Itoa(app.ID) + "/" + app.Icon + ".jpg"
+	}
+}
+
 func (app App) GetCommunityLink() (string) {
 	return "https://steamcommunity.com/app/" + strconv.Itoa(app.ID) + "/?utm_source=SteamAuthority&utm_medium=SteamAuthority&utm_campaign=SteamAuthority"
 }

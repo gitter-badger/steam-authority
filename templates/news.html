@@ -24,13 +24,7 @@
             {{ range $key, $value := .Articles }}
 
                 <li class="media">
-
-                {{ if eq (index $.Apps .AppID).Icon "" }}
-                    <img class="mr-3" src="/assets/img/no-app-icon.png" alt="{{ (index $.Apps .AppID).Name }}">
-                {{ else }}
-                    <img class="mr-3" src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{{ .AppID }}/{{ (index $.Apps .AppID).Icon }}.jpg" alt="{{ (index $.Apps .AppID).Name }}">
-                {{ end }}
-
+                    <img class="mr-3" src="{{ (index $.Apps .AppID).GetIcon }}" alt="{{ (index $.Apps .AppID).GetName }}">
                     <div class="media-body">
                         <h5 class="mt-0 mb-1"><a href="{{ (index $.Apps .AppID).GetPath }}#news">{{ .Title }}</a></h5>
                         <p class="text-muted">

@@ -42,11 +42,7 @@
                     {{ range $key, $value := .Apps }}
                     <tr data-link="{{ .GetPath }}">
                         <td class="img">
-                        {{ if eq .Icon "" }}
-                            <img src="/assets/img/no-app-icon.png" alt="{{ .GetName }}">
-                        {{ else }}
-                            <img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{{ .ID }}/{{ .Icon }}.jpg" alt="{{ .GetName }}">
-                        {{ end }}
+                            <img src="{{ .GetIcon }}" alt="{{ .GetName }}">
                         </td>
                         <td>{{ .GetName }}</td>
                         <td>{{ .GetType }}</td>

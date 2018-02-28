@@ -60,11 +60,7 @@
                 {{ range $key, $value := .Apps }}
                     <tr>
                         <td class="img">
-                        {{ if eq .Icon "" }}
-                            <img class="mr-3" src="/assets/img/no-app-icon.png" alt="{{ .Name }}">
-                        {{ else }}
-                            <img class="mr-3" src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{{ .ID }}/{{ .Icon }}.jpg" alt="{{ .Name }}">
-                        {{ end }}
+                            <img class="mr-3" src="{{ .GetIcon }}" alt="{{ .GetName }}">
                         </td>
                         <td style="white-space:nowrap"><a href="/apps/{{.ID}}">{{.GetName}}</a></td>
                         <td>{{ .GetType }}</td>
