@@ -14,6 +14,7 @@ go build
 cp ./crontab /etc/cron.d/steamauthority
 
 # Restart PICS
+chmod +x ./cmd/pics.sh
 ./cmd/pics.sh
 
 # Tell Rollbar
