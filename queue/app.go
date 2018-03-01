@@ -1,7 +1,6 @@
 package queue
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
@@ -96,9 +95,7 @@ func appConsumer() {
 
 				sqlErr := mysql.ConsumeApp(msg)
 				if sqlErr != nil {
-					fmt.Println("2")
 					logger.Error(sqlErr)
-					//sqlErr = nil
 				}
 
 				if dsErr == nil && sqlErr == nil {

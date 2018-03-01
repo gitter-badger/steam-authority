@@ -3,38 +3,41 @@ package steam
 import (
 	"encoding/json"
 	"errors"
-	"net/url"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/kr/pretty"
 )
 
-/**
-http://store.steampowered.com/api/packagedetails?packageids=32848
-*/
+func GetAppDetailsFromStore(id int) (app AppDetailsBody, err error) {
 
-// todo, dont bother use get() for these 2..
-// todo, they just need to handle "null" responses
+	idx := strconv.Itoa(id)
 
-func GetAppDetailsFromStore(id string) (app AppDetailsBody, err error) {
+	response, err := http.Get("http://store.steampowered.com/api/appdetails?appids=" + strconv.Itoa(id))
+	if err != nil {
+		return app, err
+	}
+	defer response.Body.Close()
 
-	options := url.Values{}
-	options.Set("appids", id)
-
-	bytes, err := get("", options)
+	// Convert to bytes
+	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return app, err
 	}
 
 	// Check for no app
-	if string(bytes) == "null" {
+	if string(contents) == "null" {
+		fmt.Println("invalid app id: " + strconv.Itoa(id))
 		return app, errors.New("invalid app id")
 	}
 
 	// Fix values that can change type, causing unmarshal errors
 	var regex *regexp.Regexp
-	var b = string(bytes)
+	var b = string(contents)
 
 	// Convert strings to ints
 	regex = regexp.MustCompile(`:"(\d+)"`) // After colon
@@ -63,23 +66,23 @@ func GetAppDetailsFromStore(id string) (app AppDetailsBody, err error) {
 	b = strings.Replace(b, "\"pc_requirements\":[]", "\"pc_requirements\":null", 1)
 	b = strings.Replace(b, "\"mac_requirements\":[]", "\"mac_requirements\":null", 1)
 	b = strings.Replace(b, "\"linux_requirements\":[]", "\"linux_requirements\":null", 1)
-	bytes = []byte(b)
+	contents = []byte(b)
 
 	// Unmarshal JSON
 	resp := make(map[string]AppDetailsBody)
-	if err := json.Unmarshal(bytes, &resp); err != nil {
+	if err := json.Unmarshal(contents, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
-			pretty.Print(string(bytes))
+			pretty.Print(string(contents))
 			pretty.Print(err.Error())
 		}
 		return app, err
 	}
 
-	if resp[id].Success == false {
+	if resp[idx].Success == false {
 		return app, errors.New("no app with id in steam")
 	}
 
-	return resp[id], nil
+	return resp[idx], nil
 }
 
 type AppDetailsBody struct {
@@ -210,102 +213,73 @@ type AppDetailsCategory struct {
 	Description string `json:"description"`
 }
 
-func GetPackageDetailsFromStore(id string) (app AppDetailsBody, err error) {
+func GetPackageDetailsFromStore(id int) (pack PackageDetailsBody, err error) {
 
-	options := url.Values{}
-	options.Set("appids", id)
+	idx := strconv.Itoa(id)
 
-	bytes, err := get("", options)
+	response, err := http.Get("http://store.steampowered.com/api/packagedetails?packageids=" + strconv.Itoa(id))
 	if err != nil {
-		return app, err
+		return pack, err
+	}
+	defer response.Body.Close()
+
+	// Convert to bytes
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return pack, err
 	}
 
-	// Check for no app
-	if string(bytes) == "null" {
-		return app, errors.New("invalid app id")
+	// Check for no pack
+	if string(contents) == "null" {
+		return pack, errors.New("invalid package id")
 	}
-
-	// Fix values that can change type, causing unmarshal errors
-	var regex *regexp.Regexp
-	var b = string(bytes)
-
-	// Convert strings to ints
-	regex = regexp.MustCompile(`:"(\d+)"`) // After colon
-	b = regex.ReplaceAllString(b, `:$1`)
-
-	regex = regexp.MustCompile(`,"(\d+)"`) // After comma
-	b = regex.ReplaceAllString(b, `,$1`)
-
-	regex = regexp.MustCompile(`"(\d+)",`) // Before comma
-	b = regex.ReplaceAllString(b, `$1,`)
-
-	regex = regexp.MustCompile(`"packages":\["(\d+)"\]`) // Package array with single int
-	b = regex.ReplaceAllString(b, `"packages":[$1]`)
-
-	// Make some its strings again
-	regex = regexp.MustCompile(`"date":(\d+)`)
-	b = regex.ReplaceAllString(b, `"date":"$1"`)
-
-	regex = regexp.MustCompile(`"name":(\d+)`)
-	b = regex.ReplaceAllString(b, `"name":"$1"`)
-
-	regex = regexp.MustCompile(`"description":(\d+)`)
-	b = regex.ReplaceAllString(b, `"description":"$1"`)
-
-	// Fix arrays that should be objects
-	b = strings.Replace(b, "\"pc_requirements\":[]", "\"pc_requirements\":null", 1)
-	b = strings.Replace(b, "\"mac_requirements\":[]", "\"mac_requirements\":null", 1)
-	b = strings.Replace(b, "\"linux_requirements\":[]", "\"linux_requirements\":null", 1)
-	bytes = []byte(b)
 
 	// Unmarshal JSON
-	resp := make(map[string]AppDetailsBody)
-	if err := json.Unmarshal(bytes, &resp); err != nil {
+	resp := make(map[string]PackageDetailsBody)
+	if err := json.Unmarshal(contents, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
-			pretty.Print(string(bytes))
+			pretty.Print(string(contents))
 			pretty.Print(err.Error())
 		}
-		return app, err
+		return pack, err
 	}
 
-	if resp[id].Success == false {
-		return app, errors.New("no app with id in steam")
+	if resp[idx].Success == false {
+		return pack, errors.New("no package with id in steam")
 	}
 
-	return resp[id], nil
+	return resp[idx], nil
 }
 
 type PackageDetailsBody struct {
-	Num32848 struct {
-		Success bool `json:"success"`
-		Data    struct {
-			Name        string `json:"name"`
-			PageImage   string `json:"page_image"`
-			HeaderImage string `json:"header_image"`
-			SmallLogo   string `json:"small_logo"`
-			Apps        []struct {
-				ID   int    `json:"id"`
-				Name string `json:"name"`
-			} `json:"apps"`
-			Price struct {
-				Currency        string `json:"currency"`
-				Initial         int    `json:"initial"`
-				Final           int    `json:"final"`
-				DiscountPercent int    `json:"discount_percent"`
-				Individual      int    `json:"individual"`
-			} `json:"price"`
-			Platforms struct {
-				Windows bool `json:"windows"`
-				Mac     bool `json:"mac"`
-				Linux   bool `json:"linux"`
-			} `json:"platforms"`
-			Controller struct {
-				FullGamepad bool `json:"full_gamepad"`
-			} `json:"controller"`
-			ReleaseDate struct {
-				ComingSoon bool   `json:"coming_soon"`
-				Date       string `json:"date"`
-			} `json:"release_date"`
-		} `json:"data"`
-	} `json:"32848"`
+	Success bool `json:"success"`
+	Data struct {
+		Name        string `json:"name"`
+		PageImage   string `json:"page_image"`
+		HeaderImage string `json:"header_image"`
+		SmallLogo   string `json:"small_logo"`
+		Apps []struct {
+			ID   int    `json:"id"`
+			Name string `json:"name"`
+		} `json:"apps"`
+		Price struct {
+			Currency        string `json:"currency"`
+			Initial         int    `json:"initial"`
+			Final           int    `json:"final"`
+			DiscountPercent int    `json:"discount_percent"`
+			Individual      int    `json:"individual"`
+		} `json:"price"`
+		Platforms struct {
+			Windows bool `json:"windows"`
+			Mac     bool `json:"mac"`
+			Linux   bool `json:"linux"`
+		} `json:"platforms"`
+		Controller struct {
+			FullGamepad bool `json:"full_gamepad"`
+		} `json:"controller"`
+		ReleaseDate struct {
+			ComingSoon bool   `json:"coming_soon"`
+			Date       string `json:"date"`
+		} `json:"release_date"`
+	} `json:"data"`
 }

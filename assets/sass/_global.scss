@@ -32,8 +32,19 @@ body {
     cursor: pointer;
 }
 
-.card-header-tabs{
-    a{
+.card-header-tabs {
+    a {
         color: $dark;
+    }
+}
+
+td.platforms {
+    font-size: 26px;
+    line-height: 28px;
+    i, svg {
+        margin-right: 5px;
+    }
+    i:last-child, svg:last-child {
+        margin-right: 0;
     }
 }

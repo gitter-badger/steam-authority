@@ -3,7 +3,7 @@ package mysql
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
+	"html/template"
 	"strconv"
 	"time"
 
@@ -13,16 +13,28 @@ import (
 )
 
 type Package struct {
-	ID          int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"` //
-	CreatedAt   *time.Time `gorm:"not null;column:created_at"`                    //
-	UpdatedAt   *time.Time `gorm:"not null;column:updated_at"`                    //
-	Name        string     `gorm:"not null;column:name;defaukt:x"`                //
-	BillingType int8       `gorm:"not null;column:billing_type"`                  //
-	LicenseType int8       `gorm:"not null;column:license_type"`                  //
-	Status      int8       `gorm:"not null;column:status"`                        //
-	Apps        string     `gorm:"not null;column:apps"`                          // JSON
-	ChangeID    int        `gorm:"not null;column:change_id"`                     //
-	Extended    string     `gorm:"not null;column:extended"`                      // JSON
+	ID              int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"` //
+	CreatedAt       *time.Time `gorm:"not null;column:created_at"`                    //
+	UpdatedAt       *time.Time `gorm:"not null;column:updated_at"`                    //
+	Name            string     `gorm:"not null;column:name"`                          //
+	ImagePage       string     `gorm:"not null;column:image_page"`                    //
+	ImageHeader     string     `gorm:"not null;column:image_header"`                  //
+	ImageLogo       string     `gorm:"not null;column:image_logo"`                    //
+	BillingType     int8       `gorm:"not null;column:billing_type"`                  //
+	LicenseType     int8       `gorm:"not null;column:license_type"`                  //
+	Status          int8       `gorm:"not null;column:status"`                        //
+	Apps            string     `gorm:"not null;column:apps;default:'[]'"`             // JSON
+	ChangeID        int        `gorm:"not null;column:change_id"`                     //
+	Extended        string     `gorm:"not null;column:extended;default:'{}'"`         // JSON
+	PurchaseText    string     `gorm:"not null;column:purchase_text"`                 //
+	PriceInitial    int        `gorm:"not null;column:price_initial"`                 //
+	PriceFinal      int        `gorm:"not null;column:price_final"`                   //
+	PriceDiscount   int        `gorm:"not null;column:price_discount"`                //
+	PriceIndividual int        `gorm:"not null;column:price_individual"`              //
+	Controller      string     `gorm:"not null;column:controller;default:'{}'"`       // JSON
+	ComingSoon      bool       `gorm:"not null;column:coming_soon"`                   //
+	ReleaseDate     *time.Time `gorm:"not null;column:controller"`                    //
+	Platforms       string     `gorm:"not null;column:platforms;default:'[]'"`        // JSON
 }
 
 func getDefaultPackageJSON() Package {
@@ -139,6 +151,36 @@ func (pack Package) GetExtended() (extended map[string]interface{}, err error) {
 	return extended, nil
 }
 
+func (pack Package) GetPlatforms() (platforms []string, err error) {
+
+	bytes := []byte(pack.Platforms)
+	if err := json.Unmarshal(bytes, &platforms); err != nil {
+		return platforms, err
+	}
+
+	return platforms, nil
+}
+
+func (pack Package) GetPlatformImages() (ret template.HTML, err error) {
+
+	platforms, err := pack.GetPlatforms()
+	if err != nil {
+		return ret, err
+	}
+
+	for _, v := range platforms {
+		if v == "macos" {
+			ret = ret + `<i class="fab fa-apple"></i>`
+		} else if v == "windows" {
+			ret = ret + `<i class="fab fa-windows"></i>`
+		} else if v == "linux" {
+			ret = ret + `<i class="fab fa-linux"></i>`
+		}
+	}
+
+	return ret, nil
+}
+
 func GetPackage(id int) (pack Package, err error) {
 
 	db, err := getDB()
@@ -203,9 +245,7 @@ func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
 		return packages, err
 	}
 
-	db = db.Where("JSON_CONTAINS(apps, '[\""+strconv.Itoa(appID)+"\"]')").Limit(96).Order("id DESC").Find(&packages)
-
-	fmt.Println("JSON_CONTAINS(apps, '[\""+strconv.Itoa(appID)+"\"]')")
+	db = db.Where("JSON_CONTAINS(apps, '[\"" + strconv.Itoa(appID) + "\"]')").Limit(96).Order("id DESC").Find(&packages)
 
 	if db.Error != nil {
 		return packages, db.Error
@@ -241,6 +281,12 @@ func ConsumePackage(msg amqp.Delivery) (err error) {
 // GORM callback
 func (pack *Package) fill() (err error) {
 
+	// Get app details
+	err = pack.fillFromAPI()
+	if err != nil {
+		return err
+	}
+
 	// Get app details from PICS
 	err = pack.fillFromPICS()
 	if err != nil {
@@ -255,6 +301,70 @@ func (pack *Package) fill() (err error) {
 	if pack.Extended == "" || pack.Extended == "null" {
 		pack.Extended = "{}"
 	}
+
+	return nil
+}
+
+func (pack *Package) fillFromAPI() (err error) {
+
+	// Get data
+	response, err := steam.GetPackageDetailsFromStore(pack.ID)
+	if err != nil {
+
+		// Not all apps can be found
+		if err.Error() == "no package with id in steam" {
+			return nil
+		}
+
+		return err
+	}
+
+	// Controller
+	controllerString, err := json.Marshal(response.Data.Controller)
+	if err != nil {
+		return err
+	}
+
+	// Platforms
+	var platforms []string
+	if response.Data.Platforms.Linux {
+		platforms = append(platforms, "linux")
+	}
+	if response.Data.Platforms.Windows {
+		platforms = append(platforms, "windows")
+	}
+	if response.Data.Platforms.Windows {
+		platforms = append(platforms, "macos")
+	}
+
+	platformsString, err := json.Marshal(platforms)
+	if err != nil {
+		return err
+	}
+
+	// Release date
+	var releaseDate = time.Time{}
+	if response.Data.ReleaseDate.Date != "" {
+		releaseDate, err = time.Parse("2 Jan, 2006", response.Data.ReleaseDate.Date)
+		if err != nil {
+			return err
+		}
+	}
+
+	//
+	pack.Name = response.Data.Name
+	pack.ImageHeader = response.Data.HeaderImage
+	pack.ImageLogo = response.Data.SmallLogo
+	pack.ImageHeader = response.Data.HeaderImage
+	//pack.Apps = string(appsString) // Can get from PICS
+	pack.PriceInitial = response.Data.Price.Initial
+	pack.PriceFinal = response.Data.Price.Final
+	pack.PriceDiscount = response.Data.Price.DiscountPercent
+	pack.PriceIndividual = response.Data.Price.Individual
+	pack.Platforms = string(platformsString)
+	pack.Controller = string(controllerString)
+	pack.ReleaseDate = &releaseDate
+	pack.ComingSoon = response.Data.ReleaseDate.ComingSoon
 
 	return nil
 }

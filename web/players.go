@@ -88,7 +88,7 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queue.PlayerProducer(idx)
+	//queue.PlayerProducer(76561197995497914)
 
 	player, err := datastore.GetPlayer(idx)
 	if err != nil {
@@ -97,8 +97,15 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if player.AddFriends {
-		queue.FriendsProducer(player.PlayerID)
+	// Queue friends
+	if player.ShouldScanFriends() {
+
+		for _, v := range player.Friends {
+			vv, _ := strconv.Atoi(v.SteamID)
+			queue.PlayerProducer(vv)
+		}
+
+		datastore.UpdatePlayerFriendsScannedDate(player)
 	}
 
 	// Redirect to correct slug

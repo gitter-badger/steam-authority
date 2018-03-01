@@ -22,14 +22,18 @@
 
             <div class="list-group list-group-flush">
             {{ range $key, $value := .Friends }}
-                <a href="{{.GetPath}}" class="list-group-item list-group-item-action">
 
-                {{ if ne .PersonaName "" }}
-                    {{ .PersonaName }}
-                  {{else}}
-                    <span class="text-muted">Queued <i class="fas fa-spinner fa-spin"></i></span>
-                {{end}}
+
+            {{ if ne .PersonaName "" }}
+                <a href="{{.GetPath}}" class="list-group-item list-group-item-action">
+                {{ .PersonaName }}
                 </a>
+            {{else}}
+                <span class="list-group-item list-group-item-action">
+                    <span class="text-muted">Added to the <a href="/queues">queue</a> <i class="fas fa-spinner fa-spin"></i></span>
+                </span>
+            {{end}}
+
             {{ end }}
             </div>
 

@@ -31,7 +31,6 @@ type Player struct {
 	PlayTime       int                         `datastore:"play_time"`
 	TimeCreated    int                         `datastore:"time_created"` // In Steam's DB
 	Friends        []steam.GetFriendListFriend `datastore:"friends,noindex"`
-	AddFriends     bool                        `datastore:"-"`
 }
 
 func (p Player) GetKey() (key *datastore.Key) {
@@ -42,12 +41,20 @@ func (p Player) GetPath() string {
 	return "/players/" + strconv.Itoa(p.PlayerID) + "/" + slug.Make(p.PersonaName)
 }
 
-func (p Player) shouldScanFriends() bool {
+func (p Player) ShouldScanFriends() bool {
 	return p.FriendsAddedAt.Unix() < (time.Now().Unix() - int64(60*60*24*30))
 }
 
 func (p Player) shouldUpdate() bool {
 	return p.UpdatedAt.Unix() < (time.Now().Unix() - int64(60*60*24))
+}
+
+func UpdatePlayerFriendsScannedDate(player Player) (err error) {
+
+	player.FriendsAddedAt = time.Now()
+	_, err = SaveKind(player.GetKey(), &player)
+
+	return err
 }
 
 func GetPlayer(id int) (ret Player, err error) {
@@ -161,12 +168,6 @@ func ConsumePlayer(msg amqp.Delivery) (err error) {
 func (p *Player) Fill() (player *Player, err error) {
 
 	// todo, get player bans, groups
-
-	// Add friends to rabbit
-	if player.UpdatedAt.Unix() < (time.Now().Unix() - int64(86400)) {
-		p.AddFriends = true
-		p.FriendsAddedAt = time.Now()
-	}
 
 	//Get summary
 	summary, err := steam.GetPlayerSummaries([]int{p.PlayerID})

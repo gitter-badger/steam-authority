@@ -8,21 +8,12 @@ import (
 	"os"
 )
 
-func get(path string, query url.Values, useKey ...bool) (bytes []byte, err error) {
+func get(path string, query url.Values) (bytes []byte, err error) {
 
-	if path != "" {
-		query.Add("format", "json")
+	query.Add("format", "json")
+	query.Add("key", os.Getenv("STEAM_API_KEY"))
 
-		if !(len(useKey) > 0 && !useKey[0]) {
-			query.Add("key", os.Getenv("STEAM_API_KEY"))
-		}
-		path = "http://api.steampowered.com/" + path
-	} else {
-		path = "http://store.steampowered.com/api/appdetails"
-	}
-
-	// Debug
-	//logger.Info("STEAM: " + path + "?" + query.Encode())
+	path = "http://api.steampowered.com/" + path
 
 	// Grab the JSON from node
 	response, err := http.Get(path + "?" + query.Encode())

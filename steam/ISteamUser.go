@@ -135,20 +135,20 @@ type PlayerSummariesResponse struct {
 
 type PlayerSummariesPlayer struct {
 	SteamID                  string `json:"steamid"`
-	CommunityVisibilityState int8   `json:"communityvisibilitystate"`
-	ProfileState             int8   `json:"profilestate"`
+	CommunityVisibilityState int    `json:"communityvisibilitystate"`
+	ProfileState             int    `json:"profilestate"`
 	PersonaName              string `json:"personaname"`
 	LastLogOff               int64  `json:"lastlogoff"`
-	CommentPermission        int8   `json:"commentpermission"`
+	CommentPermission        int    `json:"commentpermission"`
 	ProfileURL               string `json:"profileurl"`
 	Avatar                   string `json:"avatar"`
 	AvatarMedium             string `json:"avatarmedium"`
 	AvatarFull               string `json:"avatarfull"`
-	PersonaState             int8   `json:"personastate"`
+	PersonaState             int    `json:"personastate"`
 	RealName                 string `json:"realname"`
 	PrimaryClanID            string `json:"primaryclanid"`
 	TimeCreated              int64  `json:"timecreated"`
-	PersonaStateFlags        int8   `json:"personastateflags"`
+	PersonaStateFlags        int    `json:"personastateflags"`
 	LOCCountryCode           string `json:"loccountrycode"`
 	LOCStateCode             string `json:"locstatecode"`
 }

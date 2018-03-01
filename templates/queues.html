@@ -1,0 +1,45 @@
+{{define "queues"}} {{ template "_header" . }}
+
+<div class="container" id="queue-page">
+
+    <div class="jumbotron">
+
+        <h1 class="display-4">Queue</h1>
+        <p class="lead">When new items get added to the site, they go through a queue to not overload the servers.</p>
+
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light text-white">
+
+            <h5 class="float-right" style="margin-bottom: 0;">
+                <span class="badge badge-success" id="live-badge">Live (5)</span>
+            </h5>
+
+        </div>
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover table-sm table-striped table-ranks table-images">
+                    <thead>
+                    <th scope="col" width="20%">Queue</th>
+                    <th scope="col" width="20%">Items</th>
+                    <th scope="col" width="60%">Rate</th>
+                    </thead>
+                {{ range $key, $value := .Queues }}
+                    <tr>
+                        <td>{{ .Name }}</td>
+                        <td>{{ .MessagesUnacknowledged }}</td>
+                        <td>{{ .MessageStats.AckDetails.Rate }}/s</td>
+                    </tr>
+                {{ end }}
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+{{ template "_footer" }} {{end}}

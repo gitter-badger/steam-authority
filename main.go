@@ -106,12 +106,13 @@ func main() {
 
 	// Other
 	r.Get("/", web.HomeHandler)
-	r.Get("/changelog", web.CommitsHandler)
+	r.Get("/commits", web.CommitsHandler)
 	r.Get("/credits", web.CreditsHandler)
 	r.Get("/donate", web.DonateHandler)
 	r.Get("/faqs", web.FAQsHandler)
 	r.Get("/genres", web.GenresHandler)
 	r.Get("/news", web.NewsHandler)
+	r.Get("/queues", web.QueuesHandler)
 	r.Get("/tags", web.TagsHandler)
 	r.Get("/websocket", websockets.Handler)
 
@@ -122,7 +123,7 @@ func main() {
 
 	http.ListenAndServe(":8085", r)
 
-	// Block for goroutines
+	// Block for goroutines to run forever
 	forever := make(chan bool)
 	<-forever
 }

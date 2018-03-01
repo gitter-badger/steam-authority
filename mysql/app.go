@@ -35,7 +35,7 @@ type App struct {
 	Genres            string     `gorm:"not null;column:genres;default:'[]'"`           // JSON
 	Screenshots       string     `gorm:"not null;column:screenshots;default:'[]'"`      // JSON
 	Movies            string     `gorm:"not null;column:movies;default:'[]'"`           // JSON
-	Achievements      string     `gorm:"not null;column:achievements;default:'[]'"`     // JSON
+	Achievements      string     `gorm:"not null;column:achievements;default:'{}'"`     // JSON
 	Background        string     `gorm:"not null;column:background"`                    //
 	Platforms         string     `gorm:"not null;column:platforms;default:'[]'"`        // JSON
 	GameID            int        `gorm:"not null;column:game_id"`                       //
@@ -423,7 +423,7 @@ func (app *App) fill() (err error) {
 func (app *App) fillFromAPI() (err error) {
 
 	// Get data
-	appDetails, err := steam.GetAppDetailsFromStore(strconv.Itoa(app.ID))
+	response, err := steam.GetAppDetailsFromStore(app.ID)
 	if err != nil {
 
 		// Not all apps can be found
@@ -435,50 +435,50 @@ func (app *App) fillFromAPI() (err error) {
 	}
 
 	// Screenshots
-	screenshotsString, err := json.Marshal(appDetails.Data.Screenshots)
+	screenshotsString, err := json.Marshal(response.Data.Screenshots)
 	if err != nil {
 		return err
 	}
 
 	// Movies
-	moviesString, err := json.Marshal(appDetails.Data.Movies)
+	moviesString, err := json.Marshal(response.Data.Movies)
 	if err != nil {
 		return err
 	}
 
 	// Achievements
-	achievementsString, err := json.Marshal(appDetails.Data.Achievements)
+	achievementsString, err := json.Marshal(response.Data.Achievements)
 	if err != nil {
 		return err
 	}
 
 	// DLC
-	dlcString, err := json.Marshal(appDetails.Data.DLC)
+	dlcString, err := json.Marshal(response.Data.DLC)
 	if err != nil {
 		return err
 	}
 
 	// Developers
-	developersString, err := json.Marshal(appDetails.Data.Developers)
+	developersString, err := json.Marshal(response.Data.Developers)
 	if err != nil {
 		return err
 	}
 
 	// Publishers
-	publishersString, err := json.Marshal(appDetails.Data.Publishers)
+	publishersString, err := json.Marshal(response.Data.Publishers)
 	if err != nil {
 		return err
 	}
 
 	// Packages
-	packagesString, err := json.Marshal(appDetails.Data.Packages)
+	packagesString, err := json.Marshal(response.Data.Packages)
 	if err != nil {
 		return err
 	}
 
 	// Categories
 	var categories []int8
-	for _, v := range appDetails.Data.Categories {
+	for _, v := range response.Data.Categories {
 		categories = append(categories, v.ID)
 	}
 
@@ -489,25 +489,25 @@ func (app *App) fillFromAPI() (err error) {
 
 	// Genres
 	//var genres []int8
-	//for _, v := range appDetails.Data.Genres {
+	//for _, v := range response.Data.Genres {
 	//	genre, _ := strconv.ParseInt(v.ID, 10, 8)
 	//genres = append(genres, v.ID)
 	//}
 
-	genresString, err := json.Marshal(appDetails.Data.Genres)
+	genresString, err := json.Marshal(response.Data.Genres)
 	if err != nil {
 		return err
 	}
 
 	// Platforms
 	var platforms []string
-	if appDetails.Data.Platforms.Linux {
+	if response.Data.Platforms.Linux {
 		platforms = append(platforms, "linux")
 	}
-	if appDetails.Data.Platforms.Windows {
+	if response.Data.Platforms.Windows {
 		platforms = append(platforms, "windows")
 	}
-	if appDetails.Data.Platforms.Windows {
+	if response.Data.Platforms.Windows {
 		platforms = append(platforms, "macos")
 	}
 
@@ -517,31 +517,31 @@ func (app *App) fillFromAPI() (err error) {
 	}
 
 	//
-	app.Name = appDetails.Data.Name
-	app.Type = appDetails.Data.Type
-	app.IsFree = appDetails.Data.IsFree
+	app.Name = response.Data.Name
+	app.Type = response.Data.Type
+	app.IsFree = response.Data.IsFree
 	app.DLC = string(dlcString)
-	app.ShortDescription = appDetails.Data.ShortDescription
-	app.HeaderImage = appDetails.Data.HeaderImage
+	app.ShortDescription = response.Data.ShortDescription
+	app.HeaderImage = response.Data.HeaderImage
 	app.Developers = string(developersString)
 	app.Publishers = string(publishersString)
 	app.Packages = string(packagesString)
-	app.MetacriticScore = appDetails.Data.Metacritic.Score
-	app.MetacriticFullURL = appDetails.Data.Metacritic.URL
+	app.MetacriticScore = response.Data.Metacritic.Score
+	app.MetacriticFullURL = response.Data.Metacritic.URL
 	app.Categories = string(categoriesString)
 	app.Genres = string(genresString)
 	app.Screenshots = string(screenshotsString)
 	app.Movies = string(moviesString)
 	app.Achievements = string(achievementsString)
-	app.Background = appDetails.Data.Background
+	app.Background = response.Data.Background
 	app.Platforms = string(platformsString)
-	app.GameID = appDetails.Data.Fullgame.AppID
-	app.GameName = appDetails.Data.Fullgame.Name
+	app.GameID = response.Data.Fullgame.AppID
+	app.GameName = response.Data.Fullgame.Name
 
 	// Price
-	app.PriceInitial = appDetails.Data.PriceOverview.Initial
-	app.PriceFinal = appDetails.Data.PriceOverview.Final
-	app.PriceDiscount = appDetails.Data.PriceOverview.DiscountPercent
+	app.PriceInitial = response.Data.PriceOverview.Initial
+	app.PriceFinal = response.Data.PriceOverview.Final
+	app.PriceDiscount = response.Data.PriceOverview.DiscountPercent
 
 	return nil
 }

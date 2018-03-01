@@ -1,10 +1,10 @@
 .oldschool {
-	margin: 0 auto;
-	background-color: #4c5844;
-	color: #a0aa95;
-	padding: 10px;
-	border: 1px solid;
-	border-color: #889180 #272f20 #272f20 #889180;
+    margin: 0 auto;
+    background-color: #4c5844;
+    color: #a0aa95;
+    padding: 10px;
+    border: 1px solid;
+    border-color: #889180 #272f20 #272f20 #889180;
 
     h1 {
         margin: 0;
@@ -21,35 +21,35 @@
         overflow-y: scroll;
     }
 
-	div::-webkit-scrollbar {
-		width: 18px;
-	}
-	div::-webkit-scrollbar-track {
-		background-color: #5a6a4d;
-	}
-	div::-webkit-scrollbar-thumb {
-		background-color: #4c5844;
-		border: 1px solid;
-		border-color: #889180 #272f20 #272f20 #889180;
-	}
-	div::-webkit-scrollbar-thumb:active {
-		border-color: #272f20 #889180 #889180 #272f20;
-	}
-	div::-webkit-scrollbar-button {
-		border: 1px solid;
-		border-color: #889180 #272f20 #272f20 #889180;
-		background-color: #4c5844;
-		height: 18px;
-	}
-	div::-webkit-scrollbar-button:vertical:decrement{
-		background: url(/assets/img/error-page/scroll_up.png);
-		background-color: #4c5844;
-	}
-	div::-webkit-scrollbar-button:vertical:increment{
-		background: url(/assets/img/error-page/scroll_down.png);
-		background-color: #4c5844;
-	}
-	div::-webkit-scrollbar-button:active {
-		border-color: #272f20 #889180 #889180 #272f20;
-	}
+    div::-webkit-scrollbar {
+        width: 18px;
+    }
+    div::-webkit-scrollbar-track {
+        background-color: #5a6a4d;
+    }
+    div::-webkit-scrollbar-thumb {
+        background-color: #4c5844;
+        border: 1px solid;
+        border-color: #889180 #272f20 #272f20 #889180;
+    }
+    div::-webkit-scrollbar-thumb:active {
+        border-color: #272f20 #889180 #889180 #272f20;
+    }
+    div::-webkit-scrollbar-button {
+        border: 1px solid;
+        border-color: #889180 #272f20 #272f20 #889180;
+        background-color: #4c5844;
+        height: 18px;
+    }
+    div::-webkit-scrollbar-button:vertical:decrement {
+        background: url(/assets/img/error-page/scroll_up.png);
+        background-color: #4c5844;
+    }
+    div::-webkit-scrollbar-button:vertical:increment {
+        background: url(/assets/img/error-page/scroll_down.png);
+        background-color: #4c5844;
+    }
+    div::-webkit-scrollbar-button:active {
+        border-color: #272f20 #889180 #889180 #272f20;
+    }
 }
