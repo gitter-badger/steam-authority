@@ -11,10 +11,10 @@ dep ensure
 go build
 
 # Copy over crontab
-cp ../crontab /etc/cron.d/steamauthority
+cp ./crontab /etc/cron.d/steamauthority
 
 # Restart PICS
-./pics.sh
+./cmd/pics.sh
 
 # Tell Rollbar
 curl https://api.rollbar.com/api/1/deploy/ \
