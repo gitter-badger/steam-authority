@@ -2,6 +2,7 @@ package steam
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -35,6 +36,10 @@ func GetPICSInfo(apps []int, packages []int) (jsInfo JsInfo, err error) {
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return jsInfo, err
+	}
+
+	if len(bytes) == 0 {
+		return jsInfo, errors.New("empty response from pics")
 	}
 
 	// Fix arrays that should be objects

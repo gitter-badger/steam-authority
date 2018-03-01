@@ -126,7 +126,7 @@ type adminGenreCount struct {
 func adminTags(w http.ResponseWriter, r *http.Request) {
 
 	filter := url.Values{}
-	filter.Set("json_depth", "2")
+	filter.Set("json_depth", "3")
 
 	apps, err := mysql.SearchApps(filter, 0, "")
 	if err != nil {

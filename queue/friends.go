@@ -1,16 +1,14 @@
 package queue
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
-	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/streadway/amqp"
 )
 
-func getAppQueue() (queue amqp.Queue, err error) {
+func getFriendsQueue() (queue amqp.Queue, err error) {
 
 	err = connect()
 	if err != nil {
@@ -18,22 +16,22 @@ func getAppQueue() (queue amqp.Queue, err error) {
 	}
 
 	queue, err = channel.QueueDeclare(
-		namespace+"Apps", // name
-		true,             // durable
-		false,            // delete when unused
-		false,            // exclusive
-		false,            // no-wait
-		nil,              // arguments
+		namespace+"Friends", // name
+		true,                // durable
+		false,               // delete when unused
+		false,               // exclusive
+		false,               // no-wait
+		nil,                 // arguments
 	)
 
 	return queue, err
 }
 
-func AppProducer(id int, change int) (err error) {
+func FriendsProducer(id int) (err error) {
 
-	//logger.Info("Adding app " + strconv.Itoa(id) + " to rabbit")
+	//logger.Info("Adding friend " + strconv.Itoa(id) + " to rabbit")
 
-	queue, err := getAppQueue()
+	queue, err := getFriendsQueue()
 	if err != nil {
 		return err
 	}
@@ -55,17 +53,17 @@ func AppProducer(id int, change int) (err error) {
 	return nil
 }
 
-func appConsumer() {
+func friendsConsumer() {
 
 	for {
 
-		queue, err := getAppQueue()
+		queue, err := getFriendsQueue()
 		if err != nil {
 			logger.Error(err)
 			continue
 		}
 
-		//fmt.Println("Getting app messages from rabbit")
+		//fmt.Println("Getting friends messages from rabbit")
 		messages, err := channel.Consume(
 			queue.Name, // queue
 			"",         // consumer
@@ -86,23 +84,21 @@ func appConsumer() {
 				break
 			case msg := <-messages:
 
-				//id := string(msg.Body)
-				//logger.Info("Reading app " + id + " from rabbit")
+				id := string(msg.Body)
+				idx, _ := strconv.Atoi(id)
 
-				dsErr := datastore.ConsumeApp(msg)
-				if dsErr != nil {
-					logger.Error(dsErr)
+				//logger.Info("Reading friend " + id + " from rabbit")
+
+				player, err := datastore.GetPlayer(idx)
+				for _, v := range player.Friends {
+					vv, _ := strconv.Atoi(v.SteamID)
+					PlayerProducer(vv)
 				}
 
-				sqlErr := mysql.ConsumeApp(msg)
-				if sqlErr != nil {
-					fmt.Println("2")
-					logger.Error(sqlErr)
-					//sqlErr = nil
-				}
-
-				if dsErr == nil && sqlErr == nil {
+				if err == nil {
 					msg.Ack(false)
+				} else {
+					logger.Error(err)
 				}
 			}
 		}

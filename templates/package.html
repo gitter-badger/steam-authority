@@ -55,16 +55,16 @@
                     <th scope="col" width="25%">Name</th>
                     <th scope="col">Type</th>
                     <th scope="col">Platforms</th>
-                    <th scope="col">DLC</th>
+                    <th scope="col">DLC #</th>
                     </thead>
                 {{ range $key, $value := .Apps }}
                     <tr>
                         <td class="img">
-                            <img class="mr-3" src="{{ .GetIcon }}" alt="{{ .GetName }}">
+                            <img class="mr-3 rounded" src="{{ .GetIcon }}" alt="{{ .GetName }}">
                         </td>
                         <td style="white-space:nowrap"><a href="/apps/{{.ID}}">{{.GetName}}</a></td>
                         <td>{{ .GetType }}</td>
-                        <td>{{ .GetPlatforms }}</td>
+                        <td>{{ .GetPlatformImages }}</td>
                         <td>{{ len .GetDLC }}</td>
                     </tr>
                 {{ end }}

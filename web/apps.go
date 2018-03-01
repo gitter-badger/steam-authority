@@ -67,6 +67,13 @@ func AppHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Redirect to correct slug
+	correctSLug := slugify.Make(app.Name)
+	if slug != "" && app.Name != "" && slug != correctSLug {
+		http.Redirect(w, r, "/apps/"+id+"/"+correctSLug, 302)
+		return
+	}
+
 	// Make banners
 	banners := make(map[string][]string)
 	var primary []string
@@ -84,13 +91,6 @@ func AppHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get news
 	news, err := datastore.GetArticles(idx, 1000)
-
-	// Redirect to correct slug
-	correctSLug := slugify.Make(app.Name)
-	if slug != "" && app.Name != "" && slug != correctSLug {
-		http.Redirect(w, r, "/apps/"+id+"/"+correctSLug, 302)
-		return
-	}
 
 	// Get packages
 	packages, err := mysql.GetPackagesAppIsIn(app.ID)

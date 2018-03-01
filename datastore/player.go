@@ -31,7 +31,7 @@ type Player struct {
 	PlayTime       int                         `datastore:"play_time"`
 	TimeCreated    int                         `datastore:"time_created"` // In Steam's DB
 	Friends        []steam.GetFriendListFriend `datastore:"friends,noindex"`
-	AddFriends     bool                        `datastore:"-"` // Internal
+	AddFriends     bool                        `datastore:"-"`
 }
 
 func (p Player) GetKey() (key *datastore.Key) {
@@ -42,7 +42,15 @@ func (p Player) GetPath() string {
 	return "/players/" + strconv.Itoa(p.PlayerID) + "/" + slug.Make(p.PersonaName)
 }
 
-func GetPlayer(id int, produceFriends bool) (ret Player, err error) {
+func (p Player) shouldScanFriends() bool {
+	return p.FriendsAddedAt.Unix() < (time.Now().Unix() - int64(60*60*24*30))
+}
+
+func (p Player) shouldUpdate() bool {
+	return p.UpdatedAt.Unix() < (time.Now().Unix() - int64(60*60*24))
+}
+
+func GetPlayer(id int) (ret Player, err error) {
 
 	client, context, err := getDSClient()
 	if err != nil {
@@ -51,14 +59,12 @@ func GetPlayer(id int, produceFriends bool) (ret Player, err error) {
 
 	key := datastore.NameKey(PLAYER, strconv.Itoa(id), nil)
 
-	player := &Player{}
+	player := new(Player)
 	player.PlayerID = id
-	player.AddFriends = produceFriends
 
 	err = client.Get(context, key, player)
 	if err != nil {
 
-		// todo, clear latest players cache
 		// Not in DB, go get it!
 		if err.Error() == "datastore: no such entity" {
 
@@ -68,15 +74,13 @@ func GetPlayer(id int, produceFriends bool) (ret Player, err error) {
 		return *player, err
 	}
 
-	if player.UpdatedAt.Unix() < (time.Now().Unix() - int64(86400)) {
+	if player.shouldUpdate() {
+
 		player.Fill()
-		//player.AddFriends = false
 		_, err = SaveKind(player.GetKey(), player)
 		return *player, err
 	}
 
-	// todo, add friendsScannedAt field????????????????????????
-	//player.AddFriends = false
 	return *player, nil
 }
 
@@ -149,7 +153,7 @@ func ConsumePlayer(msg amqp.Delivery) (err error) {
 	id := string(msg.Body)
 	idx, _ := strconv.Atoi(id)
 
-	_, err = GetPlayer(idx, false)
+	_, err = GetPlayer(idx)
 
 	return err
 }
@@ -157,6 +161,12 @@ func ConsumePlayer(msg amqp.Delivery) (err error) {
 func (p *Player) Fill() (player *Player, err error) {
 
 	// todo, get player bans, groups
+
+	// Add friends to rabbit
+	if player.UpdatedAt.Unix() < (time.Now().Unix() - int64(86400)) {
+		p.AddFriends = true
+		p.FriendsAddedAt = time.Now()
+	}
 
 	//Get summary
 	summary, err := steam.GetPlayerSummaries([]int{p.PlayerID})

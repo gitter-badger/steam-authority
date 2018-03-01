@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func commitsHandler(w http.ResponseWriter, r *http.Request) {
+func CommitsHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(

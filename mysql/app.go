@@ -3,14 +3,15 @@ package mysql
 import (
 	"encoding/json"
 	"errors"
+	"html/template"
 	"net/url"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gosimple/slug"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/kr/pretty"
 	"github.com/steam-authority/steam-authority/steam"
 	"github.com/streadway/amqp"
 )
@@ -47,6 +48,9 @@ type App struct {
 	Icon              string     `gorm:"not null;column:icon"`                          // PICS
 	ClientIcon        string     `gorm:"not null;column:client_icon"`                   // PICS
 	Ghost             bool       `gorm:"not null;column:is_ghost;type:tinyint(1)"`      //
+	PriceInitial      int        `gorm:"not null;column:price_initial"`                 //
+	PriceFinal        int        `gorm:"not null;column:price_ final"`                  //
+	PriceDiscount     int        `gorm:"not null;column:price_discount"`                //
 }
 
 func getDefaultAppJSON() App {
@@ -90,7 +94,7 @@ func (app App) GetType() (ret string) {
 func (app App) GetIcon() (ret string) {
 
 	if app.Icon == "" {
-		return "/assets/img/no-app-icon.png"
+		return "/assets/img/steam-square.png"
 	} else {
 		return "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/" + strconv.Itoa(app.ID) + "/" + app.Icon + ".jpg"
 	}
@@ -137,6 +141,26 @@ func (app App) GetPlatforms() (platforms []string, err error) {
 	}
 
 	return platforms, nil
+}
+
+func (app App) GetPlatformImages() (ret template.HTML, err error) {
+
+	platforms, err := app.GetPlatforms()
+	if err != nil {
+		return ret, err
+	}
+
+	for _, v := range platforms {
+		if v == "macos" {
+			ret = ret + `<i class="fab fa-apple"></i>`
+		} else if v == "windows" {
+			ret = ret + `<i class="fab fa-windows"></i>`
+		} else if v == "linux" {
+			ret = ret + `<i class="fab fa-linux"></i>`
+		}
+	}
+
+	return ret, nil
 }
 
 func (app App) GetDLC() (dlcs []int, err error) {
@@ -333,7 +357,7 @@ func ConsumeApp(msg amqp.Delivery) (err error) {
 func (app *App) fill() (err error) {
 
 	// Get app details
-	err = app.fillFromAppDetails()
+	err = app.fillFromAPI()
 	if err != nil {
 		return err
 	}
@@ -396,74 +420,14 @@ func (app *App) fill() (err error) {
 	return nil
 }
 
-func (app *App) fillFromPICS() (err error) {
-
-	// Call PICS
-	resp, err := steam.GetPICSInfo([]int{app.ID}, []int{})
-	if err != nil {
-		return err
-	}
-
-	var js steam.JsApp
-	if val, ok := resp.Apps[strconv.Itoa(app.ID)]; ok {
-		js = val
-	} else {
-		pretty.Print(resp)
-		pretty.Print(err.Error())
-		return errors.New("no app key in json")
-	}
-
-	// Tags, convert map to slice
-	var tagsSlice []int
-	for _, v := range js.Common.StoreTags {
-		vv, _ := strconv.Atoi(v)
-		tagsSlice = append(tagsSlice, vv)
-	}
-
-	tags, err := json.Marshal(tagsSlice)
-	if err != nil {
-		return err
-	}
-
-	// String to int
-	var metacriticScoreInt int
-	if js.Common.MetacriticScore == "" {
-		metacriticScoreInt = 0
-	} else {
-		metacriticScoreInt, err = strconv.Atoi(js.Common.MetacriticScore)
-		if err != nil {
-			return err
-		}
-	}
-
-	//
-	app.Name = js.Common.Name
-	app.Type = js.Common.Type
-	app.ReleaseState = js.Common.ReleaseState
-	//app.Platforms = strings.Split(js.Common.OSList, ",") // Can get from API
-	app.MetacriticScore = int8(metacriticScoreInt)
-	app.MetacriticFullURL = js.Common.MetacriticURL
-	app.StoreTags = string(tags)
-	app.Developers = js.Extended.Developer
-	app.Publishers = js.Extended.Publisher
-	app.Homepage = js.Extended.Homepage
-	app.ChangeNumber = js.ChangeNumber
-	app.Logo = js.Common.Logo
-	app.Icon = js.Common.Icon
-	app.ClientIcon = js.Common.ClientIcon
-
-	return nil
-}
-
-func (app *App) fillFromAppDetails() (err error) {
+func (app *App) fillFromAPI() (err error) {
 
 	// Get data
-	appDetails, err := steam.GetAppDetails(strconv.Itoa(app.ID))
+	appDetails, err := steam.GetAppDetailsFromStore(strconv.Itoa(app.ID))
 	if err != nil {
 
 		// Not all apps can be found
 		if err.Error() == "no app with id in steam" {
-			app.Ghost = true
 			return nil
 		}
 
@@ -573,6 +537,66 @@ func (app *App) fillFromAppDetails() (err error) {
 	app.Platforms = string(platformsString)
 	app.GameID = appDetails.Data.Fullgame.AppID
 	app.GameName = appDetails.Data.Fullgame.Name
+
+	// Price
+	app.PriceInitial = appDetails.Data.PriceOverview.Initial
+	app.PriceFinal = appDetails.Data.PriceOverview.Final
+	app.PriceDiscount = appDetails.Data.PriceOverview.DiscountPercent
+
+	return nil
+}
+
+func (app *App) fillFromPICS() (err error) {
+
+	// Call PICS
+	resp, err := steam.GetPICSInfo([]int{app.ID}, []int{})
+	if err != nil {
+		return err
+	}
+
+	var js steam.JsApp
+	if len(resp.Apps) > 0 {
+		js = resp.Apps[strconv.Itoa(app.ID)]
+	} else {
+		return errors.New("no app key in json")
+	}
+
+	// Check if empty
+	app.Ghost = reflect.DeepEqual(js.Common, steam.JsAppCommon{})
+
+	// Tags, convert map to slice
+	var tagsSlice []int
+	for _, v := range js.Common.StoreTags {
+		vv, _ := strconv.Atoi(v)
+		tagsSlice = append(tagsSlice, vv)
+	}
+
+	tags, err := json.Marshal(tagsSlice)
+	if err != nil {
+		return err
+	}
+
+	// Meta critic
+	var metacriticScoreInt = 0
+	if js.Common.MetacriticScore != "" {
+		metacriticScoreInt, _ = strconv.Atoi(js.Common.MetacriticScore)
+	}
+
+	//
+	app.Name = js.Common.Name
+	app.Type = js.Common.Type
+	app.ReleaseState = js.Common.ReleaseState
+	//app.Platforms = strings.Split(js.Common.OSList, ",") // Can get from API
+	app.MetacriticScore = int8(metacriticScoreInt)
+	app.MetacriticFullURL = js.Common.MetacriticURL
+	app.StoreTags = string(tags)
+	app.Developers = js.Extended.Developer
+	app.Publishers = js.Extended.Publisher
+	app.Homepage = js.Extended.Homepage
+	app.ChangeNumber = js.ChangeNumber
+	app.Logo = js.Common.Logo
+	app.Icon = js.Common.Icon
+	app.ClientIcon = js.Common.ClientIcon
 
 	return nil
 }

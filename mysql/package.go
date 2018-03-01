@@ -3,6 +3,7 @@ package mysql
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -202,7 +203,10 @@ func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
 		return packages, err
 	}
 
-	db = db.Where("JSON_CONTAINS(apps, '[?]')", "\""+strconv.Itoa(appID)+"\"").Limit(96).Order("id DESC").Find(&packages)
+	db = db.Where("JSON_CONTAINS(apps, '[\""+strconv.Itoa(appID)+"\"]')").Limit(96).Order("id DESC").Find(&packages)
+
+	fmt.Println("JSON_CONTAINS(apps, '[\""+strconv.Itoa(appID)+"\"]')")
+
 	if db.Error != nil {
 		return packages, db.Error
 	}
@@ -290,4 +294,113 @@ func (pack *Package) fillFromPICS() (err error) {
 	pack.Extended = string(extended)
 
 	return nil
+}
+
+// todo, make these nice, put into the GetExtended func?
+var PackageKeys = map[string]string{
+	"allowcrossregiontradingandgifting":     "allowcrossregiontradingandgifting",
+	"allowpurchasefromretrictedcountries":   "allowpurchasefromretrictedcountries",
+	"allowpurchaseinrestrictedcountries":    "allowpurchaseinrestrictedcountries",
+	"allowpurchaserestrictedcountries":      "allowpurchaserestrictedcountries",
+	"allowrunincountries":                   "allowrunincountries",
+	"alwayscountasowned":                    "alwayscountasowned",
+	"alwayscountsasowned":                   "Always Counts As Owned",
+	"alwayscountsasunowned":                 "alwayscountsasunowned",
+	"appid":                                 "appid",
+	"appidownedrequired":                    "appidownedrequired",
+	"billingagreementtype":                  "billingagreementtype",
+	"blah":                                  "blah",
+	"canbegrantedfromexternal":              "canbegrantedfromexternal",
+	"cantownapptopurchase":                  "cantownapptopurchase",
+	"complimentarypackagegrant":             "complimentarypackagegrant",
+	"complimentarypackagegrants":            "complimentarypackagegrants",
+	"curatorconnect":                        "curatorconnect",
+	"devcomp":                               "devcomp",
+	"dontallowrunincountries":               "dontallowrunincountries",
+	"dontgrantifappidowned":                 "dontgrantifappidowned",
+	"enforceintraeeaactivationrestrictions": "enforceintraeeaactivationrestrictions",
+	"excludefromsharing":                    "excludefromsharing",
+	"exfgls":                                "exfgls",
+	"expirytime":                            "expirytime",
+	"extended":                              "extended",
+	"fakechange":                            "fakechange",
+	"foo":                                   "foo",
+	"freeondemand":                          "freeondemand",
+	"freeweekend":                           "freeweekend",
+	"giftsaredeletable":                     "giftsaredeletable",
+	"giftsaremarketable":                    "giftsaremarketable",
+	"giftsaretradable":                      "giftsaretradable",
+	"grantexpirationdays":                   "grantexpirationdays",
+	"grantguestpasspackage":                 "grantguestpasspackage",
+	"grantpassescount":                      "grantpassescount",
+	"hardwarepromotype":                     "hardwarepromotype",
+	"ignorepurchasedateforrefunds":          "ignorepurchasedateforrefunds",
+	"initialperiod":                         "initialperiod",
+	"initialtimeunit":                       "initialtimeunit",
+	"iploginrestriction":                    "iploginrestriction",
+	"languages":                             "languages",
+	"launcheula":                            "launcheula",
+	"legacygamekeyappid":                    "legacygamekeyappid",
+	"lowviolenceinrestrictedcountries":      "lowviolenceinrestrictedcountries",
+	"martinotest":                           "martinotest",
+	"mustownapptopurchase":                  "mustownapptopurchase",
+	"onactivateguestpassmsg":                "onactivateguestpassmsg",
+	"onexpiredmsg":                          "onexpiredmsg",
+	"ongrantguestpassmsg":                   "ongrantguestpassmsg",
+	"onlyallowincountries":                  "onlyallowincountries",
+	"onlyallowrestrictedcountries":          "onlyallowrestrictedcountries",
+	"onlyallowrunincountries":               "onlyallowrunincountries",
+	"onpurchasegrantguestpasspackage":       "onpurchasegrantguestpasspackage",
+	"onpurchasegrantguestpasspackage0":      "onpurchasegrantguestpasspackage0",
+	"onpurchasegrantguestpasspackage1":      "onpurchasegrantguestpasspackage1",
+	"onpurchasegrantguestpasspackage2":      "onpurchasegrantguestpasspackage2",
+	"onpurchasegrantguestpasspackage3":      "onpurchasegrantguestpasspackage3",
+	"onpurchasegrantguestpasspackage4":      "onpurchasegrantguestpasspackage4",
+	"onpurchasegrantguestpasspackage5":      "onpurchasegrantguestpasspackage5",
+	"onpurchasegrantguestpasspackage6":      "onpurchasegrantguestpasspackage6",
+	"onpurchasegrantguestpasspackage7":      "onpurchasegrantguestpasspackage7",
+	"onpurchasegrantguestpasspackage8":      "onpurchasegrantguestpasspackage8",
+	"onpurchasegrantguestpasspackage9":      "onpurchasegrantguestpasspackage9",
+	"onpurchasegrantguestpasspackage10":     "onpurchasegrantguestpasspackage10",
+	"onpurchasegrantguestpasspackage11":     "onpurchasegrantguestpasspackage11",
+	"onpurchasegrantguestpasspackage12":     "onpurchasegrantguestpasspackage12",
+	"onpurchasegrantguestpasspackage13":     "onpurchasegrantguestpasspackage13",
+	"onpurchasegrantguestpasspackage14":     "onpurchasegrantguestpasspackage14",
+	"onpurchasegrantguestpasspackage15":     "onpurchasegrantguestpasspackage15",
+	"onpurchasegrantguestpasspackage16":     "onpurchasegrantguestpasspackage16",
+	"onpurchasegrantguestpasspackage17":     "onpurchasegrantguestpasspackage17",
+	"onpurchasegrantguestpasspackage18":     "onpurchasegrantguestpasspackage18",
+	"onpurchasegrantguestpasspackage19":     "onpurchasegrantguestpasspackage19",
+	"onpurchasegrantguestpasspackage20":     "onpurchasegrantguestpasspackage20",
+	"onpurchasegrantguestpasspackage21":     "onpurchasegrantguestpasspackage21",
+	"onpurchasegrantguestpasspackage22":     "onpurchasegrantguestpasspackage22",
+	"onquitguestpassmsg":                    "onquitguestpassmsg",
+	"overridetaxtype":                       "overridetaxtype",
+	"permitrunincountries":                  "permitrunincountries",
+	"prohibitrunincountries":                "prohibitrunincountries",
+	"purchaserestrictedcountries":           "purchaserestrictedcountries",
+	"purchaseretrictedcountries":            "purchaseretrictedcountries",
+	"recurringoptions":                      "recurringoptions",
+	"recurringpackageoption":                "recurringpackageoption",
+	"releaseoverride":                       "releaseoverride",
+	"releasestatecountries":                 "releasestatecountries",
+	"releasestateoverride":                  "releasestateoverride",
+	"releasestateoverridecountries":         "releasestateoverridecountries",
+	"relesestateoverride":                   "relesestateoverride",
+	"renewalperiod":                         "renewalperiod",
+	"renewaltimeunit":                       "renewaltimeunit",
+	"requiredps3apploginforpurchase":        "requiredps3apploginforpurchase",
+	"requirespreapproval":                   "requirespreapproval",
+	"restrictedcountries":                   "restrictedcountries",
+	"runrestrictedcountries":                "runrestrictedcountries",
+	"shippableitem":                         "shippableitem",
+	"skipownsallappsinpackagecheck":         "skipownsallappsinpackagecheck",
+	"starttime":                             "starttime",
+	"state":                                 "state",
+	"test":                                  "test",
+	"testchange":                            "testchange",
+	"trading_card_drops":                    "trading_card_drops",
+	"violencerestrictedcountries":           "violencerestrictedcountries",
+	"violencerestrictedterritorycodes":      "violencerestrictedterritorycodes",
+	"virtualitemreward":                     "virtualitemreward",
 }

@@ -90,11 +90,15 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 
 	queue.PlayerProducer(idx)
 
-	player, err := datastore.GetPlayer(idx, true)
+	player, err := datastore.GetPlayer(idx)
 	if err != nil {
 		logger.Error(err)
 		returnErrorTemplate(w, r, 404, err.Error())
 		return
+	}
+
+	if player.AddFriends {
+		queue.FriendsProducer(player.PlayerID)
 	}
 
 	// Redirect to correct slug
@@ -115,13 +119,6 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 	friends, err := datastore.GetPlayersByIDs(friendsSlice)
 	if err != nil {
 		logger.Error(err)
-	}
-
-	// Add friends to rabbit
-	if player.AddFriends {
-		for _, v := range friendsSlice {
-			queue.PlayerProducer(v)
-		}
 	}
 
 	// Template

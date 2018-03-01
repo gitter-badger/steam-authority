@@ -15,11 +15,13 @@
                     <h5 class="mb-1">Apps</h5>
                     <p class="mb-1">Get every app from steam and add to queue</p>
                 </a>
+            {{ if .IsProduction }}
                 <a href="/admin/deploy" class="list-group-item list-group-item-action flex-column align-items-start">
                     <small class="text-muted float-right" data-livestamp="0">0</small>
                     <h5 class="mb-1">Deploy</h5>
                     <p class="mb-1">Pull master, build and restart</p>
                 </a>
+            {{end}}
                 <a href="/admin/donations" class="list-group-item list-group-item-action flex-column align-items-start">
                     <small class="text-muted float-right" data-livestamp="0">0</small>
                     <h5 class="mb-1">Donations</h5>
@@ -44,7 +46,6 @@
 
         </div>
         <div class="col-sm">
-
 
 
         </div>
