@@ -69,6 +69,10 @@ func LoginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create login record
+	datastore.CreateLogin(id, r)
+
+	// Set session
 	session.WriteMany(w, r, map[string]string{
 		ID:     strconv.Itoa(id),
 		NAME:   resp.Response.Players[0].PersonaName,
@@ -99,12 +103,31 @@ func SettingsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	template := settingsTemplate{}
-	template.Fill(r)
+	// Get session
+	id, err := session.Read(r, session.ID)
 	if err != nil {
 		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
+
+	// Convert ID
+	idx, err := strconv.Atoi(id)
+	if err != nil {
+		returnErrorTemplate(w, r, 500, err.Error())
+		return
+	}
+
+	// Get logins
+	logins, err := datastore.GetLogins(idx, 20)
+	if err != nil {
+		returnErrorTemplate(w, r, 500, err.Error())
+		return
+	}
+
+	// Template
+	template := settingsTemplate{}
+	template.Fill(r)
+	template.Logins = logins
 
 	returnTemplate(w, r, "settings", template)
 
@@ -116,5 +139,6 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 type settingsTemplate struct {
 	GlobalTemplate
-	User datastore.Player
+	User   datastore.Player
+	Logins []datastore.Login
 }

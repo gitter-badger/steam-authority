@@ -3,9 +3,9 @@ package steam
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,7 +17,12 @@ func GetAppDetailsFromStore(id int) (app AppDetailsBody, err error) {
 
 	idx := strconv.Itoa(id)
 
-	response, err := http.Get("http://store.steampowered.com/api/appdetails?appids=" + strconv.Itoa(id))
+	query := url.Values{}
+	query.Set("appids", idx)
+	query.Set("cc", "us") // Currency
+	query.Set("l", "en")  // Language
+
+	response, err := http.Get("http://store.steampowered.com/api/appdetails?" + query.Encode())
 	if err != nil {
 		return app, err
 	}
@@ -31,8 +36,7 @@ func GetAppDetailsFromStore(id int) (app AppDetailsBody, err error) {
 
 	// Check for no app
 	if string(contents) == "null" {
-		fmt.Println("invalid app id: " + strconv.Itoa(id))
-		return app, errors.New("invalid app id")
+		return app, errors.New("invalid app id: " + strconv.Itoa(id))
 	}
 
 	// Fix values that can change type, causing unmarshal errors
@@ -217,7 +221,12 @@ func GetPackageDetailsFromStore(id int) (pack PackageDetailsBody, err error) {
 
 	idx := strconv.Itoa(id)
 
-	response, err := http.Get("http://store.steampowered.com/api/packagedetails?packageids=" + strconv.Itoa(id))
+	query := url.Values{}
+	query.Set("packageids", idx)
+	query.Set("cc", "us") // Currency
+	query.Set("l", "en")  // Language
+
+	response, err := http.Get("http://store.steampowered.com/api/packagedetails?" + query.Encode())
 	if err != nil {
 		return pack, err
 	}

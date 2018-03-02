@@ -129,3 +129,19 @@ func (t GlobalTemplate) IsLocal() (bool) {
 func (t GlobalTemplate) IsProduction() (bool) {
 	return t.Env == "production"
 }
+
+func (t GlobalTemplate) ShowAd(r *http.Request) (bool) {
+
+	noAds := []string{
+		"/admin",
+		"/donate",
+	}
+
+	for _, v := range noAds {
+		if strings.HasPrefix(r.URL.Path, v) {
+			return false
+		}
+	}
+
+	return true
+}

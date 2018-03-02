@@ -94,7 +94,7 @@ func (app App) GetType() (ret string) {
 func (app App) GetIcon() (ret string) {
 
 	if app.Icon == "" {
-		return "/assets/img/steam-square.png"
+		return "/assets/img/steam-square.jpg"
 	} else {
 		return "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/" + strconv.Itoa(app.ID) + "/" + app.Icon + ".jpg"
 	}

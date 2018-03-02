@@ -14,6 +14,7 @@ const (
 	ARTICLE = "Article"
 	PLAYER  = "Player"
 	RANK    = "Rank"
+	LOGIN   = "Login"
 )
 
 func getDSClient() (client *datastore.Client, ctx context.Context, err error) {
