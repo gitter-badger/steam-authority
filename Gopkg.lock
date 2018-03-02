@@ -17,7 +17,7 @@
   branch = "master"
   name = "github.com/Jleagle/go-helpers"
   packages = ["logger"]
-  revision = "59875401073abbd251a8b198a728a68c74a0a71c"
+  revision = "089442fcc5ce0a66dac140abfc5df0f82d9335f5"
 
 [[projects]]
   name = "github.com/bugsnag/bugsnag-go"
