@@ -16,9 +16,9 @@ go build
 cp ./crontab /etc/cron.d/steamauthority
 
 # Restart PICS
-echo "### PICS"
-chmod +x ./cmd/pics.sh
-./cmd/pics.sh
+#echo "### PICS"
+#chmod +x ./cmd/pics.sh
+#./cmd/pics.sh
 
 # Tell Rollbar
 echo "### Rollbar"
@@ -29,6 +29,6 @@ curl https://api.rollbar.com/api/1/deploy/ \
   -F local_username=Jleagle \
   --silent > /dev/null
 
-# Restart web server
+# Restart web server & PICS
 echo "### Restart"
 /etc/init.d/steam restart
