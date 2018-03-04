@@ -20,8 +20,8 @@ func (login Login) GetKey() (key *datastore.Key) {
 	return datastore.IncompleteKey(LOGIN, nil)
 }
 
-func (login Login) GetTime() (t int64) {
-	return login.CreatedAt.Unix()
+func (login Login) GetTime() (t string) {
+	return login.CreatedAt.Format(time.RFC822)
 }
 
 func CreateLogin(playerID int, r *http.Request) (err error) {

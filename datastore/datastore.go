@@ -10,11 +10,12 @@ import (
 )
 
 const (
-	CHANGE  = "Change"
-	ARTICLE = "Article"
-	PLAYER  = "Player"
-	RANK    = "Rank"
-	LOGIN   = "Login"
+	CHANGE   = "Change"
+	ARTICLE  = "Article"
+	PLAYER   = "Player"
+	RANK     = "Rank"
+	LOGIN    = "Login"
+	DONATION = "Donation"
 )
 
 func getDSClient() (client *datastore.Client, ctx context.Context, err error) {

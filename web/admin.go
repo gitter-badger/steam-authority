@@ -71,6 +71,36 @@ func adminDeploy(w http.ResponseWriter, r *http.Request) {
 
 func adminDonations(w http.ResponseWriter, r *http.Request) {
 
+	donations, err := datastore.GetDonations(0, 0)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	// ma[player]total
+	counts := make(map[int]int)
+
+	for _, v := range donations {
+
+		if _, ok := counts[v.PlayerID]; ok {
+			counts[v.PlayerID] = counts[v.PlayerID] + v.AmountUSD
+		} else {
+			counts[v.PlayerID] = v.AmountUSD
+		}
+	}
+
+	for k, v := range counts {
+		player, err := datastore.GetPlayerWithoutUpdating(k)
+		if err != nil {
+			logger.Error(err)
+			continue
+		}
+
+		player.Donated = v
+		_, err = datastore.SaveKind(player.GetKey(), player)
+	}
+
+	logger.Info("Updated " + strconv.Itoa(len(counts)) + " player donation counts")
 }
 
 // todo, handle genres that no longer have any games.

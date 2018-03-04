@@ -59,9 +59,11 @@
                 </thead>
             {{ range $key, $value := .Logins }}
                 <tr>
-                    <td>{{ .CreatedAt }}</td>
+                    <td nowrap="nowrap">{{ .GetTime }}</td>
                     <td>{{ .IP }}</td>
-                    <td>{{ .UserAgent }}</td>
+                    <td>
+                        <span data-toggle="tooltip" data-placement="top" title="{{ .UserAgent }}">{{ printf "%.50s" .UserAgent }}&hellip;</span>
+                    </td>
                 </tr>
             {{ end }}
             </table>

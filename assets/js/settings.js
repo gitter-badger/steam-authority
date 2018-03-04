@@ -15,4 +15,6 @@ if ($('#settings-page').length > 0) {
             );
         }
     });
+
+    $('[data-toggle="tooltip"]').tooltip(options)
 }

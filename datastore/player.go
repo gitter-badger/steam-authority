@@ -14,11 +14,15 @@ import (
 	"google.golang.org/api/iterator"
 )
 
+const (
+	NotFound = "datastore: no such entity"
+)
+
 type Player struct {
 	CreatedAt      time.Time                   `datastore:"created_at"`
 	UpdatedAt      time.Time                   `datastore:"updated_at"`
-	FriendsAddedAt time.Time                   `datastore:"friends_added_at"`
-	PlayerID       int                         `datastore:"player_id"`
+	FriendsAddedAt time.Time                   `datastore:"friends_added_at,noindex"`
+	PlayerID       int                         `datastore:"player_id,noindex"`
 	ValintyURL     string                      `datastore:"vality_url,noindex"`
 	Avatar         string                      `datastore:"avatar,noindex"`
 	PersonaName    string                      `datastore:"persona_name,noindex"`
@@ -31,6 +35,7 @@ type Player struct {
 	PlayTime       int                         `datastore:"play_time"`
 	TimeCreated    int                         `datastore:"time_created"` // In Steam's DB
 	Friends        []steam.GetFriendListFriend `datastore:"friends,noindex"`
+	Donated        int                         `datastore:"donated"`
 }
 
 func (p Player) GetKey() (key *datastore.Key) {
@@ -57,6 +62,30 @@ func UpdatePlayerFriendsScannedDate(player Player) (err error) {
 	return err
 }
 
+func GetPlayerWithoutUpdating(id int) (ret *Player, err error) {
+
+	client, context, err := getDSClient()
+	if err != nil {
+		return ret, err
+	}
+
+	key := datastore.NameKey(PLAYER, strconv.Itoa(id), nil)
+
+	player := new(Player)
+	player.PlayerID = id
+
+	err = client.Get(context, key, player)
+	if err != nil {
+
+		if err.Error() == NotFound {
+			return player, nil
+		}
+		return player, err
+	}
+
+	return player, nil
+}
+
 func GetPlayer(id int) (ret Player, err error) {
 
 	client, context, err := getDSClient()
@@ -73,7 +102,7 @@ func GetPlayer(id int) (ret Player, err error) {
 	if err != nil {
 
 		// Not in DB, go get it!
-		if err.Error() == "datastore: no such entity" {
+		if err.Error() == NotFound {
 
 			player.Fill()
 			_, err = SaveKind(player.GetKey(), player)
@@ -165,14 +194,14 @@ func ConsumePlayer(msg amqp.Delivery) (err error) {
 	return err
 }
 
-func (p *Player) Fill() (player *Player, err error) {
+func (p *Player) Fill() (err error) {
 
 	// todo, get player bans, groups
 
 	//Get summary
 	summary, err := steam.GetPlayerSummaries([]int{p.PlayerID})
 	if err != nil {
-		return p, err
+		return err
 	} else if len(summary.Response.Players) > 0 {
 		p.Avatar = summary.Response.Players[0].AvatarFull
 		p.ValintyURL = path.Base(summary.Response.Players[0].ProfileURL)
@@ -196,5 +225,5 @@ func (p *Player) Fill() (player *Player, err error) {
 		p.CreatedAt = time.Now()
 	}
 
-	return p, nil
+	return nil
 }
