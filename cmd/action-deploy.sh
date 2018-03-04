@@ -3,10 +3,12 @@
 cd ../
 
 # Get the latest version
+echo "### Pulling"
 git fetch origin
 git reset --hard origin/master
 
 # Build
+echo "### Building"
 dep ensure
 go build
 
@@ -14,10 +16,12 @@ go build
 cp ./crontab /etc/cron.d/steamauthority
 
 # Restart PICS
+echo "### PICS"
 chmod +x ./cmd/pics.sh
 ./cmd/pics.sh
 
 # Tell Rollbar
+echo "### Rollbar"
 curl https://api.rollbar.com/api/1/deploy/ \
   -F access_token=${STEAM_ROLLBAR_PRIVATE} \
   -F environment=${ENV} \
@@ -26,4 +30,5 @@ curl https://api.rollbar.com/api/1/deploy/ \
   --silent > /dev/null
 
 # Restart web server
+echo "### Restart"
 /etc/init.d/steam restart
