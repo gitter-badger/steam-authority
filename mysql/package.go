@@ -291,7 +291,9 @@ func (pack *Package) fill() (err error) {
 	// Get app details from PICS
 	err = pack.fillFromPICS()
 	if err != nil {
-		return err
+		if err.Error() != "no package key in json" {
+			return err
+		}
 	}
 
 	// Default JSON values

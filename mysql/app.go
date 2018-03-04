@@ -365,7 +365,9 @@ func (app *App) fill() (err error) {
 	// PICS
 	err = app.fillFromPICS()
 	if err != nil {
-		return err
+		if err.Error() != "no app key in json" {
+			return err
+		}
 	}
 
 	// Tidy

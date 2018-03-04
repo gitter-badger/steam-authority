@@ -15,11 +15,6 @@ go build
 # Copy over crontab
 cp ./crontab /etc/cron.d/steamauthority
 
-# Restart PICS
-#echo "### PICS"
-#chmod +x ./cmd/pics.sh
-#./cmd/pics.sh
-
 # Tell Rollbar
 echo "### Rollbar"
 curl https://api.rollbar.com/api/1/deploy/ \
