@@ -117,9 +117,7 @@ func main() {
 	r.Get("/websocket", websockets.Handler)
 
 	// File server
-	workDir, _ := os.Getwd()
-	filesDir := filepath.Join(workDir, "assets")
-	fileServer(r, "/assets", http.Dir(filesDir))
+	fileServer(r, "/assets")
 
 	http.ListenAndServe(":8085", r)
 
@@ -140,13 +138,19 @@ func adminRouter() http.Handler {
 
 // FileServer conveniently sets up a http.FileServer handler to serve
 // static files from a http.FileSystem.
-func fileServer(r chi.Router, path string, root http.FileSystem) {
+func fileServer(r chi.Router, path string) {
 
 	if strings.ContainsAny(path, "{}*") {
 		logger.Info("FileServer does not permit URL parameters.")
 	}
 
-	fs := http.StripPrefix(path, http.FileServer(root))
+	// Get current app path
+	dir, err := os.Executable()
+	if err != nil {
+		logger.Info("Failed to get path")
+	}
+
+	fs := http.StripPrefix(path, http.FileServer(http.Dir(filepath.Join(filepath.Dir(dir), "assets"))))
 
 	if path != "/" && path[len(path)-1] != '/' {
 		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
