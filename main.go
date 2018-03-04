@@ -144,13 +144,7 @@ func fileServer(r chi.Router, path string) {
 		logger.Info("FileServer does not permit URL parameters.")
 	}
 
-	// Get current app path
-	dir, err := os.Executable()
-	if err != nil {
-		logger.Info("Failed to get path")
-	}
-
-	fs := http.StripPrefix(path, http.FileServer(http.Dir(filepath.Join(filepath.Dir(dir), "assets"))))
+	fs := http.StripPrefix(path, http.FileServer(http.Dir(filepath.Join(os.Getenv("STEAM_PATH"), "assets"))))
 
 	if path != "/" && path[len(path)-1] != '/' {
 		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)

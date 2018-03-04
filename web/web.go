@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -19,14 +18,8 @@ import (
 
 func returnTemplate(w http.ResponseWriter, r *http.Request, page string, pageData interface{}) (err error) {
 
-	// Get current app path
-	dir, err := os.Executable()
-	if err != nil {
-		logger.Info("Failed to get path")
-	}
-	folder := filepath.Dir(dir)
-
 	// Load templates needed
+	folder := os.Getenv("STEAM_PATH")
 	t, err := template.New("t").Funcs(getTemplateFuncMap()).ParseFiles(folder+"/templates/_header.html", folder+"/templates/_footer.html", folder+"/templates/"+page+".html")
 	if err != nil {
 		logger.Error(err)
