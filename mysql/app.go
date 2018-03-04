@@ -427,7 +427,7 @@ func (app *App) fillFromAPI() (err error) {
 	if err != nil {
 
 		// Not all apps can be found
-		if err.Error() == "no app with id in steam" {
+		if err.Error() == "no app with id in steam" || strings.HasPrefix(err.Error(), "invalid app id:") {
 			return nil
 		}
 

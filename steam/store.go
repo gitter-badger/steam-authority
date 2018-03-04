@@ -240,7 +240,7 @@ func GetPackageDetailsFromStore(id int) (pack PackageDetailsBody, err error) {
 
 	// Check for no pack
 	if string(contents) == "null" {
-		return pack, errors.New("invalid package id")
+		return pack, errors.New("invalid package id: " + strconv.Itoa(id))
 	}
 
 	// Unmarshal JSON

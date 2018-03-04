@@ -22,10 +22,23 @@ func init() {
 }
 
 func RunConsumers() {
-	go playerConsumer()
+
+	//go func() {
+	//
+	//	for _ := range closeChannel {
+	//		fmt.Println("Reconnecting")
+	//		err := connect()
+	//		if err != nil {
+	//			fmt.Println(err.Error())
+	//		}
+	//	}
+	//
+	//}()
+
 	go appConsumer()
 	go changeConsumer()
 	go packageConsumer()
+	go playerConsumer()
 }
 
 func connect() (err error) {
@@ -39,13 +52,13 @@ func connect() (err error) {
 	if err != nil {
 		return err
 	}
-	//defer amqpConn.Close()
+	//defer connection.Close()
 
 	channel, err = connection.Channel()
 	if err != nil {
 		return err
 	}
-	//defer ch.Close()
+	//defer channel.Close()
 
 	//fmt.Println("connected")
 

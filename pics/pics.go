@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
@@ -26,7 +27,11 @@ func Run() {
 	for {
 		jsChange, err := getLatestChanges()
 		if err != nil {
-			logger.Error(err)
+
+			if strings.HasSuffix(err.Error(), "connect: connection refused") {
+				time.Sleep(time.Second)
+				continue
+			}
 		}
 
 		for k, v := range jsChange.Apps {
@@ -76,6 +81,7 @@ func Run() {
 			queue.ChangeProducer(v)
 		}
 
+		// Sleep
 		time.Sleep(checkSeconds * time.Second)
 	}
 }

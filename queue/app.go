@@ -2,6 +2,7 @@ package queue
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
@@ -82,6 +83,8 @@ func appConsumer() {
 		for {
 			select {
 			case err = <-closeChannel:
+				connection.Close()
+				channel.Close()
 				break
 			case msg := <-messages:
 
@@ -95,10 +98,18 @@ func appConsumer() {
 
 				sqlErr := mysql.ConsumeApp(msg)
 				if sqlErr != nil {
+
+					if strings.HasSuffix(sqlErr.Error(), "connect: connection refused") {
+						//logger.Info("nack")
+						msg.Nack(false, true)
+						continue
+					}
+
 					logger.Error(sqlErr)
 				}
 
 				if dsErr == nil && sqlErr == nil {
+					//logger.Info("ack")
 					msg.Ack(false)
 				}
 			}

@@ -29,7 +29,7 @@
                 {{ range $key, $value := .Queues }}
                     <tr>
                         <td>{{ .Name }}</td>
-                        <td>{{ .MessagesUnacknowledged }}</td>
+                        <td>{{ .Messages }}</td>
                         <td>{{ .MessageStats.AckDetails.Rate }}/s</td>
                     </tr>
                 {{ end }}

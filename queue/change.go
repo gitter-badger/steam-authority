@@ -88,6 +88,8 @@ func changeConsumer() {
 		for {
 			select {
 			case err = <-closeChannel:
+				connection.Close()
+				channel.Close()
 				break
 			case msg := <-messages:
 

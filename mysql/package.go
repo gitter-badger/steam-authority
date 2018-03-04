@@ -5,6 +5,7 @@ import (
 	"errors"
 	"html/template"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gosimple/slug"
@@ -311,8 +312,8 @@ func (pack *Package) fillFromAPI() (err error) {
 	response, err := steam.GetPackageDetailsFromStore(pack.ID)
 	if err != nil {
 
-		// Not all apps can be found
-		if err.Error() == "no package with id in steam" {
+		// Not all packages can be found
+		if err.Error() == "no package with id in steam" || strings.HasPrefix(err.Error(), "invalid package id:") {
 			return nil
 		}
 

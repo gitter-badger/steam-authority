@@ -1,8 +1,7 @@
 #!/bin/sh
 
-# Stop old script
+echo "Stop old PICS"
 pkill -f steam-pics-api
 
-# Start a new one
-cd ${STEAM_PICS_PATH}
-nohup npm start &
+echo "Start new PICS"
+nohup npm start --prefix ${STEAM_PICS_PATH} &
