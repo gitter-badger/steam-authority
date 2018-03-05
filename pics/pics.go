@@ -2,6 +2,7 @@ package pics
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/queue"
+	"github.com/steam-authority/steam-authority/stackdriver"
 )
 
 const (
@@ -24,9 +26,14 @@ var latestChangeSaved int
 // Run triggers the PICS updater to run forever
 func Run() {
 
+	stackdriver.PicsCrit(errors.New("PICS started"))
+	stackdriver.PicsMessage("PICS started")
+
 	for {
 		jsChange, err := getLatestChanges()
 		if err != nil {
+
+			stackdriver.PicsError(err)
 
 			if strings.HasSuffix(err.Error(), "connect: connection refused") {
 				time.Sleep(time.Second)
@@ -93,6 +100,7 @@ func getLatestChanges() (jsChange JsChange, err error) {
 
 		changes, err := datastore.GetLatestChanges(1)
 		if err != nil {
+			stackdriver.PicsError(err)
 			logger.Error(err)
 		}
 
@@ -108,6 +116,7 @@ func getLatestChanges() (jsChange JsChange, err error) {
 	//logger.Info("PICS: " + url)
 	response, err := http.Get(url)
 	if err != nil {
+		stackdriver.PicsError(err)
 		return jsChange, err
 	}
 	defer response.Body.Close()
@@ -115,11 +124,13 @@ func getLatestChanges() (jsChange JsChange, err error) {
 	// Convert to bytes
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		stackdriver.PicsError(err)
 		return jsChange, err
 	}
 
 	// Unmarshal JSON
 	if err := json.Unmarshal(contents, &jsChange); err != nil {
+		stackdriver.PicsError(err)
 		return jsChange, err
 	}
 

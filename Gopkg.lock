@@ -3,7 +3,7 @@
 
 [[projects]]
   name = "cloud.google.com/go"
-  packages = ["compute/metadata","datastore","internal","internal/atomiccache","internal/fields","internal/version"]
+  packages = ["compute/metadata","datastore","internal","internal/atomiccache","internal/fields","internal/version","logging","logging/apiv2","logging/internal"]
   revision = "20d4028b8a750c2aca76bf9fefa8ed2d0109b573"
   version = "v0.19.0"
 
@@ -57,7 +57,7 @@
 
 [[projects]]
   name = "github.com/golang/protobuf"
-  packages = ["proto","protoc-gen-go/descriptor","ptypes","ptypes/any","ptypes/duration","ptypes/struct","ptypes/timestamp","ptypes/wrappers"]
+  packages = ["proto","protoc-gen-go/descriptor","ptypes","ptypes/any","ptypes/duration","ptypes/empty","ptypes/struct","ptypes/timestamp","ptypes/wrappers"]
   revision = "925541529c1fa6821df4e44ce2723319eb2be768"
   version = "v1.0.0"
 
@@ -194,6 +194,12 @@
   revision = "2f32c3ac0fa4fb807a0fcefb0b6f2468a0d99bd0"
 
 [[projects]]
+  branch = "master"
+  name = "golang.org/x/sync"
+  packages = ["semaphore"]
+  revision = "fd80eb99c8f653c847d294a001bdf2a3a6f768f5"
+
+[[projects]]
   name = "golang.org/x/text"
   packages = ["collate","collate/build","internal/colltab","internal/gen","internal/tag","internal/triegen","internal/ucd","language","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
@@ -202,7 +208,7 @@
 [[projects]]
   branch = "master"
   name = "google.golang.org/api"
-  packages = ["googleapi","googleapi/internal/uritemplates","internal","iterator","option","transport/grpc"]
+  packages = ["googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","support/bundler","transport","transport/grpc","transport/http"]
   revision = "ab90adb3efa287b869ecb698db42f923cc734972"
 
 [[projects]]
@@ -214,7 +220,7 @@
 [[projects]]
   branch = "master"
   name = "google.golang.org/genproto"
-  packages = ["googleapis/api/annotations","googleapis/datastore/v1","googleapis/rpc/status","googleapis/type/latlng"]
+  packages = ["googleapis/api/annotations","googleapis/api/distribution","googleapis/api/label","googleapis/api/metric","googleapis/api/monitoredres","googleapis/datastore/v1","googleapis/logging/type","googleapis/logging/v2","googleapis/rpc/status","googleapis/type/latlng","protobuf/field_mask"]
   revision = "2c5e7ac708aaa719366570dd82bda44541ca2a63"
 
 [[projects]]
@@ -226,6 +232,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "304274a7674d4c9e80ecb2ac247a13edb20472dc2b4f479442cc1c101f512262"
+  inputs-digest = "e08d94dcf30759ced80b3aa804bde2b831e9090edec3bc23604bfa7a6a7d029d"
   solver-name = "gps-cdcl"
   solver-version = 1
