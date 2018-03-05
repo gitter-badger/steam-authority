@@ -2,6 +2,7 @@ package queue
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
@@ -132,10 +133,11 @@ func changeConsumer() {
 					}
 
 					payload := changeWebsocketPayload{
-						ID:        change.ChangeID,
-						CreatedAt: change.CreatedAt.Unix(),
-						Apps:      apps,
-						Packages:  packages,
+						ID:            change.ChangeID,
+						CreatedAt:     change.CreatedAt.Unix(),
+						CreatedAtNice: change.CreatedAt.Format(time.Stamp),
+						Apps:          apps,
+						Packages:      packages,
 					}
 					websockets.Send(websockets.CHANGES, payload)
 				}
@@ -145,10 +147,11 @@ func changeConsumer() {
 }
 
 type changeWebsocketPayload struct {
-	ID        int                             `json:"id"`
-	CreatedAt int64                           `json:"created_at"`
-	Apps      []changeAppWebsocketPayload     `json:"apps"`
-	Packages  []changePackageWebsocketPayload `json:"packages"`
+	ID            int                             `json:"id"`
+	CreatedAt     int64                           `json:"created_at"`
+	CreatedAtNice string                          `json:"created_at_nice"`
+	Apps          []changeAppWebsocketPayload     `json:"apps"`
+	Packages      []changePackageWebsocketPayload `json:"packages"`
 }
 
 type changeAppWebsocketPayload struct {

@@ -4,49 +4,35 @@
 
     <div class="jumbotron">
 
-        <div class="row">
-            <div class="col-sm-6">
-
-                <h1 class="display-4">Tags</h1>
-                <p class="lead">
-                {{ len .Tags }} Tags.
-                    Sort by <span class="sort" data-sort="tag-name">tag</span>.
-                    Sort by <span class="sort" data-sort="tag-games">games</span>.
-                </p>
-
-            </div>
-            <div class="col-sm-6">
-
-                <form class="mt-4">
-                    <div class="input-group input-group-lg mb-4">
-                        <input class="form-control tags-search" type="text" placeholder="Search for a Tag" required="required" autocomplete="off" onkeydown="clearField(event, this);">
-                    </div>
-                </form>
-
-            </div>
-        </div>
+        <h1 class="display-4"><i class="fas fa-tag"></i> Tags</h1>
 
     </div>
 
     <div class="card">
         <div class="card-body">
 
-            <div class="row tags-list">
-            {{ range $key, $value := .Tags }}
-                <div class="col-sm-4 mb-2" id="tag_{{ .ID }}">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm table-sorter table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">Tag</th>
+                        <th scope="col" class="sorter-digit">Games</th>
+                        <th scope="col" class="sorter-digit">Avg Price</th>
+                        <th scope="col" class="sorter-digit">Avg Discount</th>
+                    </tr>
+                    </thead>
 
-                    <div class="list-group">
-                        <a href="{{ .GetPath }}" class="list-group-item list-group-item-action list-group-item-secondary">
-                            <i class="fas fa-tag"></i>
-                            <h6 class="mb-1 tag-name">{{ .Name }}</h6>
-                            <small>
-                                <span class="tag-games">{{ .Apps }}</span> Games
-                            </small>
-                        </a>
-                    </div>
+                {{ range $key, $value := .Tags }}
+                    <tr>
+                        <td width="25%">{{ .GetName }}</td>
+                        <td width="25%">{{ comma .Apps }}</td>
+                        <td width="25%">{{ commaf .MeanPrice }}</td>
+                        <td width="25%">{{ commaf .MeanDiscount }}</td>
+                    </tr>
+                {{ end }}
 
-                </div>
-            {{ end }}
+                </table>
+
             </div>
 
         </div>

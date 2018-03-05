@@ -11,3 +11,7 @@ function clearField(evt, input) {
         input.value = '';
     }
 }
+
+$("body").tooltip({
+    selector: '[data-toggle="tooltip"]'
+});

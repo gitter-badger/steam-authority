@@ -30,6 +30,14 @@ func (article Article) GetKey() (key *datastore.Key) {
 	return datastore.NameKey(ARTICLE, strconv.Itoa(article.ArticleID), nil)
 }
 
+func (article Article) GetTimestamp() (int64) {
+	return article.Date.Unix()
+}
+
+func (article Article) GetNiceDate() (string) {
+	return article.Date.Format(time.Stamp)
+}
+
 func (article *Article) Tidy() *Article {
 
 	article.UpdatedAt = time.Now()

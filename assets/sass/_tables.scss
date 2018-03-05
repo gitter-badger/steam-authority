@@ -13,20 +13,23 @@
 
 table.table-sorter {
     thead tr {
-        .header {
-            background-image: url(/assets/img/tablesorter/bg.gif);
-            background-repeat: no-repeat;
-            background-position: center left;
+        .tablesorter-header {
+            background: url(/assets/img/tablesorter/bg.gif) no-repeat center left;
             cursor: pointer;
             padding-left: 20px;
+            outline: none;
         }
-        .headerSortUp {
+        .tablesorter-headerAsc {
             background-image: url(/assets/img/tablesorter/asc.gif);
             text-decoration: underline;
         }
-        .headerSortDown {
+        .tablesorter-headerDesc {
             background-image: url(/assets/img/tablesorter/desc.gif);
             text-decoration: underline;
+        }
+        .sorter-false {
+            background: none !important;
+            cursor: default;
         }
     }
 }

@@ -163,7 +163,8 @@ func adminTags(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 	}
 
-	counts := make(map[int]int)
+	// map[player]struct
+	counts := make(map[int]*adminTag)
 
 	for _, app := range apps {
 		tags, err := app.GetTags()
@@ -176,21 +177,45 @@ func adminTags(w http.ResponseWriter, r *http.Request) {
 			//logger.Info(genre.Description)
 
 			if _, ok := counts[tag]; ok {
-				counts[tag]++
+				counts[tag].count++
+				counts[tag].totalPrice = counts[tag].totalPrice + app.PriceFinal
+				counts[tag].totalDiscount = counts[tag].totalDiscount + app.PriceDiscount
 			} else {
-				counts[tag] = 1
+				counts[tag] = &adminTag{
+					count:         1,
+					totalPrice:    app.PriceFinal,
+					totalDiscount: app.PriceDiscount,
+				}
 			}
 		}
 	}
 
 	for k, v := range counts {
-		err := mysql.SaveOrUpdateTag(k, v)
+		err := mysql.SaveOrUpdateTag(k, mysql.Tag{
+			Apps:         v.count,
+			MeanPrice:    v.GetMeanPrice(),
+			MeanDiscount: v.GetMeanDiscount(),
+		})
 		if err != nil {
 			logger.Error(err)
 		}
 	}
 
 	logger.Info("Tags updated")
+}
+
+type adminTag struct {
+	count         int
+	totalPrice    int
+	totalDiscount int
+}
+
+func (t adminTag) GetMeanPrice() float64 {
+	return float64(t.totalPrice) / float64(t.count)
+}
+
+func (t adminTag) GetMeanDiscount() float64 {
+	return float64(t.totalDiscount) / float64(t.count)
 }
 
 func adminRanks(w http.ResponseWriter, r *http.Request) {

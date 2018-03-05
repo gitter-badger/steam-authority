@@ -49,7 +49,7 @@ type App struct {
 	ClientIcon        string     `gorm:"not null;column:client_icon"`                   // PICS
 	Ghost             bool       `gorm:"not null;column:is_ghost;type:tinyint(1)"`      //
 	PriceInitial      int        `gorm:"not null;column:price_initial"`                 //
-	PriceFinal        int        `gorm:"not null;column:price_ final"`                  //
+	PriceFinal        int        `gorm:"not null;column:price_final"`                   //
 	PriceDiscount     int        `gorm:"not null;column:price_discount"`                //
 }
 

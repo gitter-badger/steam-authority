@@ -11,11 +11,8 @@ import (
 
 func ChangesHandler(w http.ResponseWriter, r *http.Request) {
 
-	template := changesTemplate{}
-	template.Fill(r)
-
 	// Get changes
-	changes, err := datastore.GetLatestChanges(100)
+	changes, err := datastore.GetLatestChanges(50)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -57,6 +54,8 @@ func ChangesHandler(w http.ResponseWriter, r *http.Request) {
 	// todo, sort packagesMap by id
 
 	// Template
+	template := changesTemplate{}
+	template.Fill(r)
 	template.Changes = changes
 	template.Apps = appsMap
 	template.Packages = packagesMap

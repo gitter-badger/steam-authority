@@ -3,6 +3,7 @@
 if [ "${ENV}" == "local" ]
 then
 
+    bash ./cmd/pics.sh >> /dev/null
     realize start
 
 else

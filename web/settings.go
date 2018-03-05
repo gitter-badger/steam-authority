@@ -63,22 +63,26 @@ func LoginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Set session from steam
 	resp, err := steam.GetPlayerSummaries([]int{id})
 	if err != nil {
 		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
-	// Create login record
-	datastore.CreateLogin(id, r)
-
-	// Set session
 	session.WriteMany(w, r, map[string]string{
 		ID:     strconv.Itoa(id),
 		NAME:   resp.Response.Players[0].PersonaName,
 		AVATAR: resp.Response.Players[0].AvatarMedium,
 	})
 
+	// todo
+	//respx, err:= steam.GetOwnedGames()
+
+	// Create login record
+	datastore.CreateLogin(id, r)
+
+	// Redirect
 	http.Redirect(w, r, "/settings", 302)
 	return
 }

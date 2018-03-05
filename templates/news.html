@@ -24,11 +24,13 @@
             {{ range $key, $value := .Articles }}
 
                 <li class="media">
-                    <img class="mr-3 rounded" src="{{ (index $.Apps .AppID).GetIcon }}" alt="{{ (index $.Apps .AppID).GetName }}">
+                    <a href="{{ (index $.Apps .AppID).GetPath }}#news">
+                        <img class="mr-3 rounded" src="{{ (index $.Apps .AppID).GetIcon }}" alt="{{ (index $.Apps .AppID).GetName }}">
+                    </a>
                     <div class="media-body">
                         <h5 class="mt-0 mb-1"><a href="{{ (index $.Apps .AppID).GetPath }}#news">{{ .Title }}</a></h5>
                         <p class="text-muted">
-                            <span>{{ (index $.Apps .AppID).Name }} - By {{.Author}} @ <span data-livestamp="{{ unix .Date }}">{{ unix .Date }}</span></span>
+                            <span>{{ (index $.Apps .AppID).Name }} - By {{.Author}} @ <span data-toggle="tooltip" data-placement="top" title="{{ .GetNiceDate }}" data-livestamp="{{ .GetTimestamp }}">{{ .GetNiceDate }}</span></span>
                         </p>
                     </div>
                 </li>

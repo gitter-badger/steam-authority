@@ -6,16 +6,26 @@ import (
 )
 
 type Tag struct {
-	ID        int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
-	CreatedAt *time.Time `gorm:"not null;column:created_at"`
-	UpdatedAt *time.Time `gorm:"not null;column:updated_at"`
-	Name      string     `gorm:"not null;column:name"`
-	Apps      int        `gorm:"not null;column:apps"`
-	Votes     int        `gorm:"not null;column:votes"`
+	ID           int        `gorm:"not null;column:id;primary_key;AUTO_INCREMENT"`
+	CreatedAt    *time.Time `gorm:"not null;column:created_at"`
+	UpdatedAt    *time.Time `gorm:"not null;column:updated_at"`
+	Name         string     `gorm:"not null;column:name"`
+	Apps         int        `gorm:"not null;column:apps"`
+	MeanPrice    float64    `gorm:"not null;column:mean_price"`
+	MeanDiscount float64    `gorm:"not null;column:mean_discount"`
 }
 
 func (tag Tag) GetPath() string {
 	return "/apps?tag=" + strconv.Itoa(tag.ID)
+}
+
+func (tag Tag) GetName() (name string) {
+
+	if tag.Name == "" {
+		tag.Name = "Tag " + strconv.Itoa(tag.ID)
+	}
+
+	return tag.Name
 }
 
 func GetAllTags() (tags []Tag, err error) {
@@ -33,7 +43,7 @@ func GetAllTags() (tags []Tag, err error) {
 	return tags, nil
 }
 
-func SaveOrUpdateTag(id int, apps int) (err error) {
+func SaveOrUpdateTag(id int, vals Tag) (err error) {
 
 	db, err := getDB()
 	if err != nil {
@@ -41,7 +51,7 @@ func SaveOrUpdateTag(id int, apps int) (err error) {
 	}
 
 	tag := new(Tag)
-	db.Assign(Tag{Apps: apps}).FirstOrCreate(tag, Tag{ID: id})
+	db.Assign(vals).FirstOrCreate(tag, Tag{ID: id})
 	if db.Error != nil {
 		return db.Error
 	}

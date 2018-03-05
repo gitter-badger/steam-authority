@@ -28,6 +28,14 @@ func (change Change) GetName() (name string) {
 	return "Change " + strconv.Itoa(change.ChangeID)
 }
 
+func (change Change) GetTimestamp() (int64) {
+	return change.CreatedAt.Unix()
+}
+
+func (change Change) GetNiceDate() (string) {
+	return change.CreatedAt.Format(time.Stamp)
+}
+
 func GetLatestChanges(limit int) (changes []Change, err error) {
 
 	client, context, err := getDSClient()

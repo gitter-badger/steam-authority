@@ -4,36 +4,48 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"cloud.google.com/go/logging"
 )
 
+const (
+	LogPics      = "pics"
+	LogConsumers = "consumers"
+)
+
 var (
-	ctx          = context.Background()
-	logMain      *logging.Logger
-	logPics      *logging.Logger
-	logConsumers *logging.Logger
+	ctx    = context.Background()
+	client *logging.Client
 )
 
 func init() {
-	client, err := logging.NewClient(ctx, os.Getenv("STEAM_GOOGLE_PROJECT"))
+	var err error
+	client, err = logging.NewClient(ctx, os.Getenv("STEAM_GOOGLE_PROJECT"))
 	if err != nil {
-		fmt.Println("Error creating stackdriver client")
+		fmt.Println("error creating google logging client")
 	}
-
-	logMain = client.Logger("main")
-	logPics = client.Logger("pics")
-	logConsumers = client.Logger("consumers")
 }
 
-func PicsError(err error) {
-	logPics.Log(logging.Entry{Payload: err.Error(), Severity: logging.Error})
+func getLog(name ...string) (*logging.Logger) {
+
+	env := os.Getenv("ENV")
+
+	if len(name) > 0 {
+		return client.Logger(env + "_" + name[0])
+	} else {
+		return client.Logger(env + "_" + "main")
+	}
 }
 
-func PicsMessage(payload string) {
-	logPics.Log(logging.Entry{Payload: payload, Severity: logging.Info})
+func Error(err error, log ...string) {
+	getLog(log...).Log(logging.Entry{Payload: err.Error() + "\n\r" + string(debug.Stack()), Severity: logging.Error})
 }
 
-func PicsCrit(err error) {
-	logPics.LogSync(ctx, logging.Entry{Payload: err.Error(), Severity: logging.Critical})
+func Info(payload string, log ...string) {
+	getLog(log...).Log(logging.Entry{Payload: payload, Severity: logging.Info})
+}
+
+func Critical(err error, log ...string) {
+	getLog(log...).LogSync(ctx, logging.Entry{Payload: err.Error(), Severity: logging.Critical})
 }

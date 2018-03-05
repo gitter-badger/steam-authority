@@ -19,14 +19,14 @@ if ($('#changes-page').length > 0) {
 
                 data = data.Data;
 
-                console.log(data);
+                // console.log(data);
 
                 $('ul.list-unstyled').prepend($(
                     '<li class="media">' +
                     '    <div class="media-body">' +
                     '        <h5 class="mt-0 mb-1">Change ' + data.id + '</h5>' +
                     '        <p class="text-muted" style="margin-bottom: 0;">\n' +
-                    '            <span data-livestamp="' + data.created_at + '">' + data.created_at + '</span>\n' +
+                    '            <span data-toggle="tooltip" data-placement="top" title="' + data.created_at_nice + '" data-livestamp="' + data.created_at + '">' + data.created_at_nice + '</span>\n' +
                     '            <a href="/changes/' + data.id + '"><i class="fa fa-paperclip" aria-hidden="true"></i></a>\n' +
                     '        </p>' +
                     '        <p class="text-muted" style="margin-bottom: 0;">Apps: ' + makeAppLinks(data.apps, 'apps') + '</p>' +
@@ -34,7 +34,7 @@ if ($('#changes-page').length > 0) {
                     '    </div>' +
                     '</li>'));
 
-                $('ul.list-unstyled .media').slice(100).remove();
+                $('ul.list-unstyled .media').slice(50).remove();
             }
         };
         socket.onerror = function (e) {
