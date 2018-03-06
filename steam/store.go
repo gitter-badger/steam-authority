@@ -66,6 +66,9 @@ func GetAppDetailsFromStore(id int) (app AppDetailsBody, err error) {
 	regex = regexp.MustCompile(`"description":(\d+)`)
 	b = regex.ReplaceAllString(b, `"description":"$1"`)
 
+	regex = regexp.MustCompile(`"display_type":(\d+)`)
+	b = regex.ReplaceAllString(b, `"display_type":"$1"`)
+
 	// Fix arrays that should be objects
 	b = strings.Replace(b, "\"pc_requirements\":[]", "\"pc_requirements\":null", 1)
 	b = strings.Replace(b, "\"mac_requirements\":[]", "\"mac_requirements\":null", 1)
@@ -142,7 +145,7 @@ type AppDetailsBody struct {
 			Description             string `json:"description"`
 			SelectionText           string `json:"selection_text"`
 			SaveText                string `json:"save_text"`
-			DisplayType             int    `json:"display_type"`
+			DisplayType             string `json:"display_type"` // Can be string or int
 			IsRecurringSubscription string `json:"is_recurring_subscription"`
 			Subs []struct {
 				Packageid                int    `json:"packageid"`

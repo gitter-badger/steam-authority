@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -21,24 +22,32 @@ type Rank struct {
 	CountryCode string    `datastore:"country_code"`
 
 	// Ranks
-	Level           int `datastore:"level"`
-	LevelRank       int `datastore:"level_rank"`
-	GamesCount      int `datastore:"games"`
-	GamesRank       int `datastore:"games_rank"`
-	BadgesCount     int `datastore:"badges"`
-	BadgesRank      int `datastore:"badges_rank"`
-	PlayTime        int `datastore:"play_time"`
-	PlayTimeRank    int `datastore:"play_time_rank"`
-	TimeCreated     int `datastore:"time_created"`
-	TimeCreatedRank int `datastore:"time_created_rank"`
-	FriendsCount    int `datastore:"friends"`
-	FriendsRank     int `datastore:"friends_rank"`
+	Level        int `datastore:"level"`
+	LevelRank    int `datastore:"level_rank"`
+	GamesCount   int `datastore:"games"`
+	GamesRank    int `datastore:"games_rank"`
+	BadgesCount  int `datastore:"badges"`
+	BadgesRank   int `datastore:"badges_rank"`
+	PlayTime     int `datastore:"play_time"`
+	PlayTimeRank int `datastore:"play_time_rank"`
+	//TimeCreated     int `datastore:"time_created"`
+	//TimeCreatedRank int `datastore:"time_created_rank"`
+	FriendsCount int `datastore:"friends"`
+	FriendsRank  int `datastore:"friends_rank"`
 
 	Rank int `datastore:"-"` // Internal
 }
 
 func (rank Rank) GetKey() (key *datastore.Key) {
 	return datastore.NameKey(RANK, strconv.Itoa(rank.PlayerID), nil)
+}
+
+func (rank Rank) GetAvatar() string {
+	if strings.HasPrefix(rank.Avatar, "http") {
+		return rank.Avatar
+	} else {
+		return "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/" + rank.Avatar
+	}
 }
 
 func (rank *Rank) Tidy() *Rank {
@@ -59,10 +68,10 @@ func (rank *Rank) FillFromPlayer(player Player) *Rank {
 	rank.PersonaName = player.PersonaName
 	rank.CountryCode = player.CountryCode
 	rank.Level = player.Level
-	rank.GamesCount = player.Games
-	rank.BadgesCount = player.Badges
+	rank.GamesCount = player.GamesCount
+	rank.BadgesCount = player.BadgesCount
 	rank.PlayTime = player.PlayTime
-	rank.TimeCreated = player.TimeCreated
+	//rank.TimeCreated = player.TimeCreated
 	rank.FriendsCount = len(player.Friends)
 
 	return rank

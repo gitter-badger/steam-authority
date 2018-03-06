@@ -1,20 +1,17 @@
 package web
 
 import (
+	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/session"
 	"github.com/steam-authority/steam-authority/steam"
 	"github.com/yohcop/openid-go"
+	"encoding/json"
 	"net/http"
 	"os"
 	"path"
 	"strconv"
-)
-
-const (
-	ID     = "id"
-	NAME   = "name"
-	AVATAR = "avatar"
+	"strings"
 )
 
 // todo
@@ -57,30 +54,44 @@ func LoginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(path.Base(openID))
+	idString := path.Base(openID)
+
+	idInt, err := strconv.Atoi(idString)
 	if err != nil {
 		returnErrorTemplate(w, r, 500, err.Error())
 		return
 	}
 
 	// Set session from steam
-	resp, err := steam.GetPlayerSummaries([]int{id})
+	resp, err := steam.GetPlayerSummaries(idInt)
 	if err != nil {
-		returnErrorTemplate(w, r, 500, err.Error())
-		return
+		if !strings.HasPrefix(err.Error(), "not found in steam") {
+			returnErrorTemplate(w, r, 500, err.Error())
+			return
+		}
+	}
+
+	var gamesSlice []int
+	gamesResp, err := steam.GetOwnedGames(idInt)
+
+	for _, v := range gamesResp {
+		gamesSlice = append(gamesSlice, v.Appid)
+	}
+
+	gamesString, err := json.Marshal(gamesSlice)
+	if err != nil {
+		logger.Error(err)
 	}
 
 	session.WriteMany(w, r, map[string]string{
-		ID:     strconv.Itoa(id),
-		NAME:   resp.Response.Players[0].PersonaName,
-		AVATAR: resp.Response.Players[0].AvatarMedium,
+		session.ID:     idString,
+		session.Name:   resp.PersonaName,
+		session.Avatar: resp.AvatarMedium,
+		session.Games:  string(gamesString),
 	})
 
-	// todo
-	//respx, err:= steam.GetOwnedGames()
-
 	// Create login record
-	datastore.CreateLogin(id, r)
+	datastore.CreateLogin(idInt, r)
 
 	// Redirect
 	http.Redirect(w, r, "/settings", 302)

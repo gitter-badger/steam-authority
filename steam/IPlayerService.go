@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"net/url"
 	"strconv"
+
+	"github.com/kr/pretty"
 )
 
 // Gets information about a player's recently played games
 func GetRecentlyPlayedGames(playerID int) (games []RecentlyPlayedGame, err error) {
 
 	options := url.Values{}
-	options.Set("appid", strconv.Itoa(playerID))
+	options.Set("steamid", strconv.Itoa(playerID))
 	options.Set("count", "0")
 
 	bytes, err := get("IPlayerService/GetRecentlyPlayedGames/v1", options)
@@ -22,6 +24,8 @@ func GetRecentlyPlayedGames(playerID int) (games []RecentlyPlayedGame, err error
 	var resp RecentlyPlayedGamesResponse
 	err = json.Unmarshal(bytes, &resp)
 	if err != nil {
+		pretty.Print(err.Error())
+		pretty.Print(string(bytes))
 		return games, err
 	}
 

@@ -8,11 +8,6 @@ import (
 	"github.com/kr/pretty"
 )
 
-/**
-https://partner.steamgames.com/doc/webapi/ISteamApps#GetCheatingReports
-https://partner.steamgames.com/doc/webapi/ISteamApps#GetPlayersBanned
-*/
-
 func GetAppList() (apps []GetAppListApp, err error) {
 
 	bytes, err := get("ISteamApps/GetAppList/v2/", url.Values{})

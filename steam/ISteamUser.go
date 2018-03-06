@@ -87,47 +87,42 @@ type ResolveVanityURLResponse struct {
 	Message string `json:"message"`
 }
 
-// todo, only return the needed response
-func GetPlayerSummaries(ids []int) (resp PlayerSummariesBody, err error) {
+func GetPlayerSummaries(id int) (ret PlayerSummary, err error) {
 
-	if len(ids) > 100 {
-		return resp, errors.New("100 ids max")
-	}
-
-	var idsString []string
-	for _, v := range ids {
-		idsString = append(idsString, strconv.Itoa(v))
-	}
+	idString := strconv.Itoa(id)
 
 	options := url.Values{}
-	options.Set("steamids", strings.Join(idsString, ","))
+	options.Set("steamids", idString)
 
 	bytes, err := get("ISteamUser/GetPlayerSummaries/v2/", options)
 	if err != nil {
-		return resp, err
+		return ret, err
 	}
 
 	// Unmarshal JSON
+	var resp PlayerSummariesResponse
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			pretty.Print(string(bytes))
 			logger.Error(err)
 		}
-		return resp, err
+		return ret, err
 	}
 
-	return resp, nil
-}
+	if len(resp.Response.Players) == 0 {
+		return ret, errors.New("not found in steam: " + idString)
+	}
 
-type PlayerSummariesBody struct {
-	Response PlayerSummariesResponse
+	return resp.Response.Players[0], nil
 }
 
 type PlayerSummariesResponse struct {
-	Players []PlayerSummariesPlayer
+	Response struct {
+		Players []PlayerSummary `json:"players"`
+	} `json:"response"`
 }
 
-type PlayerSummariesPlayer struct {
+type PlayerSummary struct {
 	SteamID                  string `json:"steamid"`
 	CommunityVisibilityState int    `json:"communityvisibilitystate"`
 	ProfileState             int    `json:"profilestate"`

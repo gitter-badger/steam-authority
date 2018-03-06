@@ -11,6 +11,8 @@ const (
 	ID     = "id"
 	Name   = "name"
 	Avatar = "avatar"
+	Level  = "level"
+	Games  = "games"
 )
 
 func getSession(r *http.Request) (*sessions.Session, error) {

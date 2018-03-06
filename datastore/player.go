@@ -19,23 +19,31 @@ const (
 )
 
 type Player struct {
-	CreatedAt      time.Time                   `datastore:"created_at"`
-	UpdatedAt      time.Time                   `datastore:"updated_at"`
-	FriendsAddedAt time.Time                   `datastore:"friends_added_at,noindex"`
-	PlayerID       int                         `datastore:"player_id,noindex"`
-	ValintyURL     string                      `datastore:"vality_url,noindex"`
-	Avatar         string                      `datastore:"avatar,noindex"`
-	PersonaName    string                      `datastore:"persona_name,noindex"`
-	RealName       string                      `datastore:"real_name,noindex"`
-	CountryCode    string                      `datastore:"country_code"`
-	StateCode      string                      `datastore:"status_code"`
-	Level          int                         `datastore:"level"`
-	Games          int                         `datastore:"games"`
-	Badges         int                         `datastore:"badges"`
-	PlayTime       int                         `datastore:"play_time"`
-	TimeCreated    int                         `datastore:"time_created"` // In Steam's DB
-	Friends        []steam.GetFriendListFriend `datastore:"friends,noindex"`
-	Donated        int                         `datastore:"donated"`
+	CreatedAt        time.Time                   `datastore:"created_at"`
+	UpdatedAt        time.Time                   `datastore:"updated_at"`
+	FriendsAddedAt   time.Time                   `datastore:"friends_added_at,noindex"`
+	PlayerID         int                         `datastore:"player_id,noindex"`
+	ValintyURL       string                      `datastore:"vality_url,noindex"`
+	Avatar           string                      `datastore:"avatar,noindex"`
+	PersonaName      string                      `datastore:"persona_name,noindex"`
+	RealName         string                      `datastore:"real_name,noindex"`
+	CountryCode      string                      `datastore:"country_code"`
+	StateCode        string                      `datastore:"status_code"`
+	Level            int                         `datastore:"level"`
+	Games            []steam.OwnedGame           `datastore:"games,noindex"`
+	GamesRecent      []steam.RecentlyPlayedGame  `datastore:"games_recent,noindex"`
+	GamesCount       int                         `datastore:"games_count"`
+	Badges           steam.BadgesResponse        `datastore:"badges,noindex"`
+	BadgesCount      int                         `datastore:"badges_count"`
+	PlayTime         int                         `datastore:"play_time"`
+	TimeCreated      int                         `datastore:"time_created"` // In Steam's DB
+	Friends          []steam.GetFriendListFriend `datastore:"friends,noindex"`
+	FriendsCount     int                         `datastore:"friends_count"`
+	Donated          int                         `datastore:"donated"` // Total
+	Bans             steam.GetPlayerBanResponse  `datastore:"bans"`
+	NumberOfVACBans  int                         `datastore:"bans_cav"`
+	NumberOfGameBans int                         `datastore:"bans_game"`
+	Groups           []int                       `datastore:"groups"`
 }
 
 func (p Player) GetKey() (key *datastore.Key) {
@@ -44,6 +52,14 @@ func (p Player) GetKey() (key *datastore.Key) {
 
 func (p Player) GetPath() string {
 	return "/players/" + strconv.Itoa(p.PlayerID) + "/" + slug.Make(p.PersonaName)
+}
+
+func (p Player) GetAvatar() string {
+	if strings.HasPrefix(p.Avatar, "http") {
+		return p.Avatar
+	} else {
+		return "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/" + p.Avatar
+	}
 }
 
 func (p Player) shouldUpdate() bool {
@@ -161,7 +177,7 @@ func ConsumePlayer(msg amqp.Delivery) (err error) {
 		return err
 	}
 
-	err = player.Update()
+	err = player.UpdateIfNeeded()
 	if err != nil {
 		return err
 	}
@@ -169,11 +185,11 @@ func ConsumePlayer(msg amqp.Delivery) (err error) {
 	return nil
 }
 
-func (p *Player) Update() (err error) {
+func (p *Player) UpdateIfNeeded() (err error) {
 
 	if p.shouldUpdate() {
 
-		err = p.Fill()
+		err = p.fill()
 		if err != nil {
 			return err
 		}
@@ -187,32 +203,84 @@ func (p *Player) Update() (err error) {
 	return nil
 }
 
-func (p *Player) Fill() (err error) {
-
-	// todo, get player bans, groups
+func (p *Player) fill() (err error) {
 
 	//Get summary
-	summary, err := steam.GetPlayerSummaries([]int{p.PlayerID})
+	summary, err := steam.GetPlayerSummaries(p.PlayerID)
 	if err != nil {
-		return err
-	} else if len(summary.Response.Players) > 0 {
-		p.Avatar = summary.Response.Players[0].AvatarFull
-		p.ValintyURL = path.Base(summary.Response.Players[0].ProfileURL)
-		p.RealName = summary.Response.Players[0].RealName
-		p.CountryCode = summary.Response.Players[0].LOCCountryCode
-		p.StateCode = summary.Response.Players[0].LOCStateCode
-		p.PersonaName = summary.Response.Players[0].PersonaName
+		if !strings.HasPrefix(err.Error(), "not found in steam") {
+			logger.Error(err)
+		}
 	}
 
+	p.Avatar = strings.Replace(summary.AvatarFull, "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/", "", 1)
+	p.ValintyURL = path.Base(summary.ProfileURL)
+	p.RealName = summary.RealName
+	p.CountryCode = summary.LOCCountryCode
+	p.StateCode = summary.LOCStateCode
+	p.PersonaName = summary.PersonaName
+
+	// Get games
+	gamesResponse, err := steam.GetOwnedGames(p.PlayerID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	p.Games = gamesResponse
+	p.GamesCount = len(gamesResponse)
+
+	// Get recent games
+	recentGames, err := steam.GetRecentlyPlayedGames(p.PlayerID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	p.GamesRecent = recentGames
+
+	// Get badges
+	badges, err := steam.GetBadges(p.PlayerID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	p.Badges = badges
+	p.BadgesCount = len(badges.Badges)
+	
 	//Get friends
 	friends, err := steam.GetFriendList(p.PlayerID)
 	if err != nil {
 		logger.Error(err)
-	} else {
-		p.Friends = friends
 	}
 
-	// Dates
+	p.Friends = friends
+
+	// Get level
+	level, err := steam.GetSteamLevel(p.PlayerID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	p.Level = level
+
+	// Get bans
+	bans, err := steam.GetPlayerBans(p.PlayerID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	p.Bans = bans
+	p.NumberOfGameBans = bans.NumberOfGameBans
+	p.NumberOfVACBans = bans.NumberOfVACBans
+
+	// Get groups
+	groups, err := steam.GetUserGroupList(p.PlayerID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	p.Groups = groups
+
+	// Fix dates
 	p.UpdatedAt = time.Now()
 	if p.CreatedAt.IsZero() {
 		p.CreatedAt = time.Now()
@@ -222,6 +290,10 @@ func (p *Player) Fill() (err error) {
 }
 
 func (p *Player) Save() (err error) {
+
+	if p.PlayerID == 0 {
+		logger.Info("Saving player with ID 0")
+	}
 
 	_, err = SaveKind(p.GetKey(), p)
 	if err != nil {
