@@ -131,6 +131,7 @@ func (t *GlobalTemplate) Fill(r *http.Request) {
 	// From request
 	t.Path = r.URL.Path
 	t.IsAdmin = r.Header.Get("Authorization") != ""
+	t.request = r
 }
 
 func (t GlobalTemplate) LoggedIn() (bool) {
