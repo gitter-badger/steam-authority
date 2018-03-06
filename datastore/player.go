@@ -46,23 +46,24 @@ func (p Player) GetPath() string {
 	return "/players/" + strconv.Itoa(p.PlayerID) + "/" + slug.Make(p.PersonaName)
 }
 
-func (p Player) ShouldScanFriends() bool {
+func (p Player) shouldUpdate() bool {
+
+	if p.PersonaName == "" {
+		return true
+	}
+
+	if p.UpdatedAt.Unix() < (time.Now().Unix() - int64(60*60*24)) {
+		return true
+	}
+
+	return false
+}
+
+func (p Player) ShouldUpdateFriends() bool {
 	return p.FriendsAddedAt.Unix() < (time.Now().Unix() - int64(60*60*24*30))
 }
 
-func (p Player) shouldUpdate() bool {
-	return p.UpdatedAt.Unix() < (time.Now().Unix() - int64(60*60*24))
-}
-
-func UpdatePlayerFriendsScannedDate(player Player) (err error) {
-
-	player.FriendsAddedAt = time.Now()
-	_, err = SaveKind(player.GetKey(), &player)
-
-	return err
-}
-
-func GetPlayerWithoutUpdating(id int) (ret *Player, err error) {
+func GetPlayer(id int) (ret *Player, err error) {
 
 	client, context, err := getDSClient()
 	if err != nil {
@@ -84,40 +85,6 @@ func GetPlayerWithoutUpdating(id int) (ret *Player, err error) {
 	}
 
 	return player, nil
-}
-
-func GetPlayer(id int) (ret Player, err error) {
-
-	client, context, err := getDSClient()
-	if err != nil {
-		return ret, err
-	}
-
-	key := datastore.NameKey(PLAYER, strconv.Itoa(id), nil)
-
-	player := new(Player)
-	player.PlayerID = id
-
-	err = client.Get(context, key, player)
-	if err != nil {
-
-		// Not in DB, go get it!
-		if err.Error() == NotFound {
-
-			player.Fill()
-			_, err = SaveKind(player.GetKey(), player)
-		}
-		return *player, err
-	}
-
-	if player.shouldUpdate() {
-
-		player.Fill()
-		_, err = SaveKind(player.GetKey(), player)
-		return *player, err
-	}
-
-	return *player, nil
 }
 
 func GetPlayers(order string, limit int) (players []Player, err error) {
@@ -189,9 +156,35 @@ func ConsumePlayer(msg amqp.Delivery) (err error) {
 	id := string(msg.Body)
 	idx, _ := strconv.Atoi(id)
 
-	_, err = GetPlayer(idx)
+	player, err := GetPlayer(idx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	err = player.Update()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Player) Update() (err error) {
+
+	if p.shouldUpdate() {
+
+		err = p.Fill()
+		if err != nil {
+			return err
+		}
+
+		err = p.Save()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (p *Player) Fill() (err error) {
@@ -223,6 +216,16 @@ func (p *Player) Fill() (err error) {
 	p.UpdatedAt = time.Now()
 	if p.CreatedAt.IsZero() {
 		p.CreatedAt = time.Now()
+	}
+
+	return nil
+}
+
+func (p *Player) Save() (err error) {
+
+	_, err = SaveKind(p.GetKey(), p)
+	if err != nil {
+		return err
 	}
 
 	return nil

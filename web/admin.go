@@ -90,7 +90,7 @@ func adminDonations(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for k, v := range counts {
-		player, err := datastore.GetPlayerWithoutUpdating(k)
+		player, err := datastore.GetPlayer(k)
 		if err != nil {
 			logger.Error(err)
 			continue

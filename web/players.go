@@ -3,6 +3,7 @@ package web
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
@@ -97,15 +98,23 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = player.Update()
+	if err != nil {
+		logger.Error(err)
+		returnErrorTemplate(w, r, 500, err.Error())
+		return
+	}
+
 	// Queue friends
-	if player.ShouldScanFriends() {
+	if player.ShouldUpdateFriends() {
 
 		for _, v := range player.Friends {
 			vv, _ := strconv.Atoi(v.SteamID)
 			queue.PlayerProducer(vv)
 		}
 
-		datastore.UpdatePlayerFriendsScannedDate(player)
+		player.FriendsAddedAt = time.Now()
+		player.Save()
 	}
 
 	// Redirect to correct slug
@@ -139,7 +148,7 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 
 type playerTemplate struct {
 	GlobalTemplate
-	Player  datastore.Player
+	Player  *datastore.Player
 	Friends []datastore.Player
 }
 
