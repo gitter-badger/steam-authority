@@ -1,3 +1,4 @@
+cmd/protos/
 config/
 generated/
 node_modules/
