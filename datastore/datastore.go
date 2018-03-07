@@ -17,6 +17,7 @@ const (
 	LOGIN    = "Login"
 	DONATION = "Donation"
 	GROUP    = "Group"
+	PRICE    = "PriceChange"
 )
 
 func getDSClient() (client *datastore.Client, ctx context.Context, err error) {
