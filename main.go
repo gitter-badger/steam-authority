@@ -116,6 +116,9 @@ func main() {
 	r.Get("/tags", web.TagsHandler)
 	r.Get("/websocket", websockets.Handler)
 
+	// 404
+	r.NotFound(web.Error404Handler)
+
 	// File server
 	fileServer(r, "/assets")
 

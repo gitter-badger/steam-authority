@@ -26,6 +26,11 @@ func FAQsHandler(w http.ResponseWriter, r *http.Request) {
 	returnTemplate(w, r, "faqs", template)
 }
 
+func Error404Handler(w http.ResponseWriter, r *http.Request) {
+
+	returnErrorTemplate(w, r, 404, "Page not found")
+}
+
 type staticTemplate struct {
 	GlobalTemplate
 }
