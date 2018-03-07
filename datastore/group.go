@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 	"time"
@@ -20,6 +21,10 @@ func (g Group) GetKey() (key *datastore.Key) {
 }
 
 func GetGroupsByIDs(ids []int) (groups []Group, err error) {
+
+	if len(ids) > 1000 {
+		return groups, errors.New("too many")
+	}
 
 	client, context, err := getDSClient()
 	if err != nil {

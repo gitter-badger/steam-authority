@@ -535,13 +535,8 @@ func (app *App) fillFromAPI() (err error) {
 	app.DLC = string(dlcString)
 	app.ShortDescription = response.Data.ShortDescription
 	app.HeaderImage = response.Data.HeaderImage
-
-	if len(response.Data.Developers) > 0 {
-		app.Developer = response.Data.Developers[0]
-	}
-	if len(response.Data.Publishers) > 0 {
-		app.Publisher = response.Data.Publishers[0]
-	}
+	app.Developer = strings.Join(response.Data.Developers, ", ")
+	app.Publisher = strings.Join(response.Data.Publishers, ", ")
 	app.Packages = string(packagesString)
 	app.MetacriticScore = response.Data.Metacritic.Score
 	app.MetacriticFullURL = response.Data.Metacritic.URL

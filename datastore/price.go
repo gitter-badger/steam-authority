@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"net/http"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -12,7 +11,8 @@ import (
 type Price struct {
 	CreatedAt time.Time `datastore:"created_at"`
 	AppID     int       `datastore:"app_id"`
-	Price     string    `datastore:"price"`
+	Price     int       `datastore:"price"`
+	Discount  int       `datastore:"discount"`
 	Currency  string    `datastore:"currency"`
 }
 
@@ -20,34 +20,34 @@ func (price Price) GetKey() (key *datastore.Key) {
 	return datastore.IncompleteKey(PRICE, nil)
 }
 
-func CreateLogin(playerID int, r *http.Request) (err error) {
+func CreatePrice(appID int, price int, discount int) (err error) {
 
-	login := new(Login)
-	login.CreatedAt = time.Now()
-	login.PlayerID = playerID
-	login.UserAgent = r.Header.Get("User-Agent")
-	login.IP = r.RemoteAddr
+	p := new(Price)
+	p.CreatedAt = time.Now()
+	p.AppID = appID
+	p.Price = price
+	p.Currency = "usd"
 
-	_, err = SaveKind(login.GetKey(), login)
+	_, err = SaveKind(p.GetKey(), p)
 
 	return err
 }
 
-func GetLogins(playerID int, limit int) (logins []Login, err error) {
+func GetPrices(appID int) (prices []Price, err error) {
 
 	client, ctx, err := getDSClient()
 	if err != nil {
-		return logins, err
+		return prices, err
 	}
 
-	q := datastore.NewQuery(LOGIN).Order("-created_at").Limit(limit)
-	q = q.Filter("player_id =", playerID)
+	q := datastore.NewQuery(PRICE).Order("created_at").Limit(500)
+	q = q.Filter("app_id =", appID)
 
 	it := client.Run(ctx, q)
 
 	for {
 		var price Price
-		_, err := it.Next(&login)
+		_, err := it.Next(&price)
 		if err == iterator.Done {
 			break
 		}
@@ -55,8 +55,8 @@ func GetLogins(playerID int, limit int) (logins []Login, err error) {
 			logger.Error(err)
 		}
 
-		logins = append(logins, login)
+		prices = append(prices, price)
 	}
 
-	return logins, err
+	return prices, err
 }

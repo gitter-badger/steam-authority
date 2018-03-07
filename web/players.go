@@ -63,7 +63,7 @@ func PlayersHandler(w http.ResponseWriter, r *http.Request) {
 	template := playersTemplate{}
 	template.Fill(r)
 	template.Ranks = ranks
-	template.PlayersCount = playersCount // todo, SHow these on front end
+	template.PlayersCount = playersCount
 	template.RanksCount = ranksCount
 
 	returnTemplate(w, r, "players", template)
@@ -149,7 +149,7 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 type playerTemplate struct {
 	GlobalTemplate
 	Player  *datastore.Player
-	Friends []datastore.Player
+	Friends []*datastore.Player
 }
 
 func PlayerIDHandler(w http.ResponseWriter, r *http.Request) {

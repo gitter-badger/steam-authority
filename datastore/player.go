@@ -1,7 +1,9 @@
 package datastore
 
 import (
+	"errors"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -22,7 +24,7 @@ type Player struct {
 	CreatedAt        time.Time                   `datastore:"created_at"`
 	UpdatedAt        time.Time                   `datastore:"updated_at"`
 	FriendsAddedAt   time.Time                   `datastore:"friends_added_at,noindex"`
-	PlayerID         int                         `datastore:"player_id,noindex"`
+	PlayerID         int                         `datastore:"player_id"`
 	ValintyURL       string                      `datastore:"vality_url,noindex"`
 	Avatar           string                      `datastore:"avatar,noindex"`
 	PersonaName      string                      `datastore:"persona_name,noindex"`
@@ -129,7 +131,11 @@ func GetPlayers(order string, limit int) (players []Player, err error) {
 	return players, err
 }
 
-func GetPlayersByIDs(ids []int) (friends []Player, err error) {
+func GetPlayersByIDs(ids []int) (friends []*Player, err error) {
+
+	if len(ids) > 1000 {
+		return friends, errors.New("too many")
+	}
 
 	client, context, err := getDSClient()
 	if err != nil {
@@ -142,11 +148,16 @@ func GetPlayersByIDs(ids []int) (friends []Player, err error) {
 		keys = append(keys, key)
 	}
 
-	friends = make([]Player, len(keys))
+	friends = make([]*Player, len(keys))
 	err = client.GetMulti(context, keys, friends)
 	if err != nil && !strings.Contains(err.Error(), "no such entity") {
 		return friends, err
 	}
+
+	// Sort friends by level desc
+	sort.Slice(friends, func(i, j int) bool {
+		return friends[i].Level > friends[j].Level
+	})
 
 	return friends, nil
 }
@@ -245,7 +256,7 @@ func (p *Player) fill() (err error) {
 
 	p.Badges = badges
 	p.BadgesCount = len(badges.Badges)
-	
+
 	//Get friends
 	friends, err := steam.GetFriendList(p.PlayerID)
 	if err != nil {
