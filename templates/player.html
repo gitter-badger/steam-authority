@@ -77,7 +77,32 @@
                 </div>
                 <div class="tab-pane" id="achievements" role="tabpanel">Achievements</div>
                 <div class="tab-pane" id="badges" role="tabpanel">Badges</div>
-                <div class="tab-pane" id="games" role="tabpanel">Games</div>
+                <div class="tab-pane" id="games" role="tabpanel">
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm table-striped table-images table-sorter">
+                            <thead>
+                            <th scope="col" class="sorter-false sorter-digit"></th>
+                            <th scope="col">Game</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Play Time</th>
+                            <th scope="col">$/hour</th>
+                            </thead>
+                        {{ range $key, $value := .Games }}
+                            <tr{{if ne .ID 0}} data-link="/apps/{{ .ID }}"{{end}}>
+                                <td class="img">
+                                    <img src="{{ .Icon }}" alt="{{ .Name }}" class="avatar rounded">
+                                </td>
+                                <td>{{ .Name }}</td>
+                                <td>{{ .Price }}</td>
+                                <td>{{ .Time }}</td>
+                                <td>{{ .Value }}</td>
+                            </tr>
+                        {{ end }}
+                        </table>
+                    </div>
+
+                </div>
                 <div class="tab-pane" id="groups" role="tabpanel">Groups</div>
             </div>
         </div>

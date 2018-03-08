@@ -79,7 +79,7 @@ type OwnedGamesResponse struct {
 }
 
 type OwnedGame struct {
-	Appid                    int    `json:"appid"`
+	AppID                    int    `json:"appid"`
 	Name                     string `json:"name"`
 	PlaytimeForever          int    `json:"playtime_forever"`
 	ImgIconURL               string `json:"img_icon_url"`

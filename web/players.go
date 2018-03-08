@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/go-chi/chi"
 	slugify "github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/steam"
 )
@@ -137,11 +139,43 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 	}
 
+	// Get games
+	var gamesSlice []int
+	gamesMap := make(map[int]*playerAppTemplate)
+	for _, v := range player.Games {
+		gamesSlice = append(gamesSlice, v.AppID)
+		gamesMap[v.AppID] = &playerAppTemplate{
+			Time: v.PlaytimeForever,
+		}
+	}
+
+	gamesSql, err := mysql.GetApps(gamesSlice, []string{"id", "name", "price_initial", "icon"})
+	for _, v := range gamesSql {
+		gamesMap[v.ID].ID = v.ID
+		gamesMap[v.ID].Name = v.GetName()
+		gamesMap[v.ID].Price = v.PriceInitial
+		gamesMap[v.ID].Icon = v.GetIcon()
+	}
+
+	// Sort games
+	var sortedGamesSlice []*playerAppTemplate
+	for _, v := range gamesMap {
+		sortedGamesSlice = append(sortedGamesSlice, v)
+	}
+
+	sort.Slice(sortedGamesSlice, func(i, j int) bool {
+		if sortedGamesSlice[i].Time == sortedGamesSlice[j].Time {
+			return sortedGamesSlice[i].Name < sortedGamesSlice[j].Name
+		}
+		return sortedGamesSlice[i].Time > sortedGamesSlice[j].Time
+	})
+
 	// Template
 	template := playerTemplate{}
 	template.Fill(r)
 	template.Player = player
 	template.Friends = friends
+	template.Games = sortedGamesSlice
 
 	returnTemplate(w, r, "player", template)
 }
@@ -150,6 +184,19 @@ type playerTemplate struct {
 	GlobalTemplate
 	Player  *datastore.Player
 	Friends []*datastore.Player
+	Games   []*playerAppTemplate
+}
+
+type playerAppTemplate struct {
+	ID    int
+	Name  string
+	Price int
+	Icon  string
+	Time  int
+}
+
+func (g playerAppTemplate) Value() float64 {
+	return (float64(g.Price) / 100) / (float64(g.Time) / 60)
 }
 
 func PlayerIDHandler(w http.ResponseWriter, r *http.Request) {

@@ -75,7 +75,7 @@ func LoginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	gamesResp, err := steam.GetOwnedGames(idInt)
 
 	for _, v := range gamesResp {
-		gamesSlice = append(gamesSlice, v.Appid)
+		gamesSlice = append(gamesSlice, v.AppID)
 	}
 
 	gamesString, err := json.Marshal(gamesSlice)
