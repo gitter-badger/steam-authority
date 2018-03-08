@@ -14,10 +14,10 @@ const (
 )
 
 const (
-	queueChanges  = "changes"
-	queueApps     = "apps"
-	queuePackages = "packages"
-	queuePlayers  = "players"
+	queueChanges  = "Changes"
+	queueApps     = "Apps"
+	queuePackages = "Packages"
+	queuePlayers  = "Players"
 )
 
 var (
