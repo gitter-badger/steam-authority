@@ -3,6 +3,7 @@ package mysql
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"html/template"
 	"net/url"
 	"reflect"
@@ -103,6 +104,10 @@ func (app App) GetIcon() (ret string) {
 	} else {
 		return "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/" + strconv.Itoa(app.ID) + "/" + app.Icon + ".jpg"
 	}
+}
+
+func (app App) GetPriceInitial() string {
+	return fmt.Sprintf("%0.2f", float64(app.PriceInitial)/100)
 }
 
 func (app App) GetCommunityLink() (string) {

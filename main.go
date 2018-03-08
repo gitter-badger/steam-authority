@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/pics"
-	"github.com/steam-authority/steam-authority/queue"
+	"github.com/steam-authority/steam-authority/queue2"
 	"github.com/steam-authority/steam-authority/web"
 	"github.com/steam-authority/steam-authority/websockets"
 )
@@ -44,8 +44,8 @@ func main() {
 	}
 
 	if *flagConsumers {
-		queue.RunConsumers()
-		//queue2.RunConsumers()
+		//queue.RunConsumers()
+		queue2.RunConsumers()
 	}
 
 	// Scripts

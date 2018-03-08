@@ -23,7 +23,7 @@ func GetFriendList(id int) (friends []GetFriendListFriend, err error) {
 	}
 
 	if strings.Contains(string(bytes), "Internal Server Error") {
-		return friends, errors.New("no such user")
+		return friends, errors.New("no such user getting friends: " + strconv.Itoa(id))
 	}
 
 	// Unmarshal JSON

@@ -1,6 +1,8 @@
 package web
 
 import (
+	"fmt"
+	"math"
 	"net/http"
 	"sort"
 	"strconv"
@@ -153,7 +155,7 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 	for _, v := range gamesSql {
 		gamesMap[v.ID].ID = v.ID
 		gamesMap[v.ID].Name = v.GetName()
-		gamesMap[v.ID].Price = v.PriceInitial
+		gamesMap[v.ID].Price = v.GetPriceInitial()
 		gamesMap[v.ID].Icon = v.GetIcon()
 	}
 
@@ -190,13 +192,26 @@ type playerTemplate struct {
 type playerAppTemplate struct {
 	ID    int
 	Name  string
-	Price int
+	Price string
 	Icon  string
 	Time  int
 }
 
-func (g playerAppTemplate) Value() float64 {
-	return (float64(g.Price) / 100) / (float64(g.Time) / 60)
+func (g playerAppTemplate) GetPriceHour() string {
+
+	price, err := strconv.ParseFloat(g.Price, 64)
+	if err != nil {
+		price = 0
+	}
+
+	x := float64(price) / (float64(g.Time) / 60)
+	if math.IsNaN(x) {
+		x = 0
+	}
+	if math.IsInf(x, 0) {
+		return "∞"
+	}
+	return fmt.Sprintf("%0.2f", x)
 }
 
 func PlayerIDHandler(w http.ResponseWriter, r *http.Request) {
