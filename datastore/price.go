@@ -26,6 +26,7 @@ func CreatePrice(appID int, price int, discount int) (err error) {
 	p.CreatedAt = time.Now()
 	p.AppID = appID
 	p.Price = price
+	p.Discount = discount
 	p.Currency = "usd"
 
 	_, err = SaveKind(p.GetKey(), p)

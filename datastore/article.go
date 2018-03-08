@@ -48,7 +48,7 @@ func (article *Article) Tidy() *Article {
 	return article
 }
 
-func BulkAddArticles(articles []*Article) (err error) {
+func bulkAddArticles(articles []*Article) (err error) {
 
 	articlesLen := len(articles)
 	if articlesLen == 0 {
@@ -141,7 +141,7 @@ func GetArticlesFromSteam(id int) (articles []*Article, err error) {
 		articlePointers = append(articlePointers, &article)
 	}
 
-	err = BulkAddArticles(articlePointers)
+	err = bulkAddArticles(articlePointers)
 	if err != nil {
 		return articles, err
 	}

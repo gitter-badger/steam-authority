@@ -1,19 +1,17 @@
 package datastore
 
 import (
-	"encoding/json"
 	"strconv"
 	"time"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Jleagle/go-helpers/logger"
-	"github.com/streadway/amqp"
 	"google.golang.org/api/iterator"
 )
 
 type Change struct {
 	CreatedAt time.Time `datastore:"created_at,noindex"`
-	UpdatedAt time.Time `datastore:"updated_at,noindex"`
+	UpdatedAt time.Time `datastore:"updated_at,noindex"` // Do not use!  (backwards compatibility)
 	ChangeID  int       `datastore:"change_id"`
 	Apps      []int     `datastore:"apps,noindex"`
 	Packages  []int     `datastore:"packages,noindex"`
@@ -73,61 +71,6 @@ func GetChange(id string) (change *Change, err error) {
 
 	change = new(Change)
 	err = client.Get(context, key, change)
-	if err != nil {
-		return change, err
-	}
-
-	return change, nil
-}
-
-func AddChanges(changes []*Change) (err error) {
-
-	changesLen := len(changes)
-	if changesLen == 0 {
-		return nil
-	}
-
-	client, context, err := getDSClient()
-	if err != nil {
-		return err
-	}
-
-	keys := make([]*datastore.Key, 0)
-
-	for _, v := range changes {
-		keys = append(keys, v.GetKey())
-	}
-
-	//fmt.Println("Saving " + strconv.Itoa(changesLen) + " changes")
-
-	_, err = client.PutMulti(context, keys, changes)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (change *Change) Tidy() *Change {
-
-	change.UpdatedAt = time.Now()
-	if change.CreatedAt.IsZero() {
-		change.CreatedAt = time.Now()
-	}
-
-	return change
-}
-
-func ConsumeChange(msg amqp.Delivery) (change Change, err error) {
-
-	if err := json.Unmarshal(msg.Body, &change); err != nil {
-		return change, err
-	}
-
-	//logger.Info("Reading change " + strconv.Itoa(change.ChangeID) + " from rabbit")
-
-	// Save to DS
-	err = AddChanges([]*Change{&change})
 	if err != nil {
 		return change, err
 	}

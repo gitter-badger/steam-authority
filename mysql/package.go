@@ -34,7 +34,7 @@ type Package struct {
 	PriceIndividual int        `gorm:"not null;column:price_individual"`              //
 	Controller      string     `gorm:"not null;column:controller;default:'{}'"`       // JSON
 	ComingSoon      bool       `gorm:"not null;column:coming_soon"`                   //
-	ReleaseDate     *time.Time `gorm:"not null;column:controller"`                    //
+	ReleaseDate     *time.Time `gorm:"not null;column:release_date"`                  //
 	Platforms       string     `gorm:"not null;column:platforms;default:'[]'"`        // JSON
 }
 

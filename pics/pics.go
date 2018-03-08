@@ -47,14 +47,13 @@ func Run() {
 		// Make a list of changes to add
 		changes := make(map[int]*datastore.Change, 0)
 
-		// todo, these should get the change from DS first to keep the CreatedAt correct
+		// todo, check if the change already exists, if so, no need to do this.
 		for k, v := range jsChange.Apps {
 			_, ok := changes[v]
 			if !ok {
 				changes[v] = &datastore.Change{
 					ChangeID:  v,
 					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
 				}
 			}
 
@@ -68,7 +67,6 @@ func Run() {
 				changes[v] = &datastore.Change{
 					ChangeID:  v,
 					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
 				}
 			}
 
@@ -78,7 +76,7 @@ func Run() {
 
 		// Add changes to rabbit
 		for _, v := range changes {
-			queue.ChangeProducer(v)
+			queue.ChangeProducer(*v)
 		}
 
 		// Sleep

@@ -54,6 +54,8 @@ type App struct {
 	PriceDiscount          int        `gorm:"not null;column:price_discount"`                                 //
 	AchievementPercentages string     `gorm:"not null;column:achievement_percentages;type:text;default:'[]'"` // JSON
 	Schema                 string     `gorm:"not null;column:schema;type:text;default:'{}'"`                  // JSON
+	ComingSoon             bool       `gorm:"not null;column:coming_soon"`                                    //
+	ReleaseDate            string     `gorm:"not null;column:release_date"`                                   //
 }
 
 func getDefaultAppJSON() App {
@@ -282,6 +284,9 @@ func SearchApps(query url.Values, limit int, sort string) (apps []App, err error
 		db = db.Order(sort)
 	}
 
+	// Hide ghosts? todo, fix
+	db = db.Where("name != ''")
+
 	// JSON Depth
 	if _, ok := query["json_depth"]; ok {
 		db = db.Where("JSON_DEPTH(genres) = ?", query.Get("json_depth"))
@@ -330,31 +335,31 @@ func CountApps() (count int, err error) {
 	return count, nil
 }
 
-func ConsumeApp(msg amqp.Delivery) (err error) {
+func ConsumeApp(msg amqp.Delivery) (app *App, err error) {
+
+	app = new(App)
 
 	id := string(msg.Body)
 	idx, _ := strconv.Atoi(id)
 
 	db, err := getDB()
 	if err != nil {
-		return err
+		return app, err
 	}
-
-	app := new(App)
 
 	db.Attrs(getDefaultAppJSON()).FirstOrCreate(app, App{ID: idx})
 
 	err = app.fill()
 	if err != nil {
-		return err
+		return app, err
 	}
 
 	db.Save(app)
 	if db.Error != nil {
-		return db.Error
+		return app, db.Error
 	}
 
-	return err
+	return app, nil
 }
 
 func (app *App) fill() (err error) {
@@ -528,7 +533,7 @@ func (app *App) fillFromAPI() (err error) {
 		return err
 	}
 
-	//
+	// Other
 	app.Name = response.Data.Name
 	app.Type = response.Data.Type
 	app.IsFree = response.Data.IsFree
@@ -549,6 +554,8 @@ func (app *App) fillFromAPI() (err error) {
 	app.Platforms = string(platformsString)
 	app.GameID = response.Data.Fullgame.AppID
 	app.GameName = response.Data.Fullgame.Name
+	app.ReleaseDate = response.Data.ReleaseDate.Date
+	app.ComingSoon = response.Data.ReleaseDate.ComingSoon
 
 	// Price
 	app.PriceInitial = response.Data.PriceOverview.Initial

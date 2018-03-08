@@ -88,19 +88,25 @@ func appConsumer() {
 				break
 			case msg := <-messages:
 
-				//id := string(msg.Body)
-				//logger.Info("Reading app " + id + " from rabbit")
+				id := string(msg.Body)
 
-				dsErr := datastore.ConsumeApp(msg)
-				if dsErr != nil {
-					logger.Error(dsErr)
+				idx, err := strconv.Atoi(id)
+				if err != nil {
+					msg.Nack(false, false)
 				}
 
-				sqlErr := mysql.ConsumeApp(msg)
+				// Get news
+				_, err = datastore.GetArticlesFromSteam(idx)
+				if err != nil {
+					logger.Error(err)
+				}
+
+				// Update app
+				app, sqlErr := mysql.ConsumeApp(msg)
 				if sqlErr != nil {
 
+					// Check if PICS is down
 					if strings.HasSuffix(sqlErr.Error(), "connect: connection refused") {
-						//logger.Info("nack")
 						msg.Nack(false, true)
 						continue
 					}
@@ -108,10 +114,14 @@ func appConsumer() {
 					logger.Error(sqlErr)
 				}
 
-				if dsErr == nil && sqlErr == nil {
-					//logger.Info("ack")
-					msg.Ack(false)
+				// Save price change
+				err = datastore.CreatePrice(app.ID, app.PriceFinal, app.PriceDiscount)
+				if err != nil {
+					logger.Error(err)
 				}
+
+				// Ack
+				msg.Ack(false)
 			}
 		}
 	}

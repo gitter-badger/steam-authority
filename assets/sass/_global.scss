@@ -18,8 +18,17 @@ body {
 .jumbotron {
     padding: 2rem;
     margin-top: 2rem;
+    overflow: hidden;
+
+    h1 {
+        white-space: nowrap;
+    }
     .lead {
         margin: 0;
+    }
+    img{
+        position: relative;
+        z-index: 100;
     }
 }
 

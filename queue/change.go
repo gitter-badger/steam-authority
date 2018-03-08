@@ -30,7 +30,7 @@ func getChangeQueue() (queue amqp.Queue, err error) {
 	return queue, err
 }
 
-func ChangeProducer(change *datastore.Change) (err error) {
+func ChangeProducer(change datastore.Change) (err error) {
 
 	//logger.Info("Adding change " + strconv.Itoa(change.ChangeID) + " to rabbit")
 
@@ -39,7 +39,7 @@ func ChangeProducer(change *datastore.Change) (err error) {
 		return err
 	}
 
-	changeJSON, err := json.Marshal(*change)
+	changeJSON, err := json.Marshal(change)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,15 @@ func changeConsumer() {
 				break
 			case msg := <-messages:
 
-				change, err := datastore.ConsumeChange(msg)
+				// Get change
+				change := new(datastore.Change)
+
+				if err := json.Unmarshal(msg.Body, change); err != nil {
+					logger.Error(err)
+				}
+
+				// Save change to DS
+				_, err := datastore.SaveKind(change.GetKey(), change)
 				if err != nil {
 					logger.Error(err)
 				} else {
