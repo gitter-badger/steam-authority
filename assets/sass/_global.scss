@@ -5,14 +5,10 @@ body {
 }
 
 .navbar-brand {
-    background-color: #5cb85c;
-    display: inline-block;
-    height: 36px;
-    width: 36px;
-    line-height: 36px;
-    text-align: center;
     padding: 0;
-    margin-right: 8px;
+    img {
+        height: 40px;
+    }
 }
 
 .jumbotron {
@@ -26,7 +22,7 @@ body {
     .lead {
         margin: 0;
     }
-    img{
+    img {
         position: relative;
         z-index: 100;
     }

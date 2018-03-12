@@ -8,7 +8,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-type Price struct {
+type AppPrice struct {
 	CreatedAt time.Time `datastore:"created_at"`
 	AppID     int       `datastore:"app_id"`
 	Price     int       `datastore:"price"`
@@ -16,13 +16,13 @@ type Price struct {
 	Currency  string    `datastore:"currency"`
 }
 
-func (price Price) GetKey() (key *datastore.Key) {
+func (price AppPrice) GetKey() (key *datastore.Key) {
 	return datastore.IncompleteKey(PRICE, nil)
 }
 
 func CreatePrice(appID int, price int, discount int) (err error) {
 
-	p := new(Price)
+	p := new(AppPrice)
 	p.CreatedAt = time.Now()
 	p.AppID = appID
 	p.Price = price
@@ -34,7 +34,7 @@ func CreatePrice(appID int, price int, discount int) (err error) {
 	return err
 }
 
-func GetPrices(appID int) (prices []Price, err error) {
+func GetPrices(appID int) (prices []AppPrice, err error) {
 
 	client, ctx, err := getDSClient()
 	if err != nil {
@@ -47,7 +47,7 @@ func GetPrices(appID int) (prices []Price, err error) {
 	it := client.Run(ctx, q)
 
 	for {
-		var price Price
+		var price AppPrice
 		_, err := it.Next(&price)
 		if err == iterator.Done {
 			break

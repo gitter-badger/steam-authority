@@ -74,14 +74,7 @@ func (s queue) getConnection() (conn *amqp.Connection, ch *amqp.Channel, q amqp.
 		logger.Error(err)
 	}
 
-	q, err = ch.QueueDeclare(
-		namespace+s.Name, // name
-		true,             // durable
-		false,            // delete when unused
-		false,            // exclusive
-		false,            // no-wait
-		nil,              // arguments
-	)
+	q, err = ch.QueueDeclare(namespace+s.Name, true, false, false, false, nil)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -98,16 +91,7 @@ func (s queue) produce(data []byte) (err error) {
 		return err
 	}
 
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
-		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
-			ContentType:  "application/json",
-			Body:         data,
-		})
+	err = ch.Publish("", q.Name, false, false, amqp.Publishing{DeliveryMode: amqp.Persistent, ContentType: "application/json", Body: data})
 	if err != nil {
 		logger.Error(err)
 	}
@@ -123,15 +107,7 @@ func (s queue) consume() (err error) {
 
 		conn, ch, q, closeChan, err := s.getConnection()
 
-		msgs, err := ch.Consume(
-			q.Name, // queue
-			"",     // consumer
-			false,  // auto-ack
-			false,  // exclusive
-			false,  // no-local
-			false,  // no-wait
-			nil,    // args
-		)
+		msgs, err := ch.Consume(q.Name, "", false, false, false, false, nil)
 		if err != nil {
 			logger.Error(err)
 		}
@@ -156,7 +132,6 @@ func (s queue) consume() (err error) {
 
 					breakFor = true
 					break
-
 				}
 			}
 
