@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -26,6 +27,9 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 		go adminDonations(w, r)
 	case "genres":
 		go adminGenres(w, r)
+	case "queues":
+		r.ParseForm()
+		go adminQueues(w, r, r.PostForm)
 	case "ranks":
 		go adminRanks(w, r)
 	case "tags":
@@ -59,7 +63,12 @@ func adminApps(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, v := range apps {
-		queue.AppProducer(v.AppID, 0)
+		bytes, _ := json.Marshal(queue.AppMessage{
+			AppID:    v.AppID,
+			ChangeID: 0,
+		})
+
+		queue.Produce(queue.QueueApps, bytes)
 	}
 
 	logger.Info(strconv.Itoa(len(apps)) + " apps added to rabbit")
@@ -150,6 +159,50 @@ func adminGenres(w http.ResponseWriter, r *http.Request) {
 type adminGenreCount struct {
 	Count int
 	Genre steam.AppDetailsGenre
+}
+
+func adminQueues(w http.ResponseWriter, r *http.Request, form url.Values) {
+
+	if val := form.Get("change-id"); val != "" {
+
+		logger.Info("Change: " + val)
+		appID, _ := strconv.Atoi(val)
+		bytes, _ := json.Marshal(queue.AppMessage{
+			AppID: appID,
+		})
+		queue.Produce(queue.QueueApps, bytes)
+	}
+
+	if val := form.Get("player-id"); val != "" {
+
+		logger.Info("Player: " + val)
+		playerID, _ := strconv.Atoi(val)
+		bytes, _ := json.Marshal(queue.PlayerMessage{
+			PlayerID: playerID,
+		})
+		queue.Produce(queue.QueuePlayers, bytes)
+	}
+
+	if val := form.Get("app-id"); val != "" {
+
+		logger.Info("App: " + val)
+		appID, _ := strconv.Atoi(val)
+		bytes, _ := json.Marshal(queue.AppMessage{
+			AppID: appID,
+		})
+		queue.Produce(queue.QueueApps, bytes)
+	}
+
+	if val := form.Get("package-id"); val != "" {
+
+		logger.Info("Package: " + val)
+		packageID, _ := strconv.Atoi(val)
+		bytes, _ := json.Marshal(queue.PackageMessage{
+			PackageID: packageID,
+		})
+		queue.Produce(queue.QueuePackages, bytes)
+	}
+
 }
 
 // todo, handle tags that no longer have any games.

@@ -16,7 +16,7 @@ func SetDebug(val bool) {
 	return
 }
 
-func getDB() (conn *gorm.DB, err error) {
+func GetDB() (conn *gorm.DB, err error) {
 
 	if gormConnection == nil {
 

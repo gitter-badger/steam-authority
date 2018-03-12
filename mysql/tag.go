@@ -30,7 +30,7 @@ func (tag Tag) GetName() (name string) {
 
 func GetAllTags() (tags []Tag, err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return tags, err
 	}
@@ -45,7 +45,7 @@ func GetAllTags() (tags []Tag, err error) {
 
 func SaveOrUpdateTag(id int, vals Tag) (err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return err
 	}

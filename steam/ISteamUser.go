@@ -27,15 +27,15 @@ func GetFriendList(id int) (friends []GetFriendListFriend, err error) {
 	}
 
 	// Unmarshal JSON
-	var resp *GetFriendListBody
-	if err := json.Unmarshal(bytes, &resp); err != nil {
+	var response = new(GetFriendListBody)
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		if strings.Contains(err.Error(), "cannot unmarshal") {
 			pretty.Print(string(bytes))
 		}
 		return friends, err
 	}
 
-	return resp.Friendslist.Friends, nil
+	return response.Friendslist.Friends, nil
 }
 
 type GetFriendListBody struct {
@@ -87,7 +87,7 @@ type ResolveVanityURLResponse struct {
 	Message string `json:"message"`
 }
 
-func GetPlayerSummaries(id int) (ret PlayerSummary, err error) {
+func GetPlayerSummaries(id int) (player PlayerSummary, err error) {
 
 	idString := strconv.Itoa(id)
 
@@ -96,7 +96,7 @@ func GetPlayerSummaries(id int) (ret PlayerSummary, err error) {
 
 	bytes, err := get("ISteamUser/GetPlayerSummaries/v2/", options)
 	if err != nil {
-		return ret, err
+		return player, err
 	}
 
 	// Unmarshal JSON
@@ -106,11 +106,11 @@ func GetPlayerSummaries(id int) (ret PlayerSummary, err error) {
 			pretty.Print(string(bytes))
 			logger.Error(err)
 		}
-		return ret, err
+		return player, err
 	}
 
 	if len(resp.Response.Players) == 0 {
-		return ret, errors.New("not found in steam: " + idString)
+		return player, errors.New("not found in steam: " + idString)
 	}
 
 	return resp.Response.Players[0], nil

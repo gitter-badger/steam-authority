@@ -18,7 +18,7 @@ func (genre Genre) GetPath() string {
 
 func GetAllGenres() (genres []Genre, err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return genres, err
 	}
@@ -33,7 +33,7 @@ func GetAllGenres() (genres []Genre, err error) {
 
 func SaveOrUpdateGenre(id int, name string, apps int) (err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return err
 	}

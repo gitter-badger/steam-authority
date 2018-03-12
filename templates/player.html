@@ -55,7 +55,6 @@
                 <div class="tab-pane" id="friends" role="tabpanel">
 
                     <div class="list-group list-group-flush">
-                        <span class="list-group-item active">Friends</span>
                     {{ range $key, $value := .Friends }}
 
 
@@ -67,8 +66,8 @@
                         </a>
                     {{else}}
                         <span class="list-group-item list-group-item-action">
-                                    <span class="text-muted">Added to the <a href="/queues">queue</a> <i class="fas fa-spinner fa-spin"></i></span>
-                                </span>
+                            <span class="text-muted">Added to the <a href="/queues">queue</a> <i class="fas fa-spinner fa-spin"></i></span>
+                        </span>
                     {{end}}
 
                     {{ end }}

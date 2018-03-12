@@ -47,6 +47,40 @@
         </div>
         <div class="col-sm">
 
+            <form action="/admin/queues" method="post">
+                <div class="card">
+                    <div class="card-header">Queues</div>
+                    <div class="card-body">
+
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">App ID</label>
+                            <div class="col-sm-9">
+                                <input type="number" name="app-id" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Package ID</label>
+                            <div class="col-sm-9">
+                                <input type="number" name="package-id" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Player ID</label>
+                            <div class="col-sm-9">
+                                <input type="number" name="player-id" class="form-control" value="76561197968626192">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Change ID</label>
+                            <div class="col-sm-9">
+                                <input type="number" name="change-id" class="form-control">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-footer text-muted text-right"><button type="submit" class="btn btn-primary">Produce</button></div>
+                </div>
+            </form>
 
         </div>
     </div>

@@ -11,147 +11,67 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func getChangeQueue() (queue amqp.Queue, err error) {
+func processChange(msg amqp.Delivery) (err error) {
 
-	err = connect()
+	// Get change
+	change := new(datastore.Change)
+
+	err = json.Unmarshal(msg.Body, change)
 	if err != nil {
-		return queue, err
+		logger.Error(err)
+		msg.Nack(false, false)
+		return
 	}
 
-	queue, err = channel.QueueDeclare(
-		namespace+"Changes", // name
-		true,                // durable
-		false,               // delete when unused
-		false,               // exclusive
-		false,               // no-wait
-		nil,                 // arguments
-	)
-
-	return queue, err
-}
-
-func ChangeProducer(change datastore.Change) (err error) {
-
-	//logger.Info("Adding change " + strconv.Itoa(change.ChangeID) + " to rabbit")
-
-	queue, err := getChangeQueue()
+	// Save change to DS
+	_, err = datastore.SaveKind(change.GetKey(), change)
 	if err != nil {
-		return err
+		logger.Error(err)
 	}
 
-	changeJSON, err := json.Marshal(change)
-	if err != nil {
-		return err
+	// Send websocket
+	if websockets.HasConnections() {
+
+		// Get apps for change
+		var apps []changeAppWebsocketPayload
+		appsResp, err := mysql.GetApps(change.Apps, []string{"id", "name"})
+		if err != nil {
+			logger.Error(err)
+		}
+
+		for _, v := range appsResp {
+			apps = append(apps, changeAppWebsocketPayload{
+				ID:   v.ID,
+				Name: v.GetName(),
+			})
+		}
+
+		// Get packages for change
+		var packages []changePackageWebsocketPayload
+		packagesResp, err := mysql.GetPackages(change.Packages, []string{"id", "name"})
+		if err != nil {
+			logger.Error(err)
+		}
+
+		for _, v := range packagesResp {
+			packages = append(packages, changePackageWebsocketPayload{
+				ID:   v.ID,
+				Name: v.GetName(),
+			})
+		}
+
+		payload := changeWebsocketPayload{
+			ID:            change.ChangeID,
+			CreatedAt:     change.CreatedAt.Unix(),
+			CreatedAtNice: change.CreatedAt.Format(time.Stamp),
+			Apps:          apps,
+			Packages:      packages,
+		}
+		websockets.Send(websockets.CHANGES, payload)
 	}
 
-	err = channel.Publish(
-		"",         // exchange
-		queue.Name, // routing key
-		false,      // mandatory
-		false,      // immediate
-		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
-			ContentType:  "application/json",
-			Body:         changeJSON,
-		})
-	if err != nil {
-		return err
-	}
-
+	msg.Ack(false)
 	return nil
-}
-
-func changeConsumer() {
-
-	for {
-
-		queue, err := getChangeQueue()
-		if err != nil {
-			logger.Error(err)
-			continue
-		}
-
-		//fmt.Println("Getting change messages from rabbit")
-		messages, err := channel.Consume(
-			queue.Name, // queue
-			"",         // consumer
-			false,      // auto-ack
-			false,      // exclusive
-			false,      // no-local
-			false,      // no-wait
-			nil,        // args
-		)
-		if err != nil {
-			logger.Error(err)
-			continue
-		}
-
-		for {
-			select {
-			case err = <-closeChannel:
-				connection.Close()
-				channel.Close()
-				break
-			case msg := <-messages:
-
-				// Get change
-				change := new(datastore.Change)
-
-				if err := json.Unmarshal(msg.Body, change); err != nil {
-					logger.Error(err)
-				}
-
-				// Save change to DS
-				_, err := datastore.SaveKind(change.GetKey(), change)
-				if err != nil {
-					logger.Error(err)
-				} else {
-					msg.Ack(false)
-				}
-
-				// Send websocket
-				if websockets.HasConnections() {
-
-					// Get apps for change
-					var apps []changeAppWebsocketPayload
-					appsResp, err := mysql.GetApps(change.Apps, []string{"id", "name"})
-					if err != nil {
-						logger.Error(err)
-					}
-
-					for _, v := range appsResp {
-						apps = append(apps, changeAppWebsocketPayload{
-							ID:   v.ID,
-							Name: v.GetName(),
-						})
-					}
-
-					// Get packages for change
-					var packages []changePackageWebsocketPayload
-					packagesResp, err := mysql.GetPackages(change.Packages, []string{"id", "name"})
-					if err != nil {
-						logger.Error(err)
-					}
-
-					for _, v := range packagesResp {
-						packages = append(packages, changePackageWebsocketPayload{
-							ID:   v.ID,
-							Name: v.GetName(),
-						})
-					}
-
-					payload := changeWebsocketPayload{
-						ID:            change.ChangeID,
-						CreatedAt:     change.CreatedAt.Unix(),
-						CreatedAtNice: change.CreatedAt.Format(time.Stamp),
-						Apps:          apps,
-						Packages:      packages,
-					}
-					websockets.Send(websockets.CHANGES, payload)
-				}
-			}
-		}
-	}
 }
 
 type changeWebsocketPayload struct {

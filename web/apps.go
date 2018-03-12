@@ -51,8 +51,6 @@ func AppHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//queue.AppProducer(idx, 0)
-
 	// Get app
 	app, err := mysql.GetApp(idx)
 	if err != nil {

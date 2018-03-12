@@ -15,7 +15,6 @@ import (
 	"github.com/gosimple/slug"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/steam-authority/steam-authority/steam"
-	"github.com/streadway/amqp"
 )
 
 type App struct {
@@ -59,7 +58,7 @@ type App struct {
 	ReleaseDate            string     `gorm:"not null;column:release_date"`                                   //
 }
 
-func getDefaultAppJSON() App {
+func GetDefaultAppJSON() App {
 	return App{
 		StoreTags:              "[]",
 		Categories:             "[]",
@@ -234,7 +233,7 @@ func (app App) GetName() (name string) {
 
 func GetApp(id int) (app App, err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return app, err
 	}
@@ -257,7 +256,7 @@ func GetApps(ids []int, columns []string) (apps []App, err error) {
 		return apps, nil
 	}
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return apps, err
 	}
@@ -276,7 +275,7 @@ func GetApps(ids []int, columns []string) (apps []App, err error) {
 
 func SearchApps(query url.Values, limit int, sort string) (apps []App, err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return apps, err
 	}
@@ -327,7 +326,7 @@ func SearchApps(query url.Values, limit int, sort string) (apps []App, err error
 
 func CountApps() (count int, err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return count, err
 	}
@@ -340,34 +339,7 @@ func CountApps() (count int, err error) {
 	return count, nil
 }
 
-func ConsumeApp(msg amqp.Delivery) (app *App, err error) {
-
-	app = new(App)
-
-	id := string(msg.Body)
-	idx, _ := strconv.Atoi(id)
-
-	db, err := getDB()
-	if err != nil {
-		return app, err
-	}
-
-	db.Attrs(getDefaultAppJSON()).FirstOrCreate(app, App{ID: idx})
-
-	err = app.fill()
-	if err != nil {
-		return app, err
-	}
-
-	db.Save(app)
-	if db.Error != nil {
-		return app, db.Error
-	}
-
-	return app, nil
-}
-
-func (app *App) fill() (err error) {
+func (app *App) Fill() (err error) {
 
 	// Get app details
 	err = app.fillFromAPI()

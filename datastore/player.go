@@ -12,7 +12,6 @@ import (
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/steam"
-	"github.com/streadway/amqp"
 	"google.golang.org/api/iterator"
 )
 
@@ -131,7 +130,7 @@ func GetPlayers(order string, limit int) (players []Player, err error) {
 	return players, err
 }
 
-func GetPlayersByIDs(ids []int) (friends []*Player, err error) {
+func GetPlayersByIDs(ids []int) (friends []Player, err error) {
 
 	if len(ids) > 1000 {
 		return friends, errors.New("too many")
@@ -148,7 +147,7 @@ func GetPlayersByIDs(ids []int) (friends []*Player, err error) {
 		keys = append(keys, key)
 	}
 
-	friends = make([]*Player, len(keys))
+	friends = make([]Player, len(keys))
 	err = client.GetMulti(context, keys, friends)
 	if err != nil && !strings.Contains(err.Error(), "no such entity") {
 		return friends, err
@@ -178,24 +177,6 @@ func CountPlayers() (count int, err error) {
 	return count, nil
 }
 
-func ConsumePlayer(msg amqp.Delivery) (err error) {
-
-	id := string(msg.Body)
-	idx, _ := strconv.Atoi(id)
-
-	player, err := GetPlayer(idx)
-	if err != nil {
-		return err
-	}
-
-	err = player.UpdateIfNeeded()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (p *Player) UpdateIfNeeded() (err error) {
 
 	if p.shouldUpdate() {
@@ -219,6 +200,9 @@ func (p *Player) fill() (err error) {
 	//Get summary
 	summary, err := steam.GetPlayerSummaries(p.PlayerID)
 	if err != nil {
+		if err.Error() == steam.ErrorInvalidJson {
+			return err
+		}
 		if !strings.HasPrefix(err.Error(), "not found in steam") {
 			logger.Error(err)
 		}
@@ -234,6 +218,9 @@ func (p *Player) fill() (err error) {
 	// Get games
 	gamesResponse, err := steam.GetOwnedGames(p.PlayerID)
 	if err != nil {
+		if err.Error() == steam.ErrorInvalidJson {
+			return err
+		}
 		logger.Error(err)
 	}
 
@@ -243,6 +230,9 @@ func (p *Player) fill() (err error) {
 	// Get recent games
 	recentGames, err := steam.GetRecentlyPlayedGames(p.PlayerID)
 	if err != nil {
+		if err.Error() == steam.ErrorInvalidJson {
+			return err
+		}
 		logger.Error(err)
 	}
 
@@ -251,6 +241,9 @@ func (p *Player) fill() (err error) {
 	// Get badges
 	badges, err := steam.GetBadges(p.PlayerID)
 	if err != nil {
+		if err.Error() == steam.ErrorInvalidJson {
+			return err
+		}
 		logger.Error(err)
 	}
 
@@ -260,14 +253,21 @@ func (p *Player) fill() (err error) {
 	//Get friends
 	friends, err := steam.GetFriendList(p.PlayerID)
 	if err != nil {
+		if err.Error() == steam.ErrorInvalidJson {
+			return err
+		}
 		logger.Error(err)
 	}
 
 	p.Friends = friends
+	p.FriendsCount = len(friends)
 
 	// Get level
 	level, err := steam.GetSteamLevel(p.PlayerID)
 	if err != nil {
+		if err.Error() == steam.ErrorInvalidJson {
+			return err
+		}
 		logger.Error(err)
 	}
 
@@ -276,6 +276,9 @@ func (p *Player) fill() (err error) {
 	// Get bans
 	bans, err := steam.GetPlayerBans(p.PlayerID)
 	if err != nil {
+		if err.Error() == steam.ErrorInvalidJson {
+			return err
+		}
 		logger.Error(err)
 	}
 
@@ -286,6 +289,9 @@ func (p *Player) fill() (err error) {
 	// Get groups
 	groups, err := steam.GetUserGroupList(p.PlayerID)
 	if err != nil {
+		if err.Error() == steam.ErrorInvalidJson {
+			return err
+		}
 		logger.Error(err)
 	}
 

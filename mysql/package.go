@@ -10,7 +10,6 @@ import (
 
 	"github.com/gosimple/slug"
 	"github.com/steam-authority/steam-authority/steam"
-	"github.com/streadway/amqp"
 )
 
 type Package struct {
@@ -38,7 +37,7 @@ type Package struct {
 	Platforms       string     `gorm:"not null;column:platforms;default:'[]'"`        // JSON
 }
 
-func getDefaultPackageJSON() Package {
+func GetDefaultPackageJSON() Package {
 	return Package{
 		Apps:     "[]",
 		Extended: "{}",
@@ -184,7 +183,7 @@ func (pack Package) GetPlatformImages() (ret template.HTML, err error) {
 
 func GetPackage(id int) (pack Package, err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return pack, err
 	}
@@ -207,7 +206,7 @@ func GetPackages(ids []int, columns []string) (packages []Package, err error) {
 		return packages, nil
 	}
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return packages, err
 	}
@@ -226,7 +225,7 @@ func GetPackages(ids []int, columns []string) (packages []Package, err error) {
 
 func GetLatestPackages(limit int) (packages []Package, err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return packages, err
 	}
@@ -241,7 +240,7 @@ func GetLatestPackages(limit int) (packages []Package, err error) {
 
 func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
 
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return packages, err
 	}
@@ -255,32 +254,8 @@ func GetPackagesAppIsIn(appID int) (packages []Package, err error) {
 	return packages, nil
 }
 
-func ConsumePackage(msg amqp.Delivery) (err error) {
-
-	id := string(msg.Body)
-	idx, _ := strconv.Atoi(id)
-
-	db, err := getDB()
-	if err != nil {
-		return err
-	}
-
-	pack := new(Package)
-
-	db.Attrs(getDefaultPackageJSON()).FirstOrCreate(pack, Package{ID: idx})
-
-	pack.fill()
-
-	db.Save(pack)
-	if db.Error != nil {
-		return db.Error
-	}
-
-	return err
-}
-
 // GORM callback
-func (pack *Package) fill() (err error) {
+func (pack *Package) Fill() (err error) {
 
 	// Get app details
 	err = pack.fillFromAPI()
@@ -411,12 +386,12 @@ func (pack *Package) fillFromPICS() (err error) {
 
 // todo, make these nice, put into the GetExtended func?
 var PackageKeys = map[string]string{
-	"allowcrossregiontradingandgifting":     "allowcrossregiontradingandgifting",
-	"allowpurchasefromretrictedcountries":   "allowpurchasefromretrictedcountries",
-	"allowpurchaseinrestrictedcountries":    "allowpurchaseinrestrictedcountries",
-	"allowpurchaserestrictedcountries":      "allowpurchaserestrictedcountries",
-	"allowrunincountries":                   "allowrunincountries",
-	"alwayscountasowned":                    "alwayscountasowned",
+	"allowcrossregiontradingandgifting":     "Allow Cross Region Trading & Gifting",
+	"allowpurchasefromretrictedcountries":   "Allow Purchase From Retricted Countries",
+	"allowpurchaseinrestrictedcountries":    "Allow Purchase In Restricted Countries",
+	"allowpurchaserestrictedcountries":      "Allow Purchase Restricted Countries",
+	"allowrunincountries":                   "Allow Run Inc Cuntries",
+	"alwayscountasowned":                    "Always Count As Owned",
 	"alwayscountsasowned":                   "Always Counts As Owned",
 	"alwayscountsasunowned":                 "alwayscountsasunowned",
 	"appid":                                 "appid",
@@ -434,12 +409,12 @@ var PackageKeys = map[string]string{
 	"enforceintraeeaactivationrestrictions": "enforceintraeeaactivationrestrictions",
 	"excludefromsharing":                    "excludefromsharing",
 	"exfgls":                                "exfgls",
-	"expirytime":                            "expirytime",
-	"extended":                              "extended",
-	"fakechange":                            "fakechange",
-	"foo":                                   "foo",
-	"freeondemand":                          "freeondemand",
-	"freeweekend":                           "freeweekend",
+	"expirytime":                            "Expiry Time",
+	"extended":                              "Extended",
+	"fakechange":                            "Fake Change",
+	"foo":                                   "Foo",
+	"freeondemand":                          "Free On Demand",
+	"freeweekend":                           "Free Weekend",
 	"giftsaredeletable":                     "giftsaredeletable",
 	"giftsaremarketable":                    "giftsaremarketable",
 	"giftsaretradable":                      "giftsaretradable",
@@ -463,30 +438,30 @@ var PackageKeys = map[string]string{
 	"onlyallowincountries":                  "onlyallowincountries",
 	"onlyallowrestrictedcountries":          "onlyallowrestrictedcountries",
 	"onlyallowrunincountries":               "onlyallowrunincountries",
-	"onpurchasegrantguestpasspackage":       "onpurchasegrantguestpasspackage",
-	"onpurchasegrantguestpasspackage0":      "onpurchasegrantguestpasspackage0",
-	"onpurchasegrantguestpasspackage1":      "onpurchasegrantguestpasspackage1",
-	"onpurchasegrantguestpasspackage2":      "onpurchasegrantguestpasspackage2",
-	"onpurchasegrantguestpasspackage3":      "onpurchasegrantguestpasspackage3",
-	"onpurchasegrantguestpasspackage4":      "onpurchasegrantguestpasspackage4",
-	"onpurchasegrantguestpasspackage5":      "onpurchasegrantguestpasspackage5",
-	"onpurchasegrantguestpasspackage6":      "onpurchasegrantguestpasspackage6",
-	"onpurchasegrantguestpasspackage7":      "onpurchasegrantguestpasspackage7",
-	"onpurchasegrantguestpasspackage8":      "onpurchasegrantguestpasspackage8",
-	"onpurchasegrantguestpasspackage9":      "onpurchasegrantguestpasspackage9",
-	"onpurchasegrantguestpasspackage10":     "onpurchasegrantguestpasspackage10",
-	"onpurchasegrantguestpasspackage11":     "onpurchasegrantguestpasspackage11",
-	"onpurchasegrantguestpasspackage12":     "onpurchasegrantguestpasspackage12",
-	"onpurchasegrantguestpasspackage13":     "onpurchasegrantguestpasspackage13",
-	"onpurchasegrantguestpasspackage14":     "onpurchasegrantguestpasspackage14",
-	"onpurchasegrantguestpasspackage15":     "onpurchasegrantguestpasspackage15",
-	"onpurchasegrantguestpasspackage16":     "onpurchasegrantguestpasspackage16",
-	"onpurchasegrantguestpasspackage17":     "onpurchasegrantguestpasspackage17",
-	"onpurchasegrantguestpasspackage18":     "onpurchasegrantguestpasspackage18",
-	"onpurchasegrantguestpasspackage19":     "onpurchasegrantguestpasspackage19",
-	"onpurchasegrantguestpasspackage20":     "onpurchasegrantguestpasspackage20",
-	"onpurchasegrantguestpasspackage21":     "onpurchasegrantguestpasspackage21",
-	"onpurchasegrantguestpasspackage22":     "onpurchasegrantguestpasspackage22",
+	"onpurchasegrantguestpasspackage":       "On Purchase Grant Guest Pass Package",
+	"onpurchasegrantguestpasspackage0":      "On Purchase Grant Guest Pass Package 0",
+	"onpurchasegrantguestpasspackage1":      "On Purchase Grant Guest Pass Package 1",
+	"onpurchasegrantguestpasspackage2":      "On Purchase Grant Guest Pass Package 2",
+	"onpurchasegrantguestpasspackage3":      "On Purchase Grant Guest Pass Package 3",
+	"onpurchasegrantguestpasspackage4":      "On Purchase Grant Guest Pass Package 4",
+	"onpurchasegrantguestpasspackage5":      "On Purchase Grant Guest Pass Package 5",
+	"onpurchasegrantguestpasspackage6":      "On Purchase Grant Guest Pass Package 6",
+	"onpurchasegrantguestpasspackage7":      "On Purchase Grant Guest Pass Package 7",
+	"onpurchasegrantguestpasspackage8":      "On Purchase Grant Guest Pass Package 8",
+	"onpurchasegrantguestpasspackage9":      "On Purchase Grant Guest Pass Package 9",
+	"onpurchasegrantguestpasspackage10":     "On Purchase Grant Guest Pass Package 10",
+	"onpurchasegrantguestpasspackage11":     "On Purchase Grant Guest Pass Package 11",
+	"onpurchasegrantguestpasspackage12":     "On Purchase Grant Guest Pass Package 12",
+	"onpurchasegrantguestpasspackage13":     "On Purchase Grant Guest Pass Package 13",
+	"onpurchasegrantguestpasspackage14":     "On Purchase Grant Guest Pass Package 14",
+	"onpurchasegrantguestpasspackage15":     "On Purchase Grant Guest Pass Package 15",
+	"onpurchasegrantguestpasspackage16":     "On Purchase Grant Guest Pass Package 16",
+	"onpurchasegrantguestpasspackage17":     "On Purchase Grant Guest Pass Package 17",
+	"onpurchasegrantguestpasspackage18":     "On Purchase Grant Guest Pass Package 18",
+	"onpurchasegrantguestpasspackage19":     "On Purchase Grant Guest Pass Package 19",
+	"onpurchasegrantguestpasspackage20":     "On Purchase Grant Guest Pass Package 20",
+	"onpurchasegrantguestpasspackage21":     "On Purchase Grant Guest Pass Package 21",
+	"onpurchasegrantguestpasspackage22":     "On Purchase Grant Guest Pass Package 22",
 	"onquitguestpassmsg":                    "onquitguestpassmsg",
 	"overridetaxtype":                       "overridetaxtype",
 	"permitrunincountries":                  "permitrunincountries",

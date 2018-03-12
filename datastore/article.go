@@ -129,10 +129,10 @@ func ConvertSteamToArticle(steam steam.GetNewsForAppArticle) (article Article) {
 	return article
 }
 
-func GetArticlesFromSteam(id int) (articles []*Article, err error) {
+func GetArticlesFromSteam(appID int) (articles []*Article, err error) {
 
 	// Get app articles
-	resp, err := steam.GetNewsForApp(strconv.Itoa(id))
+	resp, err := steam.GetNewsForApp(strconv.Itoa(appID))
 
 	var articlePointers []*Article
 	for _, v := range resp {

@@ -17,14 +17,6 @@ func ChangesHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 	}
 
-	//queue.ChangeProducer(&datastore.Change{
-	//	CreatedAt: time.Now(),
-	//	UpdatedAt: time.Now(),
-	//	ChangeID:  123,
-	//	Apps:      []int{922, 923},
-	//	Packages:  []int{8491, 31794},
-	//})
-
 	// Get apps/packages
 	appIDs := make([]int, 0)
 	packageIDs := make([]int, 0)

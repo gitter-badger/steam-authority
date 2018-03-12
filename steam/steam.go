@@ -8,6 +8,10 @@ import (
 	"os"
 )
 
+const (
+	ErrorInvalidJson = "invalid character '<' looking for beginning of value"
+)
+
 func get(path string, query url.Values) (bytes []byte, err error) {
 
 	query.Add("format", "json")

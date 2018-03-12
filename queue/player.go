@@ -1,101 +1,46 @@
 package queue
 
 import (
-	"strconv"
+	"encoding/json"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/datastore"
+	"github.com/steam-authority/steam-authority/steam"
 	"github.com/streadway/amqp"
 )
 
-func getPlayerQueue() (queue amqp.Queue, err error) {
+func processPlayer(msg amqp.Delivery) (err error) {
 
-	err = connect()
+	// Get message
+	message := new(PlayerMessage)
+
+	err = json.Unmarshal(msg.Body, message)
 	if err != nil {
-		return queue, err
+		logger.Error(err)
+		msg.Nack(false, false)
+		return
 	}
 
-	queue, err = channel.QueueDeclare(
-		namespace+"Players", // name
-		true,                // durable
-		false,               // delete when unused
-		false,               // exclusive
-		false,               // no-wait
-		nil,                 // arguments
-	)
-
-	return queue, err
-}
-
-func PlayerProducer(id int) (err error) {
-
-	//logger.Info("Adding player " + strconv.Itoa(id) + " to rabbit")
-
-	queue, err := getPlayerQueue()
+	// Update player
+	player, err := datastore.GetPlayer(message.PlayerID)
 	if err != nil {
-		return err
+		logger.Error(err)
 	}
 
-	err = channel.Publish(
-		"",         // exchange
-		queue.Name, // routing key
-		false,      // mandatory
-		false,      // immediate
-		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
-			ContentType:  "text/plain",
-			Body:         []byte(strconv.Itoa(id)),
-		})
+	err = player.UpdateIfNeeded()
 	if err != nil {
-		return err
+		if err.Error() == steam.ErrorInvalidJson {
+			// API is probably down
+			msg.Nack(false, true)
+			return nil
+		}
+		logger.Error(err)
 	}
 
+	msg.Ack(false)
 	return nil
 }
 
-func playerConsumer() {
-
-	for {
-
-		queue, err := getPlayerQueue()
-		if err != nil {
-			logger.Error(err)
-			continue
-		}
-
-		//fmt.Println("Getting player messages from rabbit")
-		messages, err := channel.Consume(
-			queue.Name, // queue
-			"",         // consumer
-			false,      // auto-ack
-			false,      // exclusive
-			false,      // no-local
-			false,      // no-wait
-			nil,        // args
-		)
-		if err != nil {
-			logger.Error(err)
-			continue
-		}
-
-		for {
-			select {
-			case err = <-closeChannel:
-				connection.Close()
-				channel.Close()
-				break
-			case msg := <-messages:
-
-				//id := string(msg.Body)
-				//logger.Info("Reading player " + id + " from rabbit")
-
-				err := datastore.ConsumePlayer(msg)
-				if err != nil {
-					logger.Error(err)
-				} else {
-					msg.Ack(false)
-				}
-			}
-		}
-	}
+type PlayerMessage struct {
+	PlayerID int
 }

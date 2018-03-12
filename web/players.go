@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -93,8 +94,6 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//queue.PlayerProducer(76561197995497914)
-
 	player, err := datastore.GetPlayer(idx)
 	if err != nil {
 		logger.Error(err)
@@ -114,7 +113,10 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 
 		for _, v := range player.Friends {
 			vv, _ := strconv.Atoi(v.SteamID)
-			queue.PlayerProducer(vv)
+			p, _ := json.Marshal(queue.PlayerMessage{
+				PlayerID: vv,
+			})
+			queue.Produce(queue.QueuePlayers, p)
 		}
 
 		player.FriendsAddedAt = time.Now()
@@ -185,7 +187,7 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 type playerTemplate struct {
 	GlobalTemplate
 	Player  *datastore.Player
-	Friends []*datastore.Player
+	Friends []datastore.Player
 	Games   []*playerAppTemplate
 }
 

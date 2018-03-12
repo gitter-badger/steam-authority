@@ -36,12 +36,22 @@ func Run() {
 
 		for k, v := range jsChange.Apps {
 			appID, _ := strconv.Atoi(k)
-			queue.AppProducer(appID, v)
+			bytes, _ := json.Marshal(queue.AppMessage{
+				AppID:    appID,
+				ChangeID: v,
+			})
+
+			queue.Produce(queue.QueueApps, bytes)
 		}
 
 		for k, v := range jsChange.Packages {
 			packageID, _ := strconv.Atoi(k)
-			queue.PackageProducer(packageID, v)
+			bytes, _ := json.Marshal(queue.PackageMessage{
+				PackageID: packageID,
+				ChangeID:  v,
+			})
+
+			queue.Produce(queue.QueuePackages, bytes)
 		}
 
 		// Make a list of changes to add
@@ -76,11 +86,12 @@ func Run() {
 
 		// Add changes to rabbit
 		for _, v := range changes {
-			queue.ChangeProducer(*v)
+			bytes, _ := json.Marshal(*v)
+			queue.Produce(queue.QueueChanges, bytes)
 		}
 
 		// Sleep
-		time.Sleep(checkSeconds * time.Second)
+		time.Sleep(time.Second * checkSeconds)
 	}
 }
 

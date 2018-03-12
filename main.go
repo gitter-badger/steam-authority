@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/pics"
-	"github.com/steam-authority/steam-authority/queue2"
+	"github.com/steam-authority/steam-authority/queue"
 	"github.com/steam-authority/steam-authority/web"
 	"github.com/steam-authority/steam-authority/websockets"
 )
@@ -23,7 +23,7 @@ func main() {
 
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("STEAM_GOOGLE_APPLICATION_CREDENTIALS"))
 	if os.Getenv("ENV") == "local" {
-		os.Setenv("STEAM_DOMAIN", os.Getenv("STEAM_LOCAL_DOMAIN"))
+		os.Setenv("STEAM_DOMAIN", os.Getenv("STEAM_DOMAIN_LOCAL"))
 	} else {
 		os.Setenv("STEAM_DOMAIN", "https://steamauthority.net")
 	}
@@ -44,8 +44,7 @@ func main() {
 	}
 
 	if *flagConsumers {
-		//queue.RunConsumers()
-		queue2.RunConsumers()
+		queue.RunConsumers()
 	}
 
 	// Scripts
@@ -133,10 +132,11 @@ func main() {
 func adminRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(basicauth.New("Steam", map[string][]string{
-		os.Getenv("STEAM_AUTH_USER"): {os.Getenv("STEAM_AUTH_PASS")},
+		os.Getenv("STEAM_ADMIN_USER"): {os.Getenv("STEAM_ADMIN_PASS")},
 	}))
 	r.Get("/", web.AdminHandler)
 	r.Get("/{option}", web.AdminHandler)
+	r.Post("/{option}", web.AdminHandler)
 	return r
 }
 
