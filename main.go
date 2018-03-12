@@ -47,23 +47,6 @@ func main() {
 		queue.RunConsumers()
 	}
 
-	// Scripts
-	arguments := os.Args[1:]
-	if len(arguments) > 0 {
-
-		switch arguments[0] {
-		case "update-tags":
-			logger.Info("Tags")
-			os.Exit(0)
-		case "update-genres":
-			logger.Info("Genres")
-			os.Exit(0)
-		case "update-ranks":
-			logger.Info("Ranks")
-			os.Exit(0)
-		}
-	}
-
 	// Routes
 	r := chi.NewRouter()
 

@@ -103,6 +103,12 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = player.UpdateIfNeeded()
 	if err != nil {
+
+		if err.Error() == steam.ErrorInvalidJson {
+			returnErrorTemplate(w, r, 500, "Couldnt fetch player data, steam API may be down?")
+			return
+		}
+
 		logger.Error(err)
 		returnErrorTemplate(w, r, 500, err.Error())
 		return

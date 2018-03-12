@@ -15,7 +15,6 @@ func processPackage(msg amqp.Delivery) (err error) {
 
 	err = json.Unmarshal(msg.Body, message)
 	if err != nil {
-		logger.Error(err)
 		msg.Nack(false, false)
 		return
 	}

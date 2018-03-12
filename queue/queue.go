@@ -152,7 +152,6 @@ func (s queue) consume() (err error) {
 				err := s.Callback(msg)
 				if err != nil {
 
-					logger.Info("change process error:")
 					logger.Error(err)
 
 					breakFor = true

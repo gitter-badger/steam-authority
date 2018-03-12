@@ -18,7 +18,6 @@ func processChange(msg amqp.Delivery) (err error) {
 
 	err = json.Unmarshal(msg.Body, change)
 	if err != nil {
-		logger.Error(err)
 		msg.Nack(false, false)
 		return
 	}
