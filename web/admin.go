@@ -68,7 +68,7 @@ func adminApps(w http.ResponseWriter, r *http.Request) {
 			ChangeID: 0,
 		})
 
-		queue.Produce(queue.QueueApps, bytes)
+		queue.Produce(queue.AppQueue, bytes)
 	}
 
 	logger.Info(strconv.Itoa(len(apps)) + " apps added to rabbit")
@@ -170,7 +170,7 @@ func adminQueues(w http.ResponseWriter, r *http.Request, form url.Values) {
 		bytes, _ := json.Marshal(queue.AppMessage{
 			AppID: appID,
 		})
-		queue.Produce(queue.QueueApps, bytes)
+		queue.Produce(queue.AppQueue, bytes)
 	}
 
 	if val := form.Get("player-id"); val != "" {
@@ -180,7 +180,7 @@ func adminQueues(w http.ResponseWriter, r *http.Request, form url.Values) {
 		bytes, _ := json.Marshal(queue.PlayerMessage{
 			PlayerID: playerID,
 		})
-		queue.Produce(queue.QueuePlayers, bytes)
+		queue.Produce(queue.PlayerQueue, bytes)
 	}
 
 	if val := form.Get("app-id"); val != "" {
@@ -190,7 +190,7 @@ func adminQueues(w http.ResponseWriter, r *http.Request, form url.Values) {
 		bytes, _ := json.Marshal(queue.AppMessage{
 			AppID: appID,
 		})
-		queue.Produce(queue.QueueApps, bytes)
+		queue.Produce(queue.AppQueue, bytes)
 	}
 
 	if val := form.Get("package-id"); val != "" {
@@ -200,7 +200,7 @@ func adminQueues(w http.ResponseWriter, r *http.Request, form url.Values) {
 		bytes, _ := json.Marshal(queue.PackageMessage{
 			PackageID: packageID,
 		})
-		queue.Produce(queue.QueuePackages, bytes)
+		queue.Produce(queue.PackageQueue, bytes)
 	}
 
 }

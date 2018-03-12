@@ -116,7 +116,7 @@ func PlayerHandler(w http.ResponseWriter, r *http.Request) {
 			p, _ := json.Marshal(queue.PlayerMessage{
 				PlayerID: vv,
 			})
-			queue.Produce(queue.QueuePlayers, p)
+			queue.Produce(queue.PlayerQueue, p)
 		}
 
 		player.FriendsAddedAt = time.Now()

@@ -13,10 +13,10 @@ import (
 const (
 	namespace = "STEAM_"
 
-	QueueChanges  = "Changes"
-	QueueApps     = "Apps"
-	QueuePackages = "Packages"
-	QueuePlayers  = "Players"
+	ChangeQueue  = "Changes"
+	AppQueue     = "Apps"
+	PackageQueue = "Packages"
+	PlayerQueue  = "Players"
 )
 
 var (
@@ -26,10 +26,10 @@ var (
 func init() {
 
 	qs := []queue{
-		{Name: QueueChanges, Callback: processChange},
-		{Name: QueueApps, Callback: processApp},
-		{Name: QueuePackages, Callback: processPackage},
-		{Name: QueuePlayers, Callback: processPlayer},
+		{Name: ChangeQueue, Callback: processChange},
+		{Name: AppQueue, Callback: processApp},
+		{Name: PackageQueue, Callback: processPackage},
+		{Name: PlayerQueue, Callback: processPlayer},
 	}
 
 	queues = make(map[string]queue)

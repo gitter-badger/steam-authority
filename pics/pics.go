@@ -41,7 +41,7 @@ func Run() {
 				ChangeID: v,
 			})
 
-			queue.Produce(queue.QueueApps, bytes)
+			queue.Produce(queue.AppQueue, bytes)
 		}
 
 		for k, v := range jsChange.Packages {
@@ -51,7 +51,7 @@ func Run() {
 				ChangeID:  v,
 			})
 
-			queue.Produce(queue.QueuePackages, bytes)
+			queue.Produce(queue.PackageQueue, bytes)
 		}
 
 		// Make a list of changes to add
@@ -87,7 +87,7 @@ func Run() {
 		// Add changes to rabbit
 		for _, v := range changes {
 			bytes, _ := json.Marshal(*v)
-			queue.Produce(queue.QueueChanges, bytes)
+			queue.Produce(queue.ChangeQueue, bytes)
 		}
 
 		// Sleep
