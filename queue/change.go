@@ -19,7 +19,7 @@ func processChange(msg amqp.Delivery) (err error) {
 	err = json.Unmarshal(msg.Body, change)
 	if err != nil {
 		msg.Nack(false, false)
-		return
+		return nil
 	}
 
 	// Save change to DS

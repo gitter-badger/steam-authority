@@ -17,7 +17,7 @@ func processPlayer(msg amqp.Delivery) (err error) {
 	err = json.Unmarshal(msg.Body, message)
 	if err != nil {
 		msg.Nack(false, false)
-		return
+		return nil
 	}
 
 	// Update player
