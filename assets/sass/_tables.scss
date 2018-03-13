@@ -1,4 +1,17 @@
-.table-images {
+table.table {
+    td.platforms {
+        font-size: 26px;
+        line-height: 28px;
+        i, svg {
+            margin-right: 5px;
+        }
+        i:last-child, svg:last-child {
+            margin-right: 0;
+        }
+    }
+}
+
+table.table-images {
     td.img {
         padding: 0;
         img {

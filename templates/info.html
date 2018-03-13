@@ -1,0 +1,96 @@
+{{define "info"}} {{ template "_header" . }}
+
+<div class="container">
+
+    <div class="jumbotron">
+        <h1 class="display-4"><i class="fas fa-info-circle"></i> Info</h1>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+
+            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#info" role="tab">Info</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#faqs" role="tab">FAQs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#credits" role="tab">Credits</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane show active" id="info" role="tabpanel">
+
+                    <h5>Open Source</h5>
+                    <p>Steam Authority is open sourced on <a href="https://github.com/steam-authority/steam-authority">GitHub</a> to see exactly what's going on under the hood.</p>
+
+                </div>
+                <div class="tab-pane" id="faqs" role="tabpanel">
+
+                    <h5>I can not find a player</h5>
+                    <p>We only find out about players when they get searched for or via a friend already in our database.</p>
+
+                    <h5>A player exists but does not have a rank</h5>
+                    <p>Ranks are not live and get calculated at midnight (GMT), so new players may not have a rank right away.
+                        <br/>We may not have access to your stats, you can allow access at by editing your profile on
+                        <a href="http://steamcommunity.com">steamcommunity.com</a> and clicking "My Privacy Settings".</p>
+
+                    <h5>How can I help out?</h5>
+                    <p>Programmers can submit
+                        <a href="https://github.com/steam-authority/steam-authority">pull requests</a>.
+                        <a href="/donate">Donations</a> are always welome for everyone else.</p>
+
+                    <h5>How do we gather user data?</h5>
+                    <p>Steam has dozens of APIs we can call to get data from them. Everything on Steam Authority is also availible using the steam app.</p>
+
+                    <h5>I found a website bug</h5>
+                    <p>Please file an issue on
+                        <a href="https://github.com/steam-authority/steam-authority/issues/new">GitHub</a>. Or
+                        <a href="/contact">send me an email</a>.</p>
+
+                    <h5>What are future plans for Steam Authority?</h5>
+                    <p>See our
+                        <a href="https://trello.com/b/mi2sDpBS/steam-authority">Trello</a> workboard or
+                        <a href="/contact">email</a> me for ideas.
+                    </p>
+
+                </div>
+                <div class="tab-pane" id="credits" role="tabpanel">
+
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="list-group mb-4">
+                                <li class="list-group-item disabled">Steam API</li>
+                                <a href="https://partner.steamgames.com/doc/webapi_overview" class="list-group-item list-group-item-action">https://partner.steamgames.com/</a>
+                            </div>
+
+                            <div class="list-group mb-4">
+                                <li class="list-group-item disabled">Logo Design</li>
+                                <a href="http://www.tmcreativedesign.co.uk/" class="list-group-item list-group-item-action">http://www.tmcreativedesign.co.uk/</a>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+
+                            <div class="list-group mb-4">
+                                <li class="list-group-item disabled">Inspiration</li>
+                                <a href="https://steamladder.com" class="list-group-item list-group-item-action">steamladder.com</a>
+                                <a href="https://steamdb.info" class="list-group-item list-group-item-action">steamdb.info</a>
+                                <a href="https://steamspy.com" class="list-group-item list-group-item-action">steamspy.com</a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{{ template "_footer" }} {{end}}

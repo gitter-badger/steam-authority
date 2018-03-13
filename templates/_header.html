@@ -67,7 +67,7 @@
                 <li class="nav-item {{if startsWith .Path "/apps" }}active{{end}}">
                     <a class="nav-link" href="/apps">Games</a>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown closer">
                     <a class="nav-link dropdown-toggle" href="#" id="apps-dd" data-toggle="dropdown"></a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="/packages">Packages</a>
@@ -106,7 +106,7 @@
                     <a class="nav-link" href="/donate">Donate</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"></a>
+                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">More</a>
                     <div class="dropdown-menu">
                     {{ if .LoggedIn }}
                         <a class="dropdown-item" href="/settings">Settings</a>
@@ -120,10 +120,10 @@
                         <a class="dropdown-item" href="/genres">App Genres</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/experience">Experience</a>
-                        <a class="dropdown-item" href="/faqs">FAQs</a>
                         <a class="dropdown-item" href="/commits">Commits</a>
                         <a class="dropdown-item" href="/changes">Changes</a>
                         <a class="dropdown-item" href="/queues">Queues</a>
+                        <a class="dropdown-item" href="/info">Info</a>
                     </div>
                 </li>
             </ul>

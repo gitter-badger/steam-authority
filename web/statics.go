@@ -2,12 +2,12 @@ package web
 
 import "net/http"
 
-func CreditsHandler(w http.ResponseWriter, r *http.Request) {
+func InfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	template := staticTemplate{}
 	template.Fill(r)
 
-	returnTemplate(w, r, "credits", template)
+	returnTemplate(w, r, "info", template)
 }
 
 func DonateHandler(w http.ResponseWriter, r *http.Request) {
@@ -16,14 +16,6 @@ func DonateHandler(w http.ResponseWriter, r *http.Request) {
 	template.Fill(r)
 
 	returnTemplate(w, r, "donate", template)
-}
-
-func FAQsHandler(w http.ResponseWriter, r *http.Request) {
-
-	template := staticTemplate{}
-	template.Fill(r)
-
-	returnTemplate(w, r, "faqs", template)
 }
 
 func Error404Handler(w http.ResponseWriter, r *http.Request) {

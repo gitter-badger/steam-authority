@@ -96,10 +96,9 @@ func main() {
 	// Other
 	r.Get("/", web.HomeHandler)
 	r.Get("/commits", web.CommitsHandler)
-	r.Get("/credits", web.CreditsHandler)
 	r.Get("/donate", web.DonateHandler)
-	r.Get("/faqs", web.FAQsHandler)
 	r.Get("/genres", web.GenresHandler)
+	r.Get("/info", web.InfoHandler)
 	r.Get("/news", web.NewsHandler)
 	r.Get("/queues", web.QueuesHandler)
 	r.Get("/tags", web.TagsHandler)

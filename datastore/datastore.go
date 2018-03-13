@@ -11,7 +11,7 @@ import (
 
 const (
 	KindChange       = "Change"
-	KindArticle      = "KindArticle"
+	KindArticle      = "Article"
 	KindPlayer       = "Player"
 	KindRank         = "Rank"
 	KindLogin        = "Login"
