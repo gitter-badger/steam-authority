@@ -18,7 +18,7 @@ const (
 	KindDonation     = "Donation"
 	KindGroup        = "Group"
 	KindPriceApp     = "AppPrice"
-	KindPricePackage = "packagePrice"
+	KindPricePackage = "PackagePrice"
 )
 
 func getDSClient() (client *datastore.Client, ctx context.Context, err error) {
