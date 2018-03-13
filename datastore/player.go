@@ -48,7 +48,7 @@ type Player struct {
 }
 
 func (p Player) GetKey() (key *datastore.Key) {
-	return datastore.NameKey(PLAYER, strconv.Itoa(p.PlayerID), nil)
+	return datastore.NameKey(KindPlayer, strconv.Itoa(p.PlayerID), nil)
 }
 
 func (p Player) GetPath() string {
@@ -87,7 +87,7 @@ func GetPlayer(id int) (ret *Player, err error) {
 		return ret, err
 	}
 
-	key := datastore.NameKey(PLAYER, strconv.Itoa(id), nil)
+	key := datastore.NameKey(KindPlayer, strconv.Itoa(id), nil)
 
 	player := new(Player)
 	player.PlayerID = id
@@ -111,7 +111,7 @@ func GetPlayers(order string, limit int) (players []Player, err error) {
 		return players, err
 	}
 
-	q := datastore.NewQuery(PLAYER).Order(order).Limit(limit)
+	q := datastore.NewQuery(KindPlayer).Order(order).Limit(limit)
 	it := client.Run(ctx, q)
 
 	for {
@@ -143,7 +143,7 @@ func GetPlayersByIDs(ids []int) (friends []Player, err error) {
 
 	var keys []*datastore.Key
 	for _, v := range ids {
-		key := datastore.NameKey(PLAYER, strconv.Itoa(v), nil)
+		key := datastore.NameKey(KindPlayer, strconv.Itoa(v), nil)
 		keys = append(keys, key)
 	}
 
@@ -168,7 +168,7 @@ func CountPlayers() (count int, err error) {
 		return count, err
 	}
 
-	q := datastore.NewQuery(PLAYER)
+	q := datastore.NewQuery(KindPlayer)
 	count, err = client.Count(ctx, q)
 	if err != nil {
 		return count, err

@@ -42,6 +42,8 @@ func processApp(msg amqp.Delivery) (err error) {
 		app.ChangeNumber = message.ChangeID
 	}
 
+	priceBeforeFill := app.PriceFinal
+
 	err = app.Fill()
 	if err != nil {
 
@@ -60,9 +62,20 @@ func processApp(msg amqp.Delivery) (err error) {
 	}
 
 	// Save price change
-	err = datastore.CreatePrice(app.ID, app.PriceFinal, app.PriceDiscount)
-	if err != nil {
-		logger.Error(err)
+	price := new(datastore.AppPrice)
+	price.CreatedAt = time.Now()
+	price.AppID = app.ID
+	price.PriceInitial = app.PriceInitial
+	price.PriceFinal = app.PriceFinal
+	price.Discount = app.PriceDiscount
+	price.Currency = "usd"
+	price.Change = app.PriceFinal - priceBeforeFill
+
+	if price.Change != 0 {
+		_, err = datastore.SaveKind(price.GetKey(), price)
+		if err != nil {
+			logger.Error(err)
+		}
 	}
 
 	// Ack

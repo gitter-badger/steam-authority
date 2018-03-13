@@ -542,8 +542,6 @@ func (app *App) fillFromAPI() (err error) {
 	app.GameName = response.Data.Fullgame.Name
 	app.ReleaseDate = response.Data.ReleaseDate.Date
 	app.ComingSoon = response.Data.ReleaseDate.ComingSoon
-
-	// Price
 	app.PriceInitial = response.Data.PriceOverview.Initial
 	app.PriceFinal = response.Data.PriceOverview.Final
 	app.PriceDiscount = response.Data.PriceOverview.DiscountPercent

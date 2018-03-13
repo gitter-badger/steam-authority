@@ -17,7 +17,7 @@ type Login struct {
 }
 
 func (login Login) GetKey() (key *datastore.Key) {
-	return datastore.IncompleteKey(LOGIN, nil)
+	return datastore.IncompleteKey(KindLogin, nil)
 }
 
 func (login Login) GetTime() (t string) {
@@ -44,7 +44,7 @@ func GetLogins(playerID int, limit int) (logins []Login, err error) {
 		return logins, err
 	}
 
-	q := datastore.NewQuery(LOGIN).Order("-created_at").Limit(limit)
+	q := datastore.NewQuery(KindLogin).Order("-created_at").Limit(limit)
 	q = q.Filter("player_id =", playerID)
 
 	it := client.Run(ctx, q)

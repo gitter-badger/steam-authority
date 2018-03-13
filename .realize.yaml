@@ -1,17 +1,17 @@
 settings:
   files:
     outputs:
-      status: false
+      status: true
       path: ""
-      name: .r.outputs.log
+      name: logs.txt
     logs:
       status: false
       path: ""
-      name: .r.logs.log
+      name: logs.txt
     errors:
-      status: false
+      status: true
       path: ""
-      name: .r.errors.log
+      name: logs.txt
   legacy:
     force: false
     interval: 0s
@@ -21,7 +21,7 @@ server:
   port: 5001
   host: "localhost"
 schema:
-- name: STEAM
+- name: Steam
   path: .
   args:
   - --pics

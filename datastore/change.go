@@ -18,7 +18,7 @@ type Change struct {
 }
 
 func (change Change) GetKey() (key *datastore.Key) {
-	return datastore.NameKey(CHANGE, strconv.Itoa(change.ChangeID), nil)
+	return datastore.NameKey(KindChange, strconv.Itoa(change.ChangeID), nil)
 }
 
 func (change Change) GetName() (name string) {
@@ -41,7 +41,7 @@ func GetLatestChanges(limit int) (changes []Change, err error) {
 		return changes, err
 	}
 
-	q := datastore.NewQuery(CHANGE).Order("-change_id").Limit(limit)
+	q := datastore.NewQuery(KindChange).Order("-change_id").Limit(limit)
 	it := client.Run(context, q)
 
 	for {
@@ -67,7 +67,7 @@ func GetChange(id string) (change *Change, err error) {
 		return change, err
 	}
 
-	key := datastore.NameKey(CHANGE, id, nil)
+	key := datastore.NameKey(KindChange, id, nil)
 
 	change = new(Change)
 	err = client.Get(context, key, change)

@@ -20,7 +20,8 @@ const (
 )
 
 var (
-	queues map[string]queue
+	queues          map[string]queue
+	enableConsumers bool = true
 )
 
 func init() {

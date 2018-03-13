@@ -17,7 +17,7 @@ type Donation struct {
 }
 
 func (d Donation) GetKey() (key *datastore.Key) {
-	return datastore.IncompleteKey(DONATION, nil)
+	return datastore.IncompleteKey(KindDonation, nil)
 }
 
 func GetDonations(playerID int, limit int) (donations []Donation, err error) {
@@ -27,7 +27,7 @@ func GetDonations(playerID int, limit int) (donations []Donation, err error) {
 		return donations, err
 	}
 
-	q := datastore.NewQuery(DONATION).Order("-created_at")
+	q := datastore.NewQuery(KindDonation).Order("-created_at")
 
 	if limit != 0 {
 		q = q.Limit(limit)

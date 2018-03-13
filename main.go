@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"strings"
@@ -32,8 +33,13 @@ func main() {
 	flagDebug := flag.Bool("debug", false, "Debug")
 	flagPics := flag.Bool("pics", false, "Pics")
 	flagConsumers := flag.Bool("consumers", false, "Consumers")
+	flagPprof := flag.Bool("pprof", false, "PProf")
 
 	flag.Parse()
+
+	if *flagPprof {
+		go http.ListenAndServe(":8080", nil)
+	}
 
 	if *flagDebug {
 		mysql.SetDebug(true)

@@ -17,7 +17,7 @@ type Group struct {
 }
 
 func (g Group) GetKey() (key *datastore.Key) {
-	return datastore.NameKey(PLAYER, strconv.Itoa(g.GroupID), nil)
+	return datastore.NameKey(KindPlayer, strconv.Itoa(g.GroupID), nil)
 }
 
 func GetGroupsByIDs(ids []int) (groups []Group, err error) {
@@ -33,7 +33,7 @@ func GetGroupsByIDs(ids []int) (groups []Group, err error) {
 
 	var keys []*datastore.Key
 	for _, v := range ids {
-		key := datastore.NameKey(PLAYER, strconv.Itoa(v), nil)
+		key := datastore.NameKey(KindPlayer, strconv.Itoa(v), nil)
 		keys = append(keys, key)
 	}
 

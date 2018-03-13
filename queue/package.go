@@ -2,8 +2,10 @@ package queue
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/Jleagle/go-helpers/logger"
+	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/streadway/amqp"
 )
@@ -33,12 +35,31 @@ func processPackage(msg amqp.Delivery) (err error) {
 		pack.ChangeID = message.ChangeID
 	}
 
+	priceBeforeFill := pack.PriceFinal
+
 	// Move all the stuff in here to queue?
 	pack.Fill()
 
 	db.Save(pack)
 	if db.Error != nil {
 		logger.Error(db.Error)
+	}
+
+	// Save price change
+	price := new(datastore.PackagePrice)
+	price.CreatedAt = time.Now()
+	price.PackageID = pack.ID
+	price.PriceInitial = pack.PriceInitial
+	price.PriceFinal = pack.PriceFinal
+	price.Discount = pack.PriceDiscount
+	price.Currency = "usd"
+	price.Change = pack.PriceFinal - priceBeforeFill
+
+	if price.Change != 0 {
+		_, err = datastore.SaveKind(price.GetKey(), price)
+		if err != nil {
+			logger.Error(err)
+		}
 	}
 
 	msg.Ack(false)

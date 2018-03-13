@@ -4,6 +4,12 @@ body {
     background-color: $dark;
 }
 
+#navbar {
+    .nav-item.dropdown {
+        margin-left: -10px;
+    }
+}
+
 .navbar-brand {
     padding: 0;
     img {

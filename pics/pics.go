@@ -19,7 +19,10 @@ const (
 	bigChangeID  = 4067165 // Fallback when there are no changes in DB
 )
 
-var latestChangeSaved int
+var (
+	latestChangeSaved int
+	enablePics        bool
+)
 
 // Run triggers the PICS updater to run forever
 func Run() {

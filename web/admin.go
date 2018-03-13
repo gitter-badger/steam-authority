@@ -5,10 +5,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
+	"strings"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/go-chi/chi"
+	"github.com/hpcloud/tail"
 	"github.com/steam-authority/steam-authority/datastore"
 	"github.com/steam-authority/steam-authority/mysql"
 	"github.com/steam-authority/steam-authority/queue"
@@ -18,6 +21,8 @@ import (
 func AdminHandler(w http.ResponseWriter, r *http.Request) {
 
 	option := chi.URLParam(r, "option")
+
+	var errors []string
 
 	switch option {
 	case "apps": // Add all apps to queue
@@ -35,16 +40,29 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 		go adminRanks(w, r)
 	case "tags":
 		go adminTags(w, r)
+	case "disable-consumers":
+		go adminDisableConsumers(w, r)
 	}
 
+	// Redirect away after action
 	if option != "" {
 		http.Redirect(w, r, "/admin?"+option, 302)
 		return
 	}
 
+	// Get logs
+	t, err := tail.TailFile(os.Getenv("STEAM_PATH")+"/logs.txt", tail.Config{})
+	if err != nil {
+		logger.Error(err)
+	}
+	for line := range t.Lines {
+		errors = append(errors, strings.TrimSpace(line.Text)+"\n")
+	}
+
 	// Template
 	template := adminTemplate{}
 	template.Fill(r)
+	template.Errors = errors
 
 	returnTemplate(w, r, "admin", template)
 	return
@@ -52,6 +70,11 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 
 type adminTemplate struct {
 	GlobalTemplate
+	Errors []string
+}
+
+func adminDisableConsumers(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func adminApps(w http.ResponseWriter, r *http.Request) {
