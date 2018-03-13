@@ -23,11 +23,11 @@
                     </thead>
 
                 {{ range $key, $value := .Tags }}
-                    <tr>
+                    <tr data-link="{{.GetPath}}">
                         <td width="25%">{{ .GetName }}</td>
                         <td width="25%">{{ comma .Apps }}</td>
-                        <td width="25%">{{ commaf .MeanPrice }}</td>
-                        <td width="25%">{{ commaf .MeanDiscount }}</td>
+                        <td width="25%">${{ .GetMeanPrice }}</td>
+                        <td width="25%">{{ .GetMeanDiscount }}%</td>
                     </tr>
                 {{ end }}
 

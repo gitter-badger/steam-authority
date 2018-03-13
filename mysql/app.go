@@ -273,7 +273,7 @@ func GetApps(ids []int, columns []string) (apps []App, err error) {
 	return apps, nil
 }
 
-func SearchApps(query url.Values, limit int, sort string) (apps []App, err error) {
+func SearchApps(query url.Values, limit int, sort string, columns []string) (apps []App, err error) {
 
 	db, err := GetDB()
 	if err != nil {
@@ -288,12 +288,21 @@ func SearchApps(query url.Values, limit int, sort string) (apps []App, err error
 		db = db.Order(sort)
 	}
 
+	if len(columns) > 0 {
+		db = db.Select(columns)
+	}
+
 	// Hide ghosts? todo, fix
 	db = db.Where("name != ''")
 
-	// JSON Depth
-	if _, ok := query["json_depth"]; ok {
-		db = db.Where("JSON_DEPTH(genres) = ?", query.Get("json_depth"))
+	// Tags depth
+	if _, ok := query["tags_depth"]; ok {
+		db = db.Where("JSON_DEPTH(tags) = ?", query.Get("tags_depth"))
+	}
+
+	// Genres depth
+	if _, ok := query["genres_depth"]; ok {
+		db = db.Where("JSON_DEPTH(genres) = ?", query.Get("genres_depth"))
 	}
 
 	// Free

@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -26,6 +27,14 @@ func (tag Tag) GetName() (name string) {
 	}
 
 	return tag.Name
+}
+
+func (tag Tag) GetMeanPrice() string {
+	return fmt.Sprintf("%0.2f", tag.MeanPrice/100)
+}
+
+func (tag Tag) GetMeanDiscount() string {
+	return fmt.Sprintf("%0.2f", tag.MeanDiscount)
 }
 
 func GetAllTags() (tags []Tag, err error) {

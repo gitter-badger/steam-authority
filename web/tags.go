@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/Jleagle/go-helpers/logger"
 	"github.com/steam-authority/steam-authority/mysql"
@@ -15,6 +16,11 @@ func TagsHandler(w http.ResponseWriter, r *http.Request) {
 		returnErrorTemplate(w, r, 500, "Error getting tags")
 		return
 	}
+
+	// Sort friends by level desc
+	sort.Slice(tags, func(i, j int) bool {
+		return tags[i].Apps > tags[j].Apps
+	})
 
 	// Template
 	template := tagsTemplate{}

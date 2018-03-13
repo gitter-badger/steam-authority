@@ -14,7 +14,7 @@ import (
 func AppsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get apps
-	apps, err := mysql.SearchApps(r.URL.Query(), 96, "id DESC")
+	apps, err := mysql.SearchApps(r.URL.Query(), 96, "id DESC", []string{})
 	if err != nil {
 		logger.Error(err)
 	}

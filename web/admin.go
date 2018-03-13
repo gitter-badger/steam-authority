@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -116,9 +117,9 @@ func adminDonations(w http.ResponseWriter, r *http.Request) {
 func adminGenres(w http.ResponseWriter, r *http.Request) {
 
 	filter := url.Values{}
-	filter.Set("json_depth", "3")
+	filter.Set("genres_depth", "3")
 
-	apps, err := mysql.SearchApps(filter, 0, "")
+	apps, err := mysql.SearchApps(filter, 0, "", []string{})
 	if err != nil {
 		logger.Error(err)
 	}
@@ -208,18 +209,46 @@ func adminQueues(w http.ResponseWriter, r *http.Request, form url.Values) {
 // todo, handle tags that no longer have any games.
 func adminTags(w http.ResponseWriter, r *http.Request) {
 
-	filter := url.Values{}
-	filter.Set("json_depth", "3")
+	// Get tags names
+	response, err := http.Get("http://store.steampowered.com/tagdata/populartags/english")
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+	defer response.Body.Close()
 
-	apps, err := mysql.SearchApps(filter, 0, "")
+	// Convert to bytes
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	// Unmarshal JSON
+	var resp []steamTag
+	if err := json.Unmarshal(contents, &resp); err != nil {
+		logger.Error(err)
+		return
+	}
+
+	// Make tag map
+	steamTagMap := make(map[int]string)
+	for _, v := range resp {
+		steamTagMap[v.Tagid] = v.Name
+	}
+
+	// Get apps from mysql
+	filter := url.Values{}
+	filter.Set("tags_depth", "2")
+
+	apps, err := mysql.SearchApps(filter, 0, "", []string{"name", "price_final", "price_discount", "tags"})
 	if err != nil {
 		logger.Error(err)
 	}
 
-	// map[player]struct
 	counts := make(map[int]*adminTag)
-
 	for _, app := range apps {
+
 		tags, err := app.GetTags()
 		if err != nil {
 			logger.Error(err)
@@ -227,14 +256,15 @@ func adminTags(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, tag := range tags {
-			//logger.Info(genre.Description)
 
 			if _, ok := counts[tag]; ok {
 				counts[tag].count++
 				counts[tag].totalPrice = counts[tag].totalPrice + app.PriceFinal
 				counts[tag].totalDiscount = counts[tag].totalDiscount + app.PriceDiscount
+				counts[tag].name = steamTagMap[tag]
 			} else {
 				counts[tag] = &adminTag{
+					name:          steamTagMap[tag],
 					count:         1,
 					totalPrice:    app.PriceFinal,
 					totalDiscount: app.PriceDiscount,
@@ -248,6 +278,7 @@ func adminTags(w http.ResponseWriter, r *http.Request) {
 			Apps:         v.count,
 			MeanPrice:    v.GetMeanPrice(),
 			MeanDiscount: v.GetMeanDiscount(),
+			Name:         v.name,
 		})
 		if err != nil {
 			logger.Error(err)
@@ -258,6 +289,7 @@ func adminTags(w http.ResponseWriter, r *http.Request) {
 }
 
 type adminTag struct {
+	name          string
 	count         int
 	totalPrice    int
 	totalDiscount int
@@ -269,6 +301,11 @@ func (t adminTag) GetMeanPrice() float64 {
 
 func (t adminTag) GetMeanDiscount() float64 {
 	return float64(t.totalDiscount) / float64(t.count)
+}
+
+type steamTag struct {
+	Tagid int    `json:"tagid"`
+	Name  string `json:"name"`
 }
 
 func adminRanks(w http.ResponseWriter, r *http.Request) {

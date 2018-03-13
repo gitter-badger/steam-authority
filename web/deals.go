@@ -27,7 +27,8 @@ func DealsHandler(w http.ResponseWriter, r *http.Request) {
 	search.Set("name", "-")
 
 	// Types not in this list will show first
-	apps, err := mysql.SearchApps(search, 1000, "FIELD(`type`,'game','dlc','demo','mod','video','movie','series','episode','application','tool','advertising'), name ASC")
+	sort := "FIELD(`type`,'game','dlc','demo','mod','video','movie','series','episode','application','tool','advertising'), name ASC"
+	apps, err := mysql.SearchApps(search, 1000, sort, []string{})
 	if err != nil {
 		logger.Error(err)
 	}
