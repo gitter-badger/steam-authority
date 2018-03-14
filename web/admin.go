@@ -226,7 +226,6 @@ func adminQueues(w http.ResponseWriter, r *http.Request, form url.Values) {
 		})
 		queue.Produce(queue.PackageQueue, bytes)
 	}
-
 }
 
 // todo, handle tags that no longer have any games.
@@ -381,5 +380,6 @@ func adminRanks(w http.ResponseWriter, r *http.Request) {
 	// Delete leftover keys
 	datastore.BulkDeleteRanks(oldKeys)
 
+	logger.Info("Ranks updated")
 	w.Write([]byte("OK"))
 }

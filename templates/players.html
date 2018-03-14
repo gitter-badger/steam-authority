@@ -52,11 +52,11 @@
                             <img src="/assets/img/flags/{{ .CountryCode }}.png" alt="{{ .CountryCode }}" class="rounded">
                         </td>
                         <td>{{ .Level }}</td>
-                        <td>{{ .Games }}</td>
-                        <td>{{ .Badges }}</td>
+                        <td>{{ .GamesCount }}</td>
+                        <td>{{ .BadgesCount }}</td>
                         <td>{{ .PlayTime }}</td>
-                        <td>{{ .TimeCreated }}</td>
-                        <td>{{ .Friends }}</td>
+                        {{/*<td>{{ .TimeCreated }}</td>*/}}
+                        <td>{{ .FriendsCount }}</td>
                     </tr>
                 {{ end }}
                 </table>
